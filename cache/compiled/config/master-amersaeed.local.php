@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791146642,
-    'checksum' => 'a4299bb7810ea9dbfca1017eef8a499f',
+    'timestamp' => 1791146846,
+    'checksum' => 'ef28f0ffbd5223d46b87c29bea787183',
     'files' => [
         'user/config' => [
             'admin-next' => [
@@ -23,7 +23,7 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791145992
+                'modified' => 1791146845
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
@@ -4250,14 +4250,14 @@ node_modules'
         ],
         'system' => [
             'absolute_urls' => false,
-            'timezone' => '',
+            'timezone' => NULL,
             'default_locale' => NULL,
             'param_sep' => ':',
             'wrapped_site' => false,
             'reverse_proxy_setup' => false,
             'force_ssl' => false,
             'force_lowercase_urls' => true,
-            'custom_base_url' => '',
+            'custom_base_url' => 'https://kaffekos.pk',
             'username_regex' => '^[a-z0-9_-]{3,16}$',
             'pwd_regex' => '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}',
             'intl_enabled' => true,
@@ -4372,13 +4372,13 @@ node_modules'
                     'absolute_urls' => true,
                     'token_header' => true
                 ],
-                'append_url_extension' => '',
+                'append_url_extension' => NULL,
                 'expires' => 604800,
                 'cache_control' => NULL,
                 'last_modified' => false,
                 'etag' => true,
                 'vary_accept_encoding' => false,
-                'redirect_default_code' => 302,
+                'redirect_default_code' => '302',
                 'redirect_trailing_slash' => 1,
                 'redirect_default_route' => 0,
                 'ignore_files' => [
@@ -4418,7 +4418,7 @@ node_modules'
                 'gzip' => false,
                 'allow_webserver_gzip' => false,
                 'redis' => [
-                    'socket' => false,
+                    'socket' => NULL,
                     'password' => NULL,
                     'database' => NULL
                 ]
@@ -4456,7 +4456,7 @@ node_modules'
                 ]
             ],
             'errors' => [
-                'display' => false,
+                'display' => 0,
                 'log' => true
             ],
             'log' => [
@@ -4470,7 +4470,7 @@ node_modules'
                 'enabled' => false,
                 'provider' => 'clockwork',
                 'censored' => false,
-                'token' => '',
+                'token' => NULL,
                 'flex_render_hints' => false,
                 'shutdown' => [
                     'close_connection' => true
@@ -4490,7 +4490,7 @@ node_modules'
                 'cls' => [
                     'auto_sizes' => false,
                     'aspect_ratio' => false,
-                    'retina_scale' => 1
+                    'retina_scale' => '1'
                 ],
                 'defaults' => [
                     'loading' => 'auto',

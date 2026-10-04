@@ -2,36 +2,33 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/config/system.yaml',
-    'modified' => 1791145992,
-    'size' => 379,
+    'modified' => 1791146845,
+    'size' => 360,
     'data' => [
-        'home' => [
-            'alias' => '/home'
-        ],
+        'timezone' => NULL,
+        'custom_base_url' => 'https://kaffekos.pk',
         'pages' => [
-            'theme' => 'kaffekos'
+            'theme' => 'kaffekos',
+            'append_url_extension' => NULL,
+            'redirect_default_code' => '302'
         ],
         'cache' => [
-            'enabled' => true,
-            'check' => [
-                'method' => 'file'
+            'redis' => [
+                'socket' => NULL
             ]
         ],
         'assets' => [
-            'css_pipeline' => false,
-            'js_pipeline' => false,
             'enable_asset_timestamp' => true
         ],
-        'errors' => [
-            'display' => false,
-            'log' => true
-        ],
         'debugger' => [
-            'enabled' => false,
-            'provider' => 'clockwork'
+            'token' => NULL
+        ],
+        'images' => [
+            'cls' => [
+                'retina_scale' => '1'
+            ]
         ],
         'gpm' => [
-            'releases' => 'stable',
             'verify_peer' => true
         ],
         'updates' => [
