@@ -2,7 +2,7 @@
 title: Home
 hero:
     image: hero-facade.jpg
-    focus: 40%
+    focus: 60%
     eyebrow: 'Norwegian Coffee House · Lahore.'
     title: 'Nordic warmth, brewed in Lahore.'
     subtitle: 'Premium Hausbrandt coffee, warm hospitality and a relaxed Scandinavian café feel. A little piece of Norway in the heart of Lahore.'

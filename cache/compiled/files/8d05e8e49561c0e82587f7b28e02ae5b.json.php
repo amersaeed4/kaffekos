@@ -2,11 +2,11 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledJsonFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/data/flex/indexes/pages.json',
-    'modified' => 1791131587,
+    'modified' => 1791140535,
     'size' => 4972,
     'data' => [
         'version' => '1.5',
-        'timestamp' => 1791131587,
+        'timestamp' => 1791140535,
         'count' => 20,
         'index' => [
             '' => [
@@ -28,13 +28,13 @@ return [
                 'key' => 'home',
                 'storage_key' => '01.home',
                 'template' => 'home',
-                'storage_timestamp' => 1791130648,
+                'storage_timestamp' => 1791139192,
                 'markdown' => [
                     '' => [
-                        'home' => 1791130648
+                        'home' => 1791139192
                     ]
                 ],
-                'checksum' => '8b56b164208a98e7959ca6987b25bfb7'
+                'checksum' => 'b55c66c2296f80322145dece5e92c060'
             ],
             '02.about' => [
                 'key' => 'about',
