@@ -15,7 +15,7 @@ intro:
     enabled: true
     eyebrow: Velkommen
     title: 'Welcome to Kaffekos'
-    text: "In Norway, **kos** is the feeling of warmth, comfort and good company. It is a candle on the table, a hot cup in your hands and nowhere else to be.\n\nKaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma and smooth taste, simple Nordic-inspired bites, and a calm, clean space where friends and family can slow down."
+    text: "In Norway, **kos** is the feeling of warmth, comfort and good company. It is a candle on the table, a hot cup in your hands and nowhere else to be.\n\nKaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma and smooth taste, simple Nordic-inspired bites, and a calm, clean space where friends and family can slow down.."
     image: welcome-interior.jpg
     image2: welcome-cappuccino.jpg
     link_label: 'Read our story'
