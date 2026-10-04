@@ -13,3 +13,6 @@
 [2026-10-04T19:07:49.270277+00:00] grav.DEBUG: API client error: Thumbnail not found. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/thumbnails/c7a31da017ada0f422474e8475db4e36.jpg"} []
 [2026-10-04T19:07:52.271632+00:00] grav.DEBUG: API client error: Thumbnail not found. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/thumbnails/c7a31da017ada0f422474e8475db4e36.jpg"} []
 [2026-10-04T19:07:55.305940+00:00] grav.DEBUG: API client error: Thumbnail not found. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/thumbnails/c7a31da017ada0f422474e8475db4e36.jpg"} []
+[2026-10-04T19:49:04.478470+00:00] grav.DEBUG: API client error: Thumbnail not found. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/thumbnails/c7a31da017ada0f422474e8475db4e36.jpg"} []
+[2026-10-04T19:49:23.611766+00:00] grav.DEBUG: Flex: User index updated, 1 objects (0 added, 1 updated, 0 removed). [] []
+[2026-10-04T20:01:34.483954+00:00] grav.DEBUG: API client error: Thumbnail not found. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/thumbnails/c7a31da017ada0f422474e8475db4e36.jpg"} []

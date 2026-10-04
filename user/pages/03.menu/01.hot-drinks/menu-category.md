@@ -1,5 +1,6 @@
 ---
 title: 'Hot Drinks'
+tone: blue
 items:
     -
         name: 'Capo Cappuccino'

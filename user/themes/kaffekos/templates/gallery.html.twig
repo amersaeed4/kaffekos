@@ -1,22 +1,144 @@
 {% extends 'partials/base.html.twig' %}
 {% import 'macros/kk.html.twig' as kk %}
-{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block body_class %}page-gallery{% endblock %}
+
+{# Fun default captions + filter category per photo (matched on file name). A caption added in the page's "photos" list always wins. #}
+{% set cats = {
+    vibes: {label: 'Vibes', emoji: '✨'},
+    sips:  {label: 'Sips',  emoji: '🧋'},
+    bites: {label: 'Bites', emoji: '🥐'},
+    beans: {label: 'Beans', emoji: '🫘'}
+} %}
+{% set meta = {
+    'cappuccino-and-cake.jpg':    {cat: 'sips',  cap: 'main character breakfast'},
+    'chess-night.jpg':            {cat: 'vibes', cap: 'chess night? we’re so back'},
+    'coffee-and-bites.jpg':       {cat: 'bites', cap: 'the duo that never misses'},
+    'coffee-bean-shelf.jpg':      {cat: 'beans', cap: 'bean boutique'},
+    'coffee-beans-can.jpg':       {cat: 'beans', cap: 'fresh beans, zero stress'},
+    'coffee-tin.jpg':             {cat: 'beans', cap: 'tin-credibly cute'},
+    'exterior-evening.jpg':       {cat: 'vibes', cap: 'golden hour hits different'},
+    'exterior-path.jpg':          {cat: 'vibes', cap: 'the walk to your new fave spot'},
+    'exterior-purple-lights.jpg': {cat: 'vibes', cap: 'purple lights = instant glow-up'},
+    'frappe.jpg':                 {cat: 'sips',  cap: 'frappé szn, all year'},
+    'iced-latte.jpg':             {cat: 'sips',  cap: 'iced & unbothered'},
+    'interior-lounge.jpg':        {cat: 'vibes', cap: 'lounge mode: on'},
+    'interior-mezzanine.jpg':     {cat: 'vibes', cap: 'the upstairs hideout'},
+    'interior-seating.jpg':       {cat: 'vibes', cap: 'pick your corner'},
+    'interior-shelf.jpg':         {cat: 'vibes', cap: 'shelfie, but make it cosy'},
+    'interior-window.jpg':        {cat: 'vibes', cap: 'window seat = therapy'},
+    'pastry-display.jpg':         {cat: 'bites', cap: 'pastry case of dreams'},
+    'pastry-plate.jpg':           {cat: 'bites', cap: 'treat yourself, fr'},
+    'snack-platter.jpg':          {cat: 'bites', cap: 'sharing is caring (kinda)'}
+} %}
+{% set ribbon = ['no filter', 'just kos', 'main character energy', 'coffee o’clock', 'good vibes only', 'iced & unbothered', 'sip sip hooray', 'cosy but make it iconic'] %}
+
+{% block hero %}
+{% set photos_count = kk_gallery_photos(page)|length %}
+<section class="gal-hero">
+    <span class="gal-shape gal-star s1" aria-hidden="true"></span>
+    <span class="gal-shape gal-ring s2" aria-hidden="true"></span>
+    <span class="gal-shape gal-star s3" aria-hidden="true"></span>
+    <span class="gal-shape gal-blob s4" aria-hidden="true"></span>
+    <span class="gal-shape gal-ring s5" aria-hidden="true"></span>
+
+    <span class="gal-chip gal-chip-1" aria-hidden="true">📸 <b>{{ photos_count }}</b> pics</span>
+    <span class="gal-chip gal-chip-2" aria-hidden="true">🚫 <b>0</b> filters</span>
+    <span class="gal-chip gal-chip-3" aria-hidden="true">💜 <b>100%</b> kos</span>
+
+    <div class="wrap">
+        {% if header.banner.eyebrow %}<p class="gal-eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
+        <h1 class="gal-title" aria-label="{{ page.title|e('html_attr') }}">
+            {% for ch in page.title|split('') %}<span aria-hidden="true" style="--i: {{ loop.index0 }}">{{ ch == ' ' ? '&nbsp;'|raw : ch }}</span>{% endfor %}
+        </h1>
+        {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
+    </div>
+</section>
+
+<div class="gal-ribbons" aria-hidden="true">
+    <div class="gal-band gal-band-lime">
+        <div class="gal-track">
+            {% for i in 1..2 %}<div class="gal-group">{% for w in ribbon %}<span>{{ w }}</span>{% endfor %}</div>{% endfor %}
+        </div>
+    </div>
+    <div class="gal-band gal-band-pink">
+        <div class="gal-track gal-track-rev">
+            {% for i in 1..2 %}<div class="gal-group">{% for w in ribbon|reverse %}<span>{{ w }}</span>{% endfor %}</div>{% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 {% set photos = kk_gallery_photos(page) %}
-<section class="section">
-    {% if page.content|striptags|trim %}
-        <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
-    {% endif %}
+{% set social = theme_var('social') %}
+<section class="gal-stage">
     <div class="wrap wrap-wide">
-        <div class="gallery" data-gallery>
+        <header class="gal-head">
+            <h2>The <mark>photo dump</mark> 📸</h2>
+            {% if page.content|striptags|trim %}
+                <div class="prose">{{ page.content|raw }}</div>
+            {% else %}
+                <p>Tap a pic to blow it up. Hit the <span class="gal-inline-heart">♥</span> on your faves. Shuffle until it feels right.</p>
+            {% endif %}
+        </header>
+
+        {% if photos|length %}
+        <div class="gal-filters" role="toolbar" aria-label="Filter photos">
+            <div class="gal-chips">
+                <button type="button" class="gal-fchip is-on" data-filter="all" style="--c: var(--g-yellow)" aria-pressed="true">🌈 All</button>
+                {% for key, c in cats %}
+                    <button type="button" class="gal-fchip" data-filter="{{ key }}" style="--c: var(--g-{{ {vibes: 'pink', sips: 'sky', bites: 'orange', beans: 'lime'}[key] }})" aria-pressed="false">{{ c.emoji }} {{ c.label }}</button>
+                {% endfor %}
+                <button type="button" class="gal-fchip" data-filter="saved" style="--c: var(--g-violet)" aria-pressed="false">♥ Saved <span class="gal-saved-n" data-saved-count>0</span></button>
+            </div>
+            <div class="gal-tools">
+                <span class="gal-count" aria-live="polite">Showing <b data-shown>{{ photos|length }}</b> pics</span>
+                <button type="button" class="gal-shuffle" data-shuffle>🎲 Shuffle</button>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="gal-grid gallery" data-gallery>
             {% for ph in photos %}
-                <a class="gallery-item" href="{{ ph.media.cropResize(1800, 1800).quality(82).url }}" data-caption="{{ ph.caption|e('html_attr') }}">
-                    {{ kk.imgfit(ph.media, 700, 1000, ph.caption ?: 'Kaffekos photo') }}
-                    {% if ph.caption %}<span class="gallery-cap">{{ ph.caption }}</span>{% endif %}
-                </a>
+                {% set fname = ph.media.filename %}
+                {% set m = meta[fname]|default({cat: 'vibes', cap: ''}) %}
+                {% set cap = ph.caption ?: m.cap %}
+                <figure class="gal-card" data-cat="{{ m.cat }}" data-id="{{ fname|e('html_attr') }}">
+                    <span class="gal-tape" aria-hidden="true"></span>
+                    <div class="gal-frame">
+                        <div class="gal-photo">
+                            <a class="gallery-item" href="{{ ph.media.cropResize(1800, 1800).quality(82).url }}" data-caption="{{ cap|e('html_attr') }}" aria-label="Open photo{{ cap ? ': ' ~ cap : '' }}">
+                                {{ kk.imgfit(ph.media, 700, 1000, cap ?: 'Kaffekos photo') }}
+                            </a>
+                            <button type="button" class="gal-heart" aria-pressed="false" aria-label="Save this photo">
+                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20.5s-8-4.9-8-11A4.6 4.6 0 0 1 12 6.7 4.6 4.6 0 0 1 20 9.5c0 6.1-8 11-8 11z"/></svg>
+                            </button>
+                        </div>
+                        <figcaption class="gal-cap">
+                            <span class="gal-tag">{{ cats[m.cat].emoji }} {{ cats[m.cat].label }}</span>
+                            {% if cap %}<span class="gal-cap-text">{{ cap }}</span>{% endif %}
+                        </figcaption>
+                    </div>
+                </figure>
             {% else %}
                 <p class="center">Photos coming soon.</p>
             {% endfor %}
+        </div>
+        <p class="gal-empty" hidden>No faves yet. Tap the ♥ on any pic and it lands here 💜</p>
+    </div>
+</section>
+
+<section class="gal-cta">
+    <div class="wrap">
+        <div class="gal-cta-card">
+            <span class="gal-cta-emoji" aria-hidden="true">📱</span>
+            <h2>Your turn <span>✨</span></h2>
+            <p>Snap it, tag us, and your cup might end up on this wall.</p>
+            <div class="gal-cta-actions">
+                {% if social.instagram %}<a class="gal-btn" href="{{ social.instagram }}" target="_blank" rel="noopener">{{ kk.icon('instagram', 20) }} Tag us on Instagram</a>{% endif %}
+                <a class="gal-btn gal-btn-alt" href="{{ url('/menu') }}">🧋 Pick your drink</a>
+            </div>
+            <ul class="gal-tags" aria-label="Hashtags"><li>#kaffekos</li><li>#kos</li><li>#lahorecafe</li><li>#coffeetok</li></ul>
         </div>
     </div>
 </section>
@@ -24,7 +146,7 @@
 <dialog class="lightbox" id="lightbox" aria-label="Photo viewer">
     <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
     <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">&#8249;</button>
-    <figure><img src="" alt=""><figcaption></figcaption></figure>
+    <figure><img src="" alt=""><figcaption><span class="lightbox-text"></span><span class="lightbox-count"></span></figcaption></figure>
     <button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">&#8250;</button>
 </dialog>
 {% endblock %}

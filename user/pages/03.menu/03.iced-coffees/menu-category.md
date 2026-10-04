@@ -1,5 +1,6 @@
 ---
 title: 'Iced Coffees'
+tone: red
 items:
     - { name: 'Milan Mocha' }
     - { name: 'Caramel Latte' }

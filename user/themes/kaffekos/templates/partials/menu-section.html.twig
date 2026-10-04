@@ -1,13 +1,22 @@
-{# One category block. Pass: cat (page), currency, show_images, show_prices #}
-<section class="menu-section" id="{{ cat.slug }}">
-    <header class="menu-section-head">
+{# One category block. Pass: cat (page), currency, show_images, show_prices.
+   Optional per-category header fields: tone (blue | blue-solid | red | red-light), decor (image name in images/menu/) #}
+{% set tone = cat.header.tone ?: 'blue' %}
+{% set decor = cat.header.decor %}
+{% set shown = [] %}
+{% for item in cat.header.items if item.name and not item.soldout %}{% set shown = shown|merge([item]) %}{% endfor %}
+<section class="menu-section menu-block tone-{{ tone }}{{ decor ? ' has-decor' : '' }}" id="{{ cat.slug }}" data-menu-block>
+    <header class="menu-block-head">
         <h2>{{ cat.title }}</h2>
-        {% if cat.header.description %}<p>{{ cat.header.description }}</p>{% endif %}
+        <span class="menu-block-count" aria-hidden="true">{{ shown|length }}</span>
     </header>
-    <div class="menu-grid">
-        {% for item in cat.header.items if item.name and not item.soldout %}
+    {% if cat.header.description %}<p class="menu-block-desc">{{ cat.header.description }}</p>{% endif %}
+    <div class="menu-list">
+        {% for item in shown %}
             {% set image = item.image ? cat.media[item.image] : null %}
             {% include 'partials/menu-item.html.twig' with {item: item, image: image, currency: currency, show_image: show_images, show_price: show_prices} %}
         {% endfor %}
     </div>
+    {% if decor %}
+        <div class="menu-decor" aria-hidden="true"><img src="{{ url('theme://images/menu/' ~ decor ~ '.png') }}" alt="" loading="lazy"></div>
+    {% endif %}
 </section>

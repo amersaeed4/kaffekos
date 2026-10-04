@@ -1,5 +1,7 @@
 ---
 title: 'Matchas'
+tone: red
+decor: matcha-oslo
 items:
     - { name: 'Vanilla Bean Matcha' }
     - { name: 'Strawberry Matcha' }

@@ -4,16 +4,20 @@
 {% set hero = header.hero ?? {} %}
 {% set hero_img = hero.image ? page.media[hero.image] : null %}
 
-{% block body_class %}is-home{% endblock %}
+{% block body_class %}is-home page-home{% endblock %}
 
 {% block og_image %}{% if hero_img %}<meta property="og:image" content="{{ url(kk.imgurl(hero_img, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
 
 {% block hero %}
-<section class="hero"{% if hero_img %} style="--hero: url('{{ kk.imgurlfit(hero_img, 2400, 3200) }}'); --hero-y: {{ hero.focus ?: '40%' }}"{% endif %}>
+<section class="hero hero-fun"{% if hero_img %} style="--hero: url('{{ kk.imgurlfit(hero_img, 2400, 3200) }}'); --hero-y: {{ hero.focus ?: '40%' }}"{% endif %}>
     <div class="hero-shade"></div>
+    <span class="hm-chip hm-chip-1" aria-hidden="true"><b>Kaffe</b> coffee</span>
+    <span class="hm-chip hm-chip-2" aria-hidden="true"><b>Kos</b> cosiness</span>
+    <span class="hm-chip hm-chip-3" aria-hidden="true"><b>Skål</b> cheers</span>
     <div class="wrap hero-content">
         {% if hero.eyebrow %}<p class="eyebrow eyebrow-light">{{ hero.eyebrow }}</p>{% endif %}
-        <h1>{{ hero.title|default(page.title) }}</h1>
+        {% set hw = (hero.title|default(page.title))|split(' ') %}
+        <h1>{% if hw|length > 1 %}{{ hw|slice(0, -1)|join(' ') }} {% endif %}<em>{{ hw|last }}</em></h1>
         {% if hero.subtitle %}<p class="lead">{{ hero.subtitle }}</p>{% endif %}
         <div class="hero-actions">
             {% if hero.btn1_label %}<a class="btn btn-primary btn-lg" href="{{ kk.href(hero.btn1_url ?: '/menu') }}">{{ hero.btn1_label }}</a>{% endif %}
@@ -23,8 +27,18 @@
             <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>Opening hours below</span></p>
         {% endif %}
     </div>
-    <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
 </section>
+<div class="hm-ticker" aria-hidden="true">
+    <div class="hm-ticker-band">
+        <div class="hm-ticker-track">
+            {% for g in 1..2 %}
+                <div class="hm-ticker-group">
+                    {% for w in ['Hausbrandt', 'Kaffe', 'Kos', 'Cinnamon buns', 'Matcha', 'Velkommen', 'Frappes', 'Skål', 'Hausbrandt', 'Kaffe', 'Kos', 'Cinnamon buns', 'Matcha', 'Velkommen', 'Frappes', 'Skål'] %}<span>{{ w }}</span>{% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -34,7 +48,7 @@
 {% if (intro.enabled is null or intro.enabled) and (intro.title or intro.text) %}
     {% set intro_img = intro.image ? page.media[intro.image] : null %}
     {% set intro_img2 = intro.image2 ? page.media[intro.image2] : null %}
-    <section class="section section-welcome">
+    <section class="section section-welcome hm-welcome">
         <div class="wrap split">
             <div class="split-media">
                 {% if intro_img %}<div class="frame">{{ kk.img(intro_img, 720, 860, intro.title) }}</div>{% endif %}
@@ -48,9 +62,9 @@
                     <a class="link-arrow" href="{{ kk.href(intro.link_url ?: '/about') }}">{{ intro.link_label }} {{ kk.icon('arrow', 18) }}</a>
                 {% endif %}
                 {% if intro.stats %}
-                    <ul class="stats">
+                    <ul class="stats hm-stats">
                         {% for s in intro.stats %}
-                            <li><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
+                            <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -97,12 +111,13 @@
 {# ---------------------------------------------------------- HIGHLIGHTS #}
 {% set hl = header.highlights ?? {} %}
 {% if (hl.enabled is null or hl.enabled) and hl.items %}
-    <section class="section section-sand">
+    <section class="section hm-features">
         <div class="wrap">
-            {% include 'partials/section-head.html.twig' with {eyebrow: null, title: hl.title, subtitle: hl.subtitle} %}
-            <div class="features">
+            {% include 'partials/section-head.html.twig' with {eyebrow: 'Why Kaffekos', title: hl.title, subtitle: hl.subtitle} %}
+            <div class="features hm-cards">
+                {% set tones = ['coral', 'lagoon', 'plum', 'navy'] %}
                 {% for f in hl.items %}
-                    <div class="feature">
+                    <div class="feature hm-card hm-card--{{ tones[loop.index0 % 4] }}" data-n="{{ '%02d'|format(loop.index) }}">
                         <div class="feature-icon">{{ kk.icon(f.icon ?: 'cup', 30) }}</div>
                         <h3>{{ f.title }}</h3>
                         <p>{{ f.text }}</p>
@@ -119,15 +134,15 @@
     {% set menu_page = page.find('/menu') %}
     {% set picks = kk_featured_items(menu_page, ft.limit ?: 6) %}
     {% if picks %}
-        <section class="section">
+        <section class="section hm-favs">
             <div class="wrap">
                 {% include 'partials/section-head.html.twig' with {eyebrow: 'From our kitchen', title: ft.title, subtitle: ft.subtitle} %}
-                <div class="menu-grid">
+                <div class="menu-grid hm-fav-grid">
                     {% for pick in picks %}
                         {% include 'partials/menu-item.html.twig' with {item: pick.item, image: pick.image, currency: theme_var('menu.currency'), show_image: true, card: true, show_price: (ft.show_prices ? true : false)} %}
                     {% endfor %}
                 </div>
-                <p class="center"><a class="btn btn-outline" href="{{ menu_page.url }}">{{ ft.button_label ?: 'See the full menu' }}</a></p>
+                <p class="center"><a class="btn btn-primary btn-lg" href="{{ menu_page.url }}">{{ ft.button_label ?: 'See the full menu' }}</a></p>
             </div>
         </section>
     {% endif %}
@@ -137,7 +152,7 @@
 {% set q = header.quote ?? {} %}
 {% if (q.enabled is null or q.enabled) and (q.word or q.text) %}
     {% set q_img = q.image ? page.media[q.image] : null %}
-    <section class="kos"{% if q_img %} style="--kos-bg: url('{{ kk.imgurlfit(q_img, 2000, 2000) }}')"{% endif %}>
+    <section class="kos hm-kos"{% if q_img %} style="--kos-bg: url('{{ kk.imgurlfit(q_img, 2000, 2000) }}')"{% endif %}>
         <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
         <div class="wrap kos-inner">
             <p class="kos-word">{{ q.word }}</p>
@@ -154,17 +169,17 @@
     {% set gpage = page.find('/gallery') %}
     {% set strip = kk_gallery_photos(gpage, ps.count ?: 6) %}
     {% if strip %}
-        <section class="section section-sand">
+        <section class="section hm-strip">
             <div class="wrap">
                 {% include 'partials/section-head.html.twig' with {eyebrow: 'Gallery', title: ps.title, subtitle: ps.subtitle} %}
             </div>
             <div class="wrap wrap-wide">
-                <div class="photo-strip">
+                <div class="photo-strip hm-photos">
                     {% for ph in strip %}
                         <a href="{{ gpage.url }}" class="photo">{{ kk.img(ph.media, 560, 560, ph.caption ?: 'Kaffekos') }}</a>
                     {% endfor %}
                 </div>
-                <p class="center"><a class="btn btn-outline" href="{{ gpage.url }}">View the gallery</a></p>
+                <p class="center"><a class="btn btn-primary btn-lg" href="{{ gpage.url }}">View the gallery</a></p>
             </div>
         </section>
     {% endif %}

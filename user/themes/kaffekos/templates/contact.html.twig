@@ -1,41 +1,111 @@
 {% extends 'partials/base.html.twig' %}
 {% import 'macros/kk.html.twig' as kk %}
-{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block body_class %}page-contact{% endblock %}
+
+{% block hero %}
+{% set bimg = header.banner.image ? page.media[header.banner.image] : null %}
+{% set biz = theme_var('business') %}
+<section class="ct-hero{{ bimg ? ' has-photo' : '' }}"{% if bimg %} style="--banner: url('{{ kk.imgurlfit(bimg, 2000, 2000) }}')"{% endif %}>
+    <span class="ct-chip ct-chip-1" aria-hidden="true"><b>Hei!</b> hello</span>
+    <span class="ct-chip ct-chip-2" aria-hidden="true"><b>Kaffe?</b> coffee?</span>
+    <span class="ct-chip ct-chip-3" aria-hidden="true"><b>Takk</b> thanks</span>
+    <span class="ct-bean ct-bean-1" aria-hidden="true">{{ kk.icon('bean', 64) }}</span>
+    <span class="ct-bean ct-bean-2" aria-hidden="true">{{ kk.icon('cup', 56) }}</span>
+    <div class="wrap">
+        {% if header.banner.eyebrow %}<p class="eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
+        <h1>{% set words = page.title|split(' ') %}{% if words|length > 1 %}{{ words|slice(0, -1)|join(' ') }} {% endif %}<em>{{ words|last }}</em></h1>
+        {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
+        <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>See opening hours below</span></p>
+    </div>
+</section>
+
+{# quick-contact tiles overlapping the bottom of the hero #}
+<div class="wrap ct-quick-wrap">
+    <ul class="ct-quick">
+        {% if biz.phone %}
+            <li><a class="ct-tile ct-tile-red" href="tel:{{ biz.phone|replace({' ': ''}) }}">
+                <span class="ct-tile-icon">{{ kk.icon('phone', 26) }}</span>
+                <small>Call us</small><strong>{{ biz.phone }}</strong>
+            </a></li>
+        {% endif %}
+        {% if biz.whatsapp %}
+            <li><a class="ct-tile ct-tile-green" href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener">
+                <span class="ct-tile-icon">{{ kk.icon('whatsapp', 26) }}</span>
+                <small>WhatsApp</small><strong>Chat with us</strong>
+            </a></li>
+        {% endif %}
+        {% if biz.email %}
+            <li><a class="ct-tile ct-tile-gold" href="mailto:{{ biz.email }}">
+                <span class="ct-tile-icon">{{ kk.icon('mail', 26) }}</span>
+                <small>Email</small><strong>{{ biz.email }}</strong>
+            </a></li>
+        {% endif %}
+        {% if biz.maps_url %}
+            <li><a class="ct-tile ct-tile-navy" href="{{ biz.maps_url }}" target="_blank" rel="noopener">
+                <span class="ct-tile-icon">{{ kk.icon('pin', 26) }}</span>
+                <small>Visit us</small><strong>Get directions</strong>
+            </a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
 {% block content %}
 {% set biz = theme_var('business') %}
+{% set social = theme_var('social') %}
 {% set c = header.contact ?? {} %}
-<section class="section">
+{% set topics = header.form.fields.subject.options ?? {} %}
+<section class="section ct-main">
     {% if page.content|striptags|trim %}
         <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
     {% endif %}
     <div class="wrap contact-grid">
-        <div class="contact-form card">
+        <div class="contact-form card ct-form-card">
+            <span class="ct-stamp" aria-hidden="true">{{ kk.icon('mail', 30) }}</span>
             <h2>{{ c.form_title ?: 'Send us a message' }}</h2>
-            {% if c.form_intro %}<p>{{ c.form_intro }}</p>{% endif %}
+            {% if c.form_intro %}<p class="ct-intro">{{ c.form_intro }}</p>{% endif %}
+            {% if topics|length > 1 %}
+                <div class="ct-topics" data-topics hidden>
+                    <p class="ct-topics-label">Pick a topic</p>
+                    <div class="ct-topics-list">
+                        {% for value, label in topics %}
+                            <button type="button" class="ct-topic" data-topic="{{ value|e('html_attr') }}">{{ label }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
             {% include 'forms/form.html.twig' %}
         </div>
         <aside class="contact-side">
-            <div class="card">
-                <h2>{{ c.info_title ?: 'Find us' }}</h2>
-                <ul class="contact-list">
-                    <li>{{ kk.icon('pin', 22) }}<span>{{ biz.address|e('html')|nl2br }}</span></li>
-                    {% if biz.phone %}<li>{{ kk.icon('phone', 22) }}<a href="tel:{{ biz.phone|replace({' ': ''}) }}">{{ biz.phone }}</a></li>{% endif %}
-                    {% if biz.whatsapp %}<li>{{ kk.icon('whatsapp', 22) }}<a href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener">Message us on WhatsApp</a></li>{% endif %}
-                    {% if biz.email %}<li>{{ kk.icon('mail', 22) }}<a href="mailto:{{ biz.email }}">{{ biz.email }}</a></li>{% endif %}
-                </ul>
-                {% if biz.maps_url %}<a class="btn btn-outline btn-block" href="{{ biz.maps_url }}" target="_blank" rel="noopener">Get directions</a>{% endif %}
-            </div>
-            <div class="card">
-                <h2>{{ kk.icon('clock', 22) }} Opening hours</h2>
+            <div class="card ct-hours">
+                <h2>{{ kk.icon('clock', 26) }} Opening hours</h2>
                 {% include 'partials/hours.html.twig' with {compact: false} %}
-                <p class="open-badge open-badge-dark" data-open-status><span class="dot"></span><span data-open-text></span></p>
+                <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text></span></p>
+            </div>
+            <div class="card ct-hello">
+                <h2>{{ kk.icon('heart', 26) }} Come say hej</h2>
+                <p>Pop in for a cup, bring a book or a friend. The kettle is always on and there is a seat with your name on it.</p>
+                {% set links = {instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn', x: 'X'} %}
+                <ul class="ct-social">
+                    {% for key, name in links %}
+                        {% if social[key] %}
+                            <li><a href="{{ social[key] }}" target="_blank" rel="noopener" aria-label="{{ name }}">{{ kk.icon(key, 20) }}<span>{{ name }}</span></a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
             </div>
         </aside>
     </div>
+
     {% if (c.show_map is null or c.show_map) and biz.lat and biz.lng %}
         <div class="wrap wrap-wide contact-map">
             <iframe title="Map showing the Kaffekos location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
                 src="https://www.google.com/maps?q={{ biz.lat }},{{ biz.lng }}&amp;z=16&amp;output=embed"></iframe>
+            <div class="ct-address">
+                <h2>{{ kk.icon('pin', 24) }} {{ c.info_title ?: 'Find us' }}</h2>
+                <p>{{ biz.address|e('html')|nl2br }}</p>
+                {% if biz.maps_url %}<a class="btn btn-primary btn-block" href="{{ biz.maps_url }}" target="_blank" rel="noopener">Get directions {{ kk.icon('arrow', 18) }}</a>{% endif %}
+            </div>
         </div>
     {% endif %}
 </section>

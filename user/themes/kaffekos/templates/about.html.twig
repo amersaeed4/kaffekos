@@ -1,14 +1,57 @@
 {% extends 'partials/base.html.twig' %}
 {% import 'macros/kk.html.twig' as kk %}
+{% block body_class %}page-about{% endblock %}
 
-{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block hero %}
+{% set bimg = header.banner.image ? page.media[header.banner.image] : null %}
+{% set words = page.title|split(' ') %}
+<section class="ab-hero{{ bimg ? ' has-photo' : '' }}"{% if bimg %} style="--banner: url('{{ kk.imgurlfit(bimg, 2000, 2000) }}')"{% endif %}>
+    <span class="ab-chip ab-chip-1" aria-hidden="true"><b>Kaffe</b> coffee</span>
+    <span class="ab-chip ab-chip-2" aria-hidden="true"><b>Kos</b> cosiness</span>
+    <span class="ab-chip ab-chip-3" aria-hidden="true"><b>Velkommen</b> welcome</span>
+    <div class="wrap">
+        {% if header.banner.eyebrow %}<p class="eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
+        <h1>{% if words|length > 1 %}{{ words|slice(0, -1)|join(' ') }} {% endif %}<em>{{ words|last }}</em></h1>
+        {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
+    </div>
+</section>
+<div class="ab-ticker" aria-hidden="true">
+    <div class="ab-ticker-band">
+        <div class="ab-ticker-track">
+            {% for g in 1..2 %}
+                <div class="ab-ticker-group">
+                    {% for w in ['Kaffe', 'Kos', 'Velkommen', 'Takk', 'Skål', 'Kos deg', 'Kaffe', 'Kos', 'Velkommen', 'Takk', 'Skål', 'Kos deg'] %}<span>{{ w }}</span>{% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 {% set story_img = header.story_image ? page.media[header.story_image] : null %}
-<section class="section">
+<section class="section ab-story">
+    <div class="wrap">
+        <div class="ab-eq">
+            <div class="ab-eq-term" style="--r:-3deg; background: var(--ab-green)"><b>Kaffe</b><small>coffee</small></div>
+            <span class="ab-eq-op" aria-hidden="true">+</span>
+            <div class="ab-eq-term" style="--r:2deg; background: var(--ab-coral)"><b>Kos</b><small>cosiness</small></div>
+            <span class="ab-eq-op" aria-hidden="true">=</span>
+            <div class="ab-eq-term is-sum" style="--r:-2deg"><b>Kaffekos</b><small>our little corner of Norway</small></div>
+        </div>
+    </div>
     <div class="wrap {{ story_img ? 'split' : 'wrap-narrow' }}">
         {% if story_img %}
-            <div class="split-media"><div class="frame">{{ kk.img(story_img, 720, 860, page.title) }}</div></div>
+            <div class="split-media ab-photo">
+                <div class="ab-photo-card">{{ kk.img(story_img, 720, 860, page.title) }}</div>
+                <div class="ab-badge" aria-hidden="true">
+                    <svg class="ring" viewBox="0 0 120 120">
+                        <defs><path id="ab-circ" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs>
+                        <text><textPath href="#ab-circ" textLength="290" lengthAdjust="spacing">KOS · KAFFE · KOS · KAFFE · KOS · </textPath></text>
+                    </svg>
+                    {{ kk.icon('heart', 34) }}
+                </div>
+            </div>
         {% endif %}
         <div class="split-text prose">{{ page.content|raw }}</div>
     </div>
@@ -16,16 +59,17 @@
 
 {% set vals = header.values ?? {} %}
 {% if vals.items %}
-<section class="section section-sand">
+<section class="section ab-values">
     <div class="wrap">
-        {% include 'partials/section-head.html.twig' with {eyebrow: null, title: vals.title, subtitle: null} %}
-        <div class="features">
+        {% include 'partials/section-head.html.twig' with {eyebrow: 'Våre verdier · Our values', title: vals.title, subtitle: null} %}
+        <div class="ab-cards">
+            {% set tones = ['green', 'coral', 'plum', 'lagoon'] %}
             {% for f in vals.items %}
-                <div class="feature">
-                    <div class="feature-icon">{{ kk.icon(f.icon ?: 'heart', 30) }}</div>
+                <article class="ab-card ab-card--{{ f.tone ?: tones[(loop.index0) % 4] }}" data-n="{{ '%02d'|format(loop.index) }}">
+                    <div class="ab-card-icon">{{ kk.icon(f.icon ?: 'heart', 30) }}</div>
                     <h3>{{ f.title }}</h3>
                     <p>{{ f.text }}</p>
-                </div>
+                </article>
             {% endfor %}
         </div>
     </div>
@@ -53,6 +97,22 @@
     </div>
 </section>
 {% endif %}
+
+<section class="ab-hello">
+    <div class="wrap ab-hello-grid">
+        <div class="ab-hello-art" aria-hidden="true">
+            <img src="{{ url('theme://images/menu/cup-hug.png') }}" alt="" loading="lazy">
+        </div>
+        <div class="ab-hello-text">
+            <h2>Velkommen.<br><em>Kos deg!</em></h2>
+            <p>Welcome. Make yourself at home, there is always a seat and a warm cup waiting.</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary btn-lg" href="{{ url('/menu') }}">Explore the menu</a>
+                <a class="btn btn-ghost btn-lg" href="{{ url('/contact') }}">Find us</a>
+            </div>
+        </div>
+    </div>
+</section>
 
 {% include 'partials/visit.html.twig' with {eyebrow: 'Velkommen', title: 'Come say hello', text: ''} %}
 {% endblock %}

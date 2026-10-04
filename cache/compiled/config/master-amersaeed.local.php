@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791142301,
-    'checksum' => '2d296b99578786cd16fedb7c974cb25c',
+    'timestamp' => 1791143910,
+    'checksum' => '5a3c6539c7f1f4563792c2cc8a297f79',
     'files' => [
         'user/config' => [
             'media' => [
@@ -19,11 +19,11 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791141390
+                'modified' => 1791143910
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
-                'modified' => 1791141390
+                'modified' => 1791143910
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',

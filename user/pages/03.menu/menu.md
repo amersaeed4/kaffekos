@@ -1,5 +1,6 @@
 ---
-title: Menu
+title: 'Drinks Menu'
+menu: Menu
 banner:
     eyebrow: 'Meny'
     subtitle: 'Coffee, matcha, shakes and more, made with care.'

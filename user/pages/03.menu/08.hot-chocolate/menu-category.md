@@ -1,5 +1,6 @@
 ---
 title: 'Hot Chocolate'
+tone: red
 items:
     -
         name: 'Signature Hot Chocolate'

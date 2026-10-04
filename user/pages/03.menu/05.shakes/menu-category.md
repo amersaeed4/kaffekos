@@ -1,5 +1,6 @@
 ---
 title: 'Shakes'
+tone: blue
 items:
     - { name: 'Strawberry & Cream' }
     - { name: 'Cookies & Cream' }

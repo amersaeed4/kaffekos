@@ -1,10 +1,24 @@
 {% extends 'partials/base.html.twig' %}
-{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block body_class %}page-menu{% endblock %}
+{% block hero %}
+<section class="menu-hero">
+    <div class="wrap">
+        {% if header.banner.eyebrow %}<p class="eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
+        <h1>{{ page.title }}</h1>
+        {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
+        <label class="menu-search">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="menu-search" placeholder="Search the menu: latte, matcha, mocha…" autocomplete="off" aria-label="Search the menu">
+        </label>
+    </div>
+    <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
+</section>
+{% endblock %}
 {% block content %}
 {% set cats = page.children.published %}
 {% set show_images = header.menu_options.show_images is null or header.menu_options.show_images %}
 {% set show_prices = header.menu_options.show_prices is null or header.menu_options.show_prices %}
-<section class="section">
+<section class="section menu-poster">
     {% if page.content|striptags|trim %}
         <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
     {% endif %}
@@ -12,18 +26,34 @@
     {% if cats|length > 1 %}
         <nav class="menu-tabs" aria-label="Menu categories">
             <div class="wrap">
-                {% for cat in cats %}<a href="#{{ cat.slug }}">{{ cat.title }}</a>{% endfor %}
+                {% for cat in cats %}<a href="#{{ cat.slug }}" class="tab-{{ cat.header.tone ?: 'blue' }}">{{ cat.title }}</a>{% endfor %}
             </div>
         </nav>
     {% endif %}
 
-    <div class="wrap wrap-menu">
-        {% for cat in cats %}
-            {% include 'partials/menu-section.html.twig' with {cat: cat, currency: theme_var('menu.currency'), show_images: show_images, show_prices: show_prices} %}
-        {% else %}
-            <p class="center">The menu is being prepared. Please check back soon.</p>
-        {% endfor %}
-        {% if header.menu_options.note %}<p class="menu-note">{{ header.menu_options.note }}</p>{% endif %}
+    <div class="wrap wrap-menu-poster">
+        <div class="menu-blocks">
+            {% for cat in cats %}
+                {% include 'partials/menu-section.html.twig' with {cat: cat, currency: theme_var('menu.currency'), show_images: show_images, show_prices: show_prices} %}
+            {% else %}
+                <p class="center">The menu is being prepared. Please check back soon.</p>
+            {% endfor %}
+            {% if cats|length is odd and cats|length > 1 %}
+                <aside class="menu-block menu-filler" aria-hidden="true">
+                    <img src="{{ url('theme://images/menu/chef.png') }}" alt="" loading="lazy">
+                    <p>Coffee. Comfort. Connection.</p>
+                </aside>
+            {% endif %}
+        </div>
+        <p class="menu-empty" id="menu-empty" hidden>Nothing matches your search. Try another word.</p>
+
+        <div class="menu-closing">
+            <img src="{{ url('theme://images/menu/norway.png') }}" alt="" loading="lazy">
+            <div>
+                <p class="menu-closing-title">Made with kos.</p>
+                {% if header.menu_options.note %}<p>{{ header.menu_options.note }}</p>{% endif %}
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}

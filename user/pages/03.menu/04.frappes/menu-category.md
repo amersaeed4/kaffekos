@@ -1,5 +1,6 @@
 ---
 title: Frappes
+tone: red-light
 items:
     -
         name: 'Milan Mocha Frappe'

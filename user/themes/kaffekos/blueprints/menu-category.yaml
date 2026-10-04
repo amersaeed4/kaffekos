@@ -20,6 +20,27 @@ form:
               type: textarea
               rows: 2
               label: Short description (optional)
+            header.tone:
+              type: select
+              label: Colour style
+              help: 'How this category looks on the Menu page.'
+              default: blue
+              options:
+                blue: 'Blue heading, light rows'
+                blue-solid: 'Blue heading, blue rows'
+                red: 'Red heading, red rows'
+                red-light: 'Red heading, light rows'
+            header.decor:
+              type: select
+              label: Illustration (optional)
+              help: 'A small drawing shown at the bottom of the category card.'
+              default: ''
+              options:
+                '': None
+                matcha-oslo: 'Matcha cup and stamp'
+                cup-hug: 'Hugging a cup'
+                chef: 'Chef on a croissant'
+                norway: 'Norway stamp'
         items:
           type: tab
           title: Menu Items

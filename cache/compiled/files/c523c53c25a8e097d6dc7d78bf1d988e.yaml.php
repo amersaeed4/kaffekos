@@ -2,8 +2,8 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/accounts/gadmin.yaml',
-    'modified' => 1791101325,
-    'size' => 440,
+    'modified' => 1791143139,
+    'size' => 460,
     'data' => [
         'state' => 'enabled',
         'email' => 'mas@amersaeed.com',
@@ -33,7 +33,8 @@ return [
         'api_tokens_valid_after' => 1791099268,
         'admin_next' => [
             'preferences' => [
-                'pagesViewMode' => 'tree'
+                'pagesViewMode' => 'tree',
+                'colorMode' => 'dark'
             ]
         ]
     ]

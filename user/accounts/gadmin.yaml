@@ -20,3 +20,4 @@ api_tokens_valid_after: 1791099268
 admin_next:
   preferences:
     pagesViewMode: tree
+    colorMode: dark

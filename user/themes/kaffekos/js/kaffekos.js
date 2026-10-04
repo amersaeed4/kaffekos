@@ -108,10 +108,31 @@
                 if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
             });
         }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-        $$('.section-head, .feature, .menu-item, .menu-section-head, .review, .split-media, .split-text, .photo, .member, .post-card, .card, .visit-info, .visit-map, .kos-inner')
+        $$('.section-head, .feature, .menu-item, .menu-block, .review, .split-media, .split-text, .photo, .member, .post-card, .card, .visit-info, .visit-map, .kos-inner, .ab-card, .ab-eq, .ab-hello-grid, .hm-stat')
             .forEach(function (el) {
                 if (el.getBoundingClientRect().top > window.innerHeight) { el.classList.add('reveal'); io.observe(el); }
             });
+    }
+
+    /* ---------- contact: topic chips drive the subject select ---------- */
+    var topics = $('[data-topics]');
+    var subject = topics && $('.contact-form select[name="data[subject]"]');
+    if (topics && subject) {
+        var chips = $$('[data-topic]', topics);
+        var syncTopics = function () {
+            chips.forEach(function (c) { c.classList.toggle('is-active', c.getAttribute('data-topic') === subject.value); });
+        };
+        chips.forEach(function (c) {
+            c.addEventListener('click', function () {
+                subject.value = c.getAttribute('data-topic');
+                subject.dispatchEvent(new Event('change', { bubbles: true }));
+                var msg = $('.contact-form textarea');
+                if (msg) msg.focus({ preventScroll: true });
+            });
+        });
+        subject.addEventListener('change', syncTopics);
+        topics.hidden = false;
+        syncTopics();
     }
 
     /* ---------- menu: highlight the category you are reading ---------- */
@@ -136,28 +157,193 @@
         $$('.menu-section').forEach(function (s) { spy.observe(s); });
     }
 
-    /* ---------- gallery lightbox ---------- */
-    var box = $('#lightbox');
-    var items = $$('[data-gallery] .gallery-item');
-    if (box && items.length && typeof box.showModal === 'function') {
-        var img = $('img', box), cap_ = $('figcaption', box), cur = 0;
-        var show = function (i) {
-            cur = (i + items.length) % items.length;
-            var a = items[cur];
-            img.src = a.getAttribute('href');
-            img.alt = a.getAttribute('data-caption') || '';
-            cap_.textContent = a.getAttribute('data-caption') || '';
+    /* ---------- menu: live search ---------- */
+    var q = $('#menu-search');
+    if (q) {
+        var blocks = $$('[data-menu-block]'), none = $('#menu-empty');
+        q.addEventListener('input', function () {
+            var term = q.value.trim().toLowerCase(), any = false;
+            blocks.forEach(function (b) {
+                var titleHit = term && b.querySelector('h2').textContent.toLowerCase().indexOf(term) > -1, shown = 0;
+                $$('.menu-item', b).forEach(function (it) {
+                    var hit = !term || titleHit || it.textContent.toLowerCase().indexOf(term) > -1;
+                    it.hidden = !hit; if (hit) shown++;
+                });
+                b.hidden = !shown; if (shown) any = true;
+                b.classList.add('is-visible');
+            });
+            $$('.menu-filler').forEach(function (f) { f.hidden = !!term; });
+            $$('.menu-tabs a').forEach(function (a) { var t = $(a.getAttribute('href')); a.hidden = !!t && t.hidden; });
+            if (none) none.hidden = any || !term;
+        });
+    }
+
+    /* ---------- gallery: filters, shuffle, saved hearts, tilt, lightbox ---------- */
+    var grid = $('[data-gallery]');
+    if (grid) {
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var cards = function () { return $$('.gal-card', grid); };
+        var shown = function () { return cards().filter(function (c) { return !c.hidden; }); };
+        var filterBtns = $$('.gal-fchip');
+        var countEl = $('[data-shown]'), emptyEl = $('.gal-empty'), savedEls = $$('[data-saved-count]');
+        var current = 'all';
+
+        /* saved photos live in this browser only */
+        var KEY = 'kk-gallery-saved', saved = [];
+        try { saved = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { saved = []; }
+        var persist = function () { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* private mode */ } };
+        var paintSaved = function () {
+            cards().forEach(function (c) {
+                var on = saved.indexOf(c.getAttribute('data-id')) > -1, b = $('.gal-heart', c);
+                b.classList.toggle('is-saved', on);
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                b.setAttribute('aria-label', on ? 'Remove from saved' : 'Save this photo');
+            });
+            savedEls.forEach(function (el) { el.textContent = saved.length; });
         };
-        items.forEach(function (a, i) {
-            a.addEventListener('click', function (e) { e.preventDefault(); show(i); box.showModal(); });
+
+        /* entrance pop: staggered, and only for cards that are actually on screen */
+        var popIn = function (list) {
+            if (reduce) return;
+            list.forEach(function (c, i) {
+                c.classList.remove('gal-in', 'gal-pre');
+                void c.offsetWidth;
+                c.style.setProperty('--d', Math.min(i, 8) * 70 + 'ms');
+                c.classList.add('gal-in');
+            });
+        };
+
+        var apply = function (name) {
+            current = name;
+            filterBtns.forEach(function (b) {
+                var on = b.getAttribute('data-filter') === name;
+                b.classList.toggle('is-on', on);
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            cards().forEach(function (c) {
+                c.hidden = !(name === 'all' || (name === 'saved' ? saved.indexOf(c.getAttribute('data-id')) > -1 : c.getAttribute('data-cat') === name));
+            });
+            var vis = shown();
+            if (countEl) countEl.textContent = vis.length;
+            if (emptyEl) emptyEl.hidden = !(name === 'saved' && !vis.length);
+            popIn(vis);
+        };
+        filterBtns.forEach(function (b) { b.addEventListener('click', function () { apply(b.getAttribute('data-filter')); }); });
+
+        var shuffle = $('[data-shuffle]');
+        if (shuffle) {
+            shuffle.addEventListener('click', function () {
+                var list = cards();
+                for (var i = list.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1)), t = list[i]; list[i] = list[j]; list[j] = t;
+                }
+                list.forEach(function (c) { grid.appendChild(c); });
+                shuffle.classList.remove('spin'); void shuffle.offsetWidth; shuffle.classList.add('spin');
+                popIn(shown());
+            });
+        }
+
+        /* heart burst */
+        var burst = function (btn) {
+            if (reduce || !btn.animate) return;
+            var r = btn.getBoundingClientRect(), x0 = r.left + r.width / 2, y0 = r.top + r.height / 2;
+            ['💖', '✨', '💜', '⭐', '💛', '🩷', '✨', '💖'].forEach(function (ch, i) {
+                var p = doc.createElement('span');
+                p.className = 'gal-burst'; p.textContent = ch;
+                p.style.left = x0 + 'px'; p.style.top = y0 + 'px';
+                doc.body.appendChild(p);
+                var ang = (Math.PI * 2 * i) / 8 + Math.random() * 0.6, dist = 50 + Math.random() * 50;
+                p.animate([
+                    { transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 },
+                    { transform: 'translate(calc(-50% + ' + Math.cos(ang) * dist + 'px), calc(-50% + ' + (Math.sin(ang) * dist - 30) + 'px)) scale(1.3) rotate(' + (Math.random() * 80 - 40) + 'deg)', opacity: 0 }
+                ], { duration: 750 + Math.random() * 300, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = function () { p.remove(); };
+            });
+        };
+        grid.addEventListener('click', function (e) {
+            var b = e.target.closest('.gal-heart');
+            if (!b) return;
+            var id = b.closest('.gal-card').getAttribute('data-id'), at = saved.indexOf(id);
+            if (at > -1) saved.splice(at, 1); else { saved.push(id); burst(b); }
+            persist(); paintSaved();
+            filterBtns.forEach(function (f) { if (f.getAttribute('data-filter') === 'saved') { f.classList.remove('bump'); void f.offsetWidth; f.classList.add('bump'); } });
+            if (current === 'saved') apply('saved');
         });
-        $('.lightbox-close', box).addEventListener('click', function () { box.close(); });
-        $('.lightbox-prev', box).addEventListener('click', function () { show(cur - 1); });
-        $('.lightbox-next', box).addEventListener('click', function () { show(cur + 1); });
-        box.addEventListener('click', function (e) { if (e.target === box) box.close(); });
-        box.addEventListener('keydown', function (e) {
-            if (e.key === 'ArrowLeft') show(cur - 1);
-            if (e.key === 'ArrowRight') show(cur + 1);
-        });
+
+        /* tilt toward the pointer (mouse only) */
+        if (!reduce && window.matchMedia('(pointer: fine)').matches) {
+            grid.addEventListener('pointermove', function (e) {
+                var c = e.target.closest('.gal-card');
+                if (!c) return;
+                var r = c.getBoundingClientRect();
+                c.style.setProperty('--rx', ((0.5 - (e.clientY - r.top) / r.height) * 9).toFixed(2) + 'deg');
+                c.style.setProperty('--ry', (((e.clientX - r.left) / r.width - 0.5) * 11).toFixed(2) + 'deg');
+            });
+            grid.addEventListener('pointerout', function (e) {
+                var c = e.target.closest('.gal-card');
+                if (c && !c.contains(e.relatedTarget)) { c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); }
+            });
+        }
+
+        paintSaved();
+
+        /* first paint: pop in what is on screen, hold back the rest until scrolled to */
+        if (!reduce) {
+            var seen = 0;
+            var io2 = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+                var n = 0;
+                entries.forEach(function (en) {
+                    if (en.isIntersecting) {
+                        io2.unobserve(en.target);
+                        en.target.classList.remove('gal-pre');
+                        en.target.style.setProperty('--d', (n++ % 4) * 90 + 'ms');
+                        en.target.classList.add('gal-in');
+                    }
+                });
+            }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 }) : null;
+            cards().forEach(function (c) {
+                if (!io2) return;
+                if (c.getBoundingClientRect().top > window.innerHeight) { c.classList.add('gal-pre'); io2.observe(c); }
+                else { c.style.setProperty('--d', (seen++ % 6) * 90 + 'ms'); c.classList.add('gal-in'); }
+            });
+        }
+
+        /* lightbox: walks through the photos currently shown */
+        var box = $('#lightbox');
+        if (box && typeof box.showModal === 'function') {
+            var fig = $('figure', box), img = $('img', box), txt = $('.lightbox-text', box), num = $('.lightbox-count', box), cur = 0, list = [];
+            var show = function (i) {
+                cur = (i + list.length) % list.length;
+                var card = list[cur], a = $('.gallery-item', card);
+                img.src = a.getAttribute('href');
+                img.alt = a.getAttribute('data-caption') || '';
+                txt.textContent = a.getAttribute('data-caption') || '';
+                num.textContent = (cur + 1) + ' / ' + list.length;
+                fig.style.setProperty('--lb', getComputedStyle(card).getPropertyValue('--c').trim() || '');
+                fig.classList.remove('swap'); void fig.offsetWidth; fig.classList.add('swap');
+            };
+            grid.addEventListener('click', function (e) {
+                var a = e.target.closest('.gallery-item');
+                if (!a) return;
+                e.preventDefault();
+                list = shown();
+                show(list.indexOf(a.closest('.gal-card')));
+                box.showModal();
+            });
+            $('.lightbox-close', box).addEventListener('click', function () { box.close(); });
+            $('.lightbox-prev', box).addEventListener('click', function () { show(cur - 1); });
+            $('.lightbox-next', box).addEventListener('click', function () { show(cur + 1); });
+            box.addEventListener('click', function (e) { if (e.target === box) box.close(); });
+            box.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowLeft') show(cur - 1);
+                if (e.key === 'ArrowRight') show(cur + 1);
+            });
+            var tx = null;
+            box.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+            box.addEventListener('touchend', function (e) {
+                if (tx === null) return;
+                var dx = e.changedTouches[0].clientX - tx; tx = null;
+                if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1));
+            }, { passive: true });
+        }
     }
 })();
