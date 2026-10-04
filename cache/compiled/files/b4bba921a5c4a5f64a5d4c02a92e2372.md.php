@@ -2,8 +2,8 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledMarkdownFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/pages/01.home/home.md',
-    'modified' => 1791131603,
-    'size' => 3898,
+    'modified' => 1791131656,
+    'size' => 3897,
     'data' => [
         'header' => [
             'title' => 'Home',
@@ -25,7 +25,7 @@ return [
                 'title' => 'Welcome to Kaffekos',
                 'text' => 'In Norway, **kos** is the feeling of warmth, comfort and good company. It is a candle on the table, a hot cup in your hands and nowhere else to be.
 
-Kaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma and smooth taste, simple Nordic-inspired bites, and a calm, clean space where friends and family can slow down..',
+Kaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma and smooth taste, simple Nordic-inspired bites, and a calm, clean space where friends and family can slow down.',
                 'image' => 'welcome-interior.jpg',
                 'image2' => 'welcome-cappuccino.jpg',
                 'link_label' => 'Read our story',
@@ -150,7 +150,7 @@ intro:
     enabled: true
     eyebrow: Velkommen
     title: \'Welcome to Kaffekos\'
-    text: "In Norway, **kos** is the feeling of warmth, comfort and good company. It is a candle on the table, a hot cup in your hands and nowhere else to be.\\n\\nKaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma and smooth taste, simple Nordic-inspired bites, and a calm, clean space where friends and family can slow down.."
+    text: "In Norway, **kos** is the feeling of warmth, comfort and good company. It is a candle on the table, a hot cup in your hands and nowhere else to be.\\n\\nKaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma and smooth taste, simple Nordic-inspired bites, and a calm, clean space where friends and family can slow down."
     image: welcome-interior.jpg
     image2: welcome-cappuccino.jpg
     link_label: \'Read our story\'
