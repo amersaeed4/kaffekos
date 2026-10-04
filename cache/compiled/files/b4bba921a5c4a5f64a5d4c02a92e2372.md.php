@@ -2,8 +2,8 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledMarkdownFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/pages/01.home/home.md',
-    'modified' => 1791138495,
-    'size' => 3898,
+    'modified' => 1791139192,
+    'size' => 3899,
     'data' => [
         'header' => [
             'title' => 'Home',
@@ -47,7 +47,7 @@ Kaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma
             ],
             'coffee' => [
                 'enabled' => true,
-                'eyebrow' => 'Our coffee:',
+                'eyebrow' => 'Our coffee::',
                 'title' => 'Brewed exclusively with Hausbrandt',
                 'text' => 'Great coffee starts with the bean. That is why every cup at Kaffekos is made with **Hausbrandt** coffee beans, and only Hausbrandt.
 
@@ -167,7 +167,7 @@ intro:
             label: \'on Google (73 reviews)\'
 coffee:
     enabled: true
-    eyebrow: \'Our coffee:\'
+    eyebrow: \'Our coffee::\'
     title: \'Brewed exclusively with Hausbrandt\'
     text: "Great coffee starts with the bean. That is why every cup at Kaffekos is made with **Hausbrandt** coffee beans, and only Hausbrandt.\\n\\nRoasting coffee in Trieste, Italy since 1892, Hausbrandt is known for premium Italian coffee and for choosing excellence. It is the same standard we hold ourselves to, one cup at a time."
     image: hausbrandt-pack.png
