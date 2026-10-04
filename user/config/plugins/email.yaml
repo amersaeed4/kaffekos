@@ -1,7 +1,4 @@
-enabled: true
 from: info@kaffekos.pk
-from_name: Kaffekos Website
 to: info@kaffekos.pk
+from_name: 'Kaffekos Website'
 to_name: Kaffekos
-mailer:
-    engine: sendmail

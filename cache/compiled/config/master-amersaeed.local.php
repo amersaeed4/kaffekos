@@ -1,9 +1,15 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791146846,
-    'checksum' => 'ef28f0ffbd5223d46b87c29bea787183',
+    'timestamp' => 1791147718,
+    'checksum' => '79b45cae7d3097ba9fc9f2193d30eb6e',
     'files' => [
+        'user/env/amersaeed.local/config' => [
+            'system' => [
+                'file' => 'user/env/amersaeed.local/config/system.yaml',
+                'modified' => 1791147647
+            ]
+        ],
         'user/config' => [
             'admin-next' => [
                 'file' => 'user/config/admin-next.yaml',
@@ -15,7 +21,7 @@ return [
             ],
             'plugins/email' => [
                 'file' => 'user/config/plugins/email.yaml',
-                'modified' => 1791100445
+                'modified' => 1791147078
             ],
             'site' => [
                 'file' => 'user/config/site.yaml',
@@ -23,7 +29,7 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791146845
+                'modified' => 1791147647
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
@@ -4257,7 +4263,7 @@ node_modules'
             'reverse_proxy_setup' => false,
             'force_ssl' => false,
             'force_lowercase_urls' => true,
-            'custom_base_url' => 'https://kaffekos.pk',
+            'custom_base_url' => '',
             'username_regex' => '^[a-z0-9_-]{3,16}$',
             'pwd_regex' => '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}',
             'intl_enabled' => true,

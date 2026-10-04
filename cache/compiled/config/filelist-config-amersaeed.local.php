@@ -3,9 +3,11 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'config',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791146845,
+    'timestamp' => 1791147718,
     'check_interval' => 2,
     'directories' => [
+        '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config' => 1791147713,
+        '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config/plugins' => 1791147713,
         '/Users/amer/Sites/kaffekos1/user/config' => 1791146640,
         '/Users/amer/Sites/kaffekos1/user/config/plugins' => 1791100445,
         '/Users/amer/Sites/kaffekos1/user/config/themes' => 1791145992,
@@ -26,11 +28,12 @@ return [
         '/Users/amer/Sites/kaffekos1/user/themes/kaffekos' => 1791100908
     ],
     'file_mtimes' => [
+        '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config/system.yaml' => 1791147647,
         '/Users/amer/Sites/kaffekos1/user/config/admin-next.yaml' => 1791146640,
         '/Users/amer/Sites/kaffekos1/user/config/media.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/config/plugins/email.yaml' => 1791100445,
+        '/Users/amer/Sites/kaffekos1/user/config/plugins/email.yaml' => 1791147078,
         '/Users/amer/Sites/kaffekos1/user/config/site.yaml' => 1791100445,
-        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791146845,
+        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791147647,
         '/Users/amer/Sites/kaffekos1/user/config/themes/kaffekos.yaml' => 1791143910,
         '/Users/amer/Sites/kaffekos1/user/config/themes/quark2.yaml' => 1791145992,
         '/Users/amer/Sites/kaffekos1/user/config/versions.yaml' => 1791099069,
@@ -56,6 +59,12 @@ return [
         '/Users/amer/Sites/kaffekos1/user/themes/kaffekos/kaffekos.yaml' => 1791129081
     ],
     'files' => [
+        'user/env/amersaeed.local/config' => [
+            'system' => [
+                'file' => 'user/env/amersaeed.local/config/system.yaml',
+                'modified' => 1791147647
+            ]
+        ],
         'user/config' => [
             'admin-next' => [
                 'file' => 'user/config/admin-next.yaml',
@@ -67,7 +76,7 @@ return [
             ],
             'plugins/email' => [
                 'file' => 'user/config/plugins/email.yaml',
-                'modified' => 1791100445
+                'modified' => 1791147078
             ],
             'site' => [
                 'file' => 'user/config/site.yaml',
@@ -75,7 +84,7 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791146845
+                'modified' => 1791147647
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
