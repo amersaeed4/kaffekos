@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791140891,
-    'checksum' => '69d32c4ea027b31f348eb4343a2cead8',
+    'timestamp' => 1791141390,
+    'checksum' => '2d296b99578786cd16fedb7c974cb25c',
     'files' => [
         'user/config' => [
             'media' => [
@@ -19,11 +19,11 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791140891
+                'modified' => 1791141390
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
-                'modified' => 1791140891
+                'modified' => 1791141390
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',
@@ -139,7 +139,7 @@ return [
                 'enabled' => true,
                 'brand' => [
                     'wordmark' => 'Kaffekos',
-                    'tagline' => 'Coffee, Comfort, Connection:'
+                    'tagline' => 'Coffee, Comfort, Connection'
                 ],
                 'header' => [
                     'cta_label' => 'Visit Us',
