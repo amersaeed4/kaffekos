@@ -1,0 +1,6 @@
+---
+deployment:
+	tasks:
+		- export DEPLOYPATH=/home/hqpnorway/kaffekos.pk/
+		- /bin/rsync -av --exclude='/.git' --exclude='/.cpanel.yml' --exclude='/.gitignore' --exclude='/cache' --exclude='/logs' --exclude='/images' --exclude='/assets' --exclude='/backup' --exclude='/tmp' ./ $DEPLOYPATH
+		- /bin/mkdir -p $DEPLOYPATH/cache $DEPLOYPATH/logs $DEPLOYPATH/images $DEPLOYPATH/assets $DEPLOYPATH/backup $DEPLOYPATH/tmp
