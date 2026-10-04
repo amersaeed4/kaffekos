@@ -3,10 +3,10 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'config',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791141390,
+    'timestamp' => 1791142301,
     'check_interval' => 2,
     'directories' => [
-        '/Users/amer/Sites/kaffekos1/user/config' => 1791140846,
+        '/Users/amer/Sites/kaffekos1/user/config' => 1791141833,
         '/Users/amer/Sites/kaffekos1/user/config/plugins' => 1791100445,
         '/Users/amer/Sites/kaffekos1/user/config/themes' => 1791140846,
         '/Users/amer/Sites/kaffekos1/system/config' => 1790904721,
