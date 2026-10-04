@@ -2,11 +2,11 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledJsonFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/data/flex/indexes/pages.json',
-    'modified' => 1791129187,
+    'modified' => 1791129570,
     'size' => 4972,
     'data' => [
         'version' => '1.5',
-        'timestamp' => 1791129187,
+        'timestamp' => 1791129570,
         'count' => 20,
         'index' => [
             '' => [
@@ -234,16 +234,16 @@ return [
                 'key' => 'journal',
                 'storage_key' => '05.journal',
                 'template' => 'blog',
-                'storage_timestamp' => 1791100445,
+                'storage_timestamp' => 1791129205,
                 'markdown' => [
                     '' => [
-                        'blog' => 1791100445
+                        'blog' => 1791129205
                     ]
                 ],
                 'children' => [
-                    '01.welcome-to-kaffekos' => 1791100539
+                    '01.welcome-to-kaffekos' => 1791101559
                 ],
-                'checksum' => '573e686c855478fcbe57334e22e3fd48'
+                'checksum' => 'f69e71ab66e84619fe3110a5d11f9b02'
             ],
             '05.journal/01.welcome-to-kaffekos' => [
                 'key' => 'journal/welcome-to-kaffekos',

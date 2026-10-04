@@ -2,15 +2,15 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledMarkdownFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/pages/03.menu/01.hot-drinks/menu-category.md',
-    'modified' => 1791128432,
-    'size' => 469,
+    'modified' => 1791129613,
+    'size' => 523,
     'data' => [
         'header' => [
             'title' => 'Hot Drinks',
             'items' => [
                 0 => [
                     'name' => 'Capo Cappuccino',
-                    'image' => 'cappuccino.jpg',
+                    'image' => '',
                     'featured' => true
                 ],
                 1 => [
@@ -51,18 +51,33 @@ return [
         ],
         'frontmatter' => 'title: \'Hot Drinks\'
 items:
-    - { name: \'Capo Cappuccino\', image: cappuccino.jpg, featured: true }
-    - { name: \'Flat White\' }
-    - { name: \'Americano\' }
-    - { name: \'Este Espresso\' }
-    - { name: \'Cortado\' }
-    - { name: \'Cafe Latte\' }
-    - { name: \'Milan Mocha\', featured: true }
-    - { name: \'Caramel Latte\' }
-    - { name: \'Hazelnut Latte\' }
-    - { name: \'Toffee Dream Latte\' }
-    - { name: \'Vanilla Bean Latte\' }
-    - { name: \'Spanish Latte\' }',
+    -
+        name: \'Capo Cappuccino\'
+        image: \'\'
+        featured: true
+    -
+        name: \'Flat White\'
+    -
+        name: Americano
+    -
+        name: \'Este Espresso\'
+    -
+        name: Cortado
+    -
+        name: \'Cafe Latte\'
+    -
+        name: \'Milan Mocha\'
+        featured: true
+    -
+        name: \'Caramel Latte\'
+    -
+        name: \'Hazelnut Latte\'
+    -
+        name: \'Toffee Dream Latte\'
+    -
+        name: \'Vanilla Bean Latte\'
+    -
+        name: \'Spanish Latte\'',
         'markdown' => ''
     ]
 ];
