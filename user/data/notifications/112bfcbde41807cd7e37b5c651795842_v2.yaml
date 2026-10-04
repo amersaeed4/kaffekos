@@ -1,0 +1,151 @@
+last_checked: 1791100962
+data:
+  dashboard-row:
+    -
+      id: 215
+      date: '2026-09-14 08:00'
+      type: promo
+      location:
+        - dashboard-row
+      title: KahunaCart
+      message: 'A complete **store inside your Grav site**, now available.'
+      image: 'https://kahunacart.com/user/themes/kahuna-site/images/kahunacart-wordmark-white.svg?v=2'
+      image_height: 38
+      accent: teal
+      layout: joined
+      action:
+        label: 'Learn more'
+        url: 'https://kahunacart.com'
+  feed:
+    -
+      id: 214
+      date: '2026-07-31 12:00'
+      type: info
+      location:
+        - feed
+      icon: 🗣️
+      message: 'Run a real community on your own site with **Forum Pro** for Grav 2, now available.'
+      link: 'https://getgrav.org/premium/forum-pro'
+    -
+      id: 212
+      date: '2026-04-25 12:00'
+      type: info
+      location:
+        - feed
+      icon: 🔌
+      message: '**Grav MCP** — Connect AI agents directly to your Grav site with the new Model Context Protocol server.'
+      link: 'https://github.com/getgrav/grav-mcp'
+    -
+      id: 213
+      date: '2026-04-25 12:00'
+      type: info
+      location:
+        - feed
+      icon: 🤝
+      message: '**Sync for Admin 2** — Real-time collaborative editing in the new Admin: edit pages together, see live cursors, never overwrite a teammate.'
+      link: 'https://getgrav.org/blog/admin-2-sync'
+    -
+      id: 202
+      date: '2025-10-21 11:40'
+      type: info
+      location:
+        - feed
+      icon: 🗺️
+      message: '**AI Translate** — Instant professional-grade translations for Grav Admin.'
+      link: 'https://getgrav.org/premium/ai-translate'
+    -
+      id: 203
+      date: '2025-10-20 11:40'
+      type: info
+      location:
+        - feed
+      icon: 🤖
+      message: '**AI Pro** — Admin AI Assistant powered by OpenAI, Anthropic, Google models and more.'
+      link: 'https://getgrav.org/premium/ai-pro'
+    -
+      id: 204
+      date: '2025-08-28 11:40'
+      type: info
+      location:
+        - feed
+      icon: ✍️
+      message: 'Edit smarter with **Editor Pro**: Modern WYSIWYM editing, live preview, and powerful content tools.'
+      link: 'https://getgrav.org/premium/editor-pro'
+    -
+      id: 205
+      date: '2025-07-30 11:40'
+      type: info
+      location:
+        - feed
+      icon: 🕙
+      message: 'Power up Grav with **Revisions Pro** — track, compare, and revert content and config.'
+      link: 'https://getgrav.org/premium/revisions-pro'
+    -
+      id: 206
+      date: '2025-07-29 11:40'
+      type: info
+      location:
+        - feed
+      icon: 🗳️
+      message: 'Transform your Grav site into an interactive experience with **Polls**.'
+      link: 'https://getgrav.org/premium/polls'
+    -
+      id: 207
+      date: '2025-07-28 11:40'
+      type: info
+      location:
+        - feed
+      icon: 💬
+      message: 'Build a community with **Comments Pro** for Grav, now available.'
+      link: 'https://getgrav.org/premium/comments-pro'
+    -
+      id: 208
+      date: '2024-02-13 11:40'
+      type: info
+      location:
+        - feed
+      icon: 🗜️
+      message: 'Optimize your Grav site with **Image Optimize**, now available.'
+      link: 'https://getgrav.org/premium/image-optimize'
+    -
+      id: 209
+      date: '2024-01-17 15:15'
+      type: info
+      location:
+        - feed
+      icon: ☕️
+      message: 'Support Grav for the price of a coffee a month!'
+      link: 'https://opencollective.com/grav'
+    -
+      id: 211
+      date: '2024-01-05 15:50'
+      type: info
+      location:
+        - feed
+      icon: 💬
+      message: 'The Grav community chat has moved from Slack to **Discord**.'
+      link: 'https://chat.getgrav.org'
+    -
+      id: 210
+      date: '2024-01-05 02:23'
+      type: info
+      location:
+        - feed
+      icon: 🎖
+      message: "Don't forget to star Grav on GitHub!"
+      link: 'https://github.com/getgrav/grav'
+  dashboard:
+    -
+      id: 201
+      date: '2026-02-21 00:01'
+      type: promo
+      location:
+        - dashboard
+      title: 'Grav Premium'
+      message: 'Premium **plugins & themes** from the creators of Grav.'
+      image: 'https://getgrav.org/user/themes/planetoid/images/grav-premium-logo-white.svg'
+      accent: purple
+      layout: joined
+      action:
+        label: 'Learn more'
+        url: 'https://getgrav.org/premium'

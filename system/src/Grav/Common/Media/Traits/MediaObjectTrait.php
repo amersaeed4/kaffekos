@@ -1,0 +1,800 @@
+<?php
+
+/**
+ * @package    Grav\Common\Media
+ *
+ * @copyright  Copyright (c) 2015 - 2026 Trilby Media, LLC. All rights reserved.
+ * @license    MIT License; see LICENSE file for details.
+ */
+
+namespace Grav\Common\Media\Traits;
+
+use Grav\Common\Data\Data;
+use Grav\Common\Media\Interfaces\MediaFileInterface;
+use Grav\Common\Media\Interfaces\MediaLinkInterface;
+use Grav\Common\Media\Interfaces\MediaObjectInterface;
+use Grav\Common\Page\Medium\Medium;
+use Grav\Common\Page\Medium\ThumbnailImageMedium;
+use Grav\Common\Utils;
+use function count;
+use function func_get_args;
+use function in_array;
+use function is_array;
+use function is_string;
+
+/**
+ * Class Medium
+ * @package Grav\Common\Page\Medium
+ *
+ * @property string $mime
+ */
+trait MediaObjectTrait
+{
+    /** @var string */
+    protected $mode = 'source';
+
+    /** @var MediaObjectInterface|null */
+    protected $_thumbnail;
+
+    /** @var array */
+    protected $thumbnailTypes = ['page', 'default'];
+
+    /** @var string|null */
+    protected $thumbnailType;
+
+    /** @var MediaObjectInterface[] */
+    protected $alternatives = [];
+
+    /** @var array */
+    protected $attributes = [];
+
+    /** @var array */
+    protected $styleAttributes = [];
+
+    /** @var array */
+    protected $metadata = [];
+
+    /** @var array */
+    protected $medium_querystring = [];
+
+    /** @var string */
+    protected $timestamp;
+
+    /**
+     * Create a copy of this media object
+     *
+     * @return static
+     */
+    public function copy()
+    {
+        return clone $this;
+    }
+
+    /**
+     * Return just metadata from the Medium object
+     *
+     * @return Data
+     */
+    public function meta()
+    {
+        return new Data($this->getItems());
+    }
+
+    /**
+     * Set querystring to file modification timestamp (or value provided as a parameter).
+     *
+     * @param string|int|null $timestamp
+     * @return $this
+     */
+    public function setTimestamp($timestamp = null)
+    {
+        if (null !== $timestamp) {
+            $this->timestamp = (string)($timestamp);
+        } elseif ($this instanceof MediaFileInterface) {
+            $this->timestamp = (string)$this->modified();
+        } else {
+            $this->timestamp = '';
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns an array containing just the metadata
+     *
+     * @return array
+     */
+    public function metadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * Whether this medium has a `.meta.yaml` sidecar contributing metadata.
+     *
+     * Lets templates and collection queries tell curated media apart from bare
+     * files: `{% if image.hasMeta %}…{% endif %}`.
+     *
+     * @return bool
+     */
+    public function hasMeta()
+    {
+        return !empty($this->metadata);
+    }
+
+    /**
+     * The keys defined in this medium's `.meta.yaml` sidecar.
+     *
+     * Example: `{{ image.metaKeys|join(', ') }}`.
+     *
+     * @return string[]
+     */
+    public function metaKeys()
+    {
+        return array_keys($this->metadata);
+    }
+
+    /**
+     * Add meta file for the medium.
+     *
+     * @param string $filepath
+     */
+    abstract public function addMetaFile($filepath);
+
+    /**
+     * Add alternative Medium to this Medium.
+     *
+     * @param int|float $ratio
+     * @param MediaObjectInterface $alternative
+     */
+    public function addAlternative($ratio, MediaObjectInterface $alternative)
+    {
+        if (!is_numeric($ratio) || $ratio === 0) {
+            return;
+        }
+
+        $alternative->set('ratio', $ratio);
+        $width = $alternative->get('width', 0);
+
+        $this->alternatives[$width] = $alternative;
+    }
+
+    /**
+     * @param bool $withDerived
+     * @return array
+     */
+    public function getAlternatives(bool $withDerived = true): array
+    {
+        $alternatives = [];
+        foreach ($this->alternatives + [$this->get('width', 0) => $this] as $size => $alternative) {
+            if ($withDerived || $alternative->filename === Utils::basename($alternative->filepath)) {
+                $alternatives[$size] = $alternative;
+            }
+        }
+
+        ksort($alternatives, SORT_NUMERIC);
+
+        return $alternatives;
+    }
+
+    /**
+     * Return string representation of the object (html).
+     *
+     * @return string
+     */
+    #[\ReturnTypeWillChange]
+    abstract public function __toString();
+
+    /**
+     * Get/set querystring for the file's url
+     *
+     * @param  string|null  $querystring
+     * @param  bool $withQuestionmark
+     * @return string
+     */
+    public function querystring($querystring = null, $withQuestionmark = true)
+    {
+        if (null !== $querystring) {
+            $this->medium_querystring[] = ltrim($querystring, '?&');
+            foreach ($this->alternatives as $alt) {
+                $alt->querystring($querystring, $withQuestionmark);
+            }
+        }
+
+        if (empty($this->medium_querystring)) {
+            return '';
+        }
+
+        // join the strings
+        $querystring = implode('&', $this->medium_querystring);
+        // explode all strings
+        $query_parts = explode('&', (string) $querystring);
+        // Join them again now ensure the elements are unique
+        $querystring = implode('&', array_unique($query_parts));
+
+        return $withQuestionmark ? ('?' . $querystring) : $querystring;
+    }
+
+    /**
+     * Get the URL with full querystring
+     *
+     * @param string $url
+     * @return string
+     */
+    public function urlQuerystring($url)
+    {
+        $querystring = $this->querystring();
+        if (isset($this->timestamp) && !Utils::contains($querystring, $this->timestamp)) {
+            $querystring = empty($querystring) ? ('?' . $this->timestamp) : ($querystring . '&' . $this->timestamp);
+        }
+
+        return ltrim($url . $querystring . $this->urlHash(), '/');
+    }
+
+    /**
+     * Get/set hash for the file's url
+     *
+     * @param  string|null  $hash
+     * @param  bool $withHash
+     * @return string
+     */
+    public function urlHash($hash = null, $withHash = true)
+    {
+        if ($hash) {
+            $this->set('urlHash', ltrim($hash, '#'));
+        }
+
+        $hash = $this->get('urlHash', '');
+
+        return $withHash && !empty($hash) ? '#' . $hash : $hash;
+    }
+
+    /**
+     * Get an element (is array) that can be rendered by the Parsedown engine
+     *
+     * @param  string|null  $title
+     * @param  string|null  $alt
+     * @param  string|null  $class
+     * @param  string|null  $id
+     * @param  bool $reset
+     * @return array
+     */
+    public function parsedownElement($title = null, $alt = null, $class = null, $id = null, $reset = true)
+    {
+        $attributes = $this->attributes;
+        $items = $this->getItems();
+
+        $style = '';
+        foreach ($this->styleAttributes as $key => $value) {
+            if (is_numeric($key)) { // Special case for inline style attributes, refer to style() method
+                $style .= $value;
+            } else {
+                // Keyed declarations come from media actions such as resize().
+                // Validate the serialized declaration so a value can't carry
+                // extra CSS past the intended property, the same fail-closed
+                // check style() applies. GHSA-ffmg-hfvg-jhg9.
+                $declaration = $key . ': ' . $value;
+                if (self::isSafeStyleValue($declaration)) {
+                    $style .= $declaration . ';';
+                }
+            }
+        }
+        if ($style) {
+            $attributes['style'] = $style;
+        }
+
+        if (empty($attributes['title'])) {
+            if (!empty($title)) {
+                $attributes['title'] = $title;
+            } elseif (!empty($items['title'])) {
+                $attributes['title'] = $items['title'];
+            }
+        }
+
+        if (empty($attributes['alt'])) {
+            if (!empty($alt)) {
+                $attributes['alt'] = $alt;
+            } elseif (!empty($items['alt'])) {
+                $attributes['alt'] = $items['alt'];
+            } elseif (!empty($items['alt_text'])) {
+                $attributes['alt'] = $items['alt_text'];
+            } else {
+                $attributes['alt'] = '';
+            }
+        }
+
+        if (empty($attributes['class'])) {
+            if (!empty($class)) {
+                $attributes['class'] = $class;
+            } elseif (!empty($items['class'])) {
+                $attributes['class'] = $items['class'];
+            }
+        }
+
+        if (empty($attributes['id'])) {
+            if (!empty($id)) {
+                $attributes['id'] = $id;
+            } elseif (!empty($items['id'])) {
+                $attributes['id'] = $items['id'];
+            }
+        }
+
+        switch ($this->mode) {
+            case 'text':
+                $element = $this->textParsedownElement($attributes, false);
+                break;
+            case 'thumbnail':
+                $thumbnail = $this->getThumbnail();
+                $element = $thumbnail ? $thumbnail->sourceParsedownElement($attributes, false) : [];
+                break;
+            case 'source':
+                $element = $this->sourceParsedownElement($attributes, false);
+                break;
+            default:
+                $element = [];
+        }
+
+        if ($reset) {
+            $this->reset();
+        }
+
+        $this->display('source');
+
+        return $element;
+    }
+
+    /**
+     * Get the HTML attributes set on this medium.
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Reset medium.
+     *
+     * @return $this
+     */
+    public function reset()
+    {
+        $this->attributes = [];
+
+        return $this;
+    }
+
+    /**
+     * Add custom attribute to medium.
+     *
+     * Reachable from Markdown via `?attribute=name,value` on image excerpts, so
+     * the attribute NAME is editor-controlled. We restrict it to plain HTML
+     * attribute identifiers (alphanumerics + `-`/`:`/`_`) and reject any name
+     * that would inject script when rendered onto an `<img>` tag — event
+     * handlers (`on*`), inline style, the XML namespace, srcdoc, and the
+     * various `form*` attributes whose URL targets are themselves trusted as
+     * actions. GHSA-r7fx-8g49-7hhr.
+     *
+     * @param string $attribute
+     * @param string $value
+     * @return $this
+     */
+    public function attribute($attribute = null, $value = '')
+    {
+        if (empty($attribute) || !is_string($attribute)) {
+            return $this;
+        }
+        if (!self::isSafeAttributeName($attribute)) {
+            return $this;
+        }
+        $this->attributes[$attribute] = $value;
+        return $this;
+    }
+
+    /** @internal */
+    private static function isSafeAttributeName(string $name): bool
+    {
+        // Strict shape: HTML attribute names are letter-led, then alnum/-/_/:/./$
+        // Anything else (whitespace, quotes, `<>`, etc.) is rejected outright.
+        if (!preg_match('/^[A-Za-z][A-Za-z0-9_:.\-]*$/', $name)) {
+            return false;
+        }
+        $lower = strtolower($name);
+        // Event handlers — primary GHSA-r7fx-8g49-7hhr vector.
+        if (str_starts_with($lower, 'on')) {
+            return false;
+        }
+        // Attribute names that open a scripting context regardless of value.
+        // We deliberately do NOT deny `src` / `href` here — themes legitimately
+        // call `$image->attribute('src', $signed_url)` from PHP, and the
+        // primary script-injection surface is the event-handler family above.
+        $denylist = ['style', 'xmlns', 'srcdoc', 'formaction'];
+        return !in_array($lower, $denylist, true);
+    }
+
+    /**
+     * Switch display mode.
+     *
+     * @param string $mode
+     *
+     * @return MediaObjectInterface|null
+     */
+    public function display($mode = 'source')
+    {
+        if ($this->mode === $mode) {
+            return $this;
+        }
+
+        $this->mode = $mode;
+        if ($mode === 'thumbnail') {
+            $thumbnail = $this->getThumbnail();
+
+            return $thumbnail ? $thumbnail->reset() : null;
+        }
+
+        return $this->reset();
+    }
+
+    /**
+     * Helper method to determine if this media item has a thumbnail or not
+     *
+     * @param string $type;
+     * @return bool
+     */
+    public function thumbnailExists($type = 'page')
+    {
+        $thumbs = $this->get('thumbnails');
+
+        return isset($thumbs[$type]);
+    }
+
+    /**
+     * Switch thumbnail.
+     *
+     * @param string $type
+     * @return $this
+     */
+    public function thumbnail($type = 'auto')
+    {
+        if ($type !== 'auto' && !in_array($type, $this->thumbnailTypes, true)) {
+            return $this;
+        }
+
+        if ($this->thumbnailType !== $type) {
+            $this->_thumbnail = null;
+        }
+
+        $this->thumbnailType = $type;
+
+        return $this;
+    }
+
+    /**
+     * Return URL to file.
+     *
+     * @param bool $reset
+     * @return string
+     */
+    abstract public function url($reset = true, $include_host = false);
+
+    /**
+     * Turn the current Medium into a Link
+     *
+     * @param  bool $reset
+     * @param  array  $attributes
+     * @return MediaLinkInterface
+     */
+    public function link($reset = true, array $attributes = [])
+    {
+        if ($this->mode !== 'source') {
+            $this->display('source');
+        }
+
+        // The image's own HTML attributes stay on the image; Link re-applies them to
+        // the medium it wraps. Only the dimensions are also mirrored onto the anchor,
+        // which is what lightbox scripts read. getgrav/grav#4282.
+        foreach (['width', 'height'] as $key) {
+            if (isset($this->attributes[$key])) {
+                empty($attributes['data-' . $key]) && $attributes['data-' . $key] = $this->attributes[$key];
+            }
+        }
+
+        empty($attributes['href']) && $attributes['href'] = $this->url();
+
+        return $this->createLink($attributes);
+    }
+
+    /**
+     * Turn the current Medium into a Link with lightbox enabled
+     *
+     * @param  int|null  $width
+     * @param  int|null  $height
+     * @param  bool $reset
+     * @return MediaLinkInterface
+     */
+    public function lightbox($width = null, $height = null, $reset = true)
+    {
+        $attributes = ['rel' => 'lightbox'];
+
+        if ($width && $height) {
+            $attributes['data-width'] = $width;
+            $attributes['data-height'] = $height;
+        }
+
+        return $this->link($reset, $attributes);
+    }
+
+    /**
+     * Add a class to the element from Markdown or Twig
+     * Example: ![Example](myimg.png?classes=float-left) or ![Example](myimg.png?classes=myclass1,myclass2)
+     *
+     * @return $this
+     */
+    public function classes()
+    {
+        $classes = func_get_args();
+        if (!empty($classes)) {
+            $this->attributes['class'] = implode(',', $classes);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an id to the element from Markdown or Twig
+     * Example: ![Example](myimg.png?id=primary-img)
+     *
+     * @param string $id
+     * @return $this
+     */
+    public function id($id)
+    {
+        if (is_string($id)) {
+            $this->attributes['id'] = trim($id);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Allows to add an inline style attribute from Markdown or Twig
+     * Example: ![Example](myimg.png?style=float:left)
+     *
+     * Reachable from Markdown via `?style=…` on image excerpts, so the CSS is
+     * editor-controlled and is written verbatim into the rendered
+     * `<img style="…">`. We validate each declaration and silently drop the
+     * whole value if any of it would open a phishing-overlay, clickjacking, or
+     * CSS-exfiltration primitive. This is the sibling sink to the `attribute()`
+     * `style` denylist entry. GHSA-pmf8-g7c8-7v54 (follow-up to
+     * GHSA-r7fx-8g49-7hhr).
+     *
+     * @param string $style
+     * @return $this
+     */
+    public function style($style)
+    {
+        if (!is_string($style) || !self::isSafeStyleValue($style)) {
+            return $this;
+        }
+        $this->styleAttributes[] = rtrim($style, ';') . ';';
+
+        return $this;
+    }
+
+    /**
+     * Validate an editor-supplied inline-style value.
+     *
+     * Inline `<img style="…">` CSS can't break out into a new HTML attribute
+     * (Parsedown runs the value through htmlspecialchars), but unconstrained
+     * CSS is still a stored-content weapon against a higher-privilege viewer:
+     * a full-viewport `position:fixed` overlay (phishing / clickjacking / UI
+     * DoS), or `background:url(…)`-style data exfiltration. We parse the value
+     * into `property: value` declarations and require each one to be benign:
+     *
+     *  - the property is a plain CSS identifier and not a positioning/stacking
+     *    primitive (`position`, `z-index`, `behavior`, `-moz-binding`), and
+     *  - the value contains no `(` (kills `url(…)` / `expression(…)`), no at-rule
+     *    (`@import`), and no markup or quoting characters.
+     *
+     * Anything outside that shape causes the entire value to be rejected, the
+     * same fail-closed behavior as {@see isSafeAttributeName()}.
+     *
+     * @internal
+     */
+    private static function isSafeStyleValue(string $style): bool
+    {
+        foreach (explode(';', $style) as $declaration) {
+            $declaration = trim($declaration);
+            if ($declaration === '') {
+                continue;
+            }
+
+            $parts = explode(':', $declaration, 2);
+            if (count($parts) !== 2) {
+                return false;
+            }
+
+            $property = strtolower(trim($parts[0]));
+            $value = trim($parts[1]);
+
+            // Property must be a plain (optionally vendor-prefixed) CSS
+            // identifier — rejects whitespace, quotes, `<>`, etc.
+            if (!preg_match('/^-?[a-z][a-z-]*$/', $property)) {
+                return false;
+            }
+
+            // Positioning / stacking primitives are the phishing-overlay vector.
+            if (in_array($property, ['position', 'z-index', 'behavior', '-moz-binding'], true)) {
+                return false;
+            }
+
+            // Values may not call functions (`url(…)`, `expression(…)`), open an
+            // at-rule, or carry markup / quoting characters.
+            if (preg_match('/[()<>@{}"\'\\\\]/', $value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Allow any action to be called on this medium from twig or markdown
+     *
+     * @param string $method
+     * @param array $args
+     * @return $this|null
+     */
+    #[\ReturnTypeWillChange]
+    public function __call($method, $args)
+    {
+        $count = count($args);
+        if ($count > 1 || ($count === 1 && !empty($args[0]))) {
+            $method .= '=' . implode(',', array_map(static function ($a) {
+                if (is_array($a)) {
+                    $a = '[' . implode(',', $a) . ']';
+                }
+
+                return rawurlencode($a);
+            }, $args));
+        } elseif ($count === 0 && !Medium::isAllowedAction((string)$method)) {
+            // Twig resolves `{{ image.copyright }}` for a key that is missing from
+            // the medium's `.meta.yaml` by falling through to __call(), so an
+            // unknown bare name used to be appended to the querystring and rewrote
+            // the `src` of the image for every visitor. A zero-argument name that
+            // is not a documented media action now reads as an absent property and
+            // returns null, matching what `{{ image['copyright'] }}` already does.
+            // Documented actions still pass through, and so does everything called
+            // with arguments — including the empty-argument form Markdown uses for
+            // flag-style params such as `![](img.png?myflag)`. getgrav/grav#4301.
+            return null;
+        }
+
+        if (!empty($method)) {
+            $this->querystring($this->querystring(null, false) . '&' . $method);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Parsedown element for source display mode
+     *
+     * @param  array $attributes
+     * @param  bool $reset
+     * @return array
+     */
+    protected function sourceParsedownElement(array $attributes, $reset = true)
+    {
+        return $this->textParsedownElement($attributes, $reset);
+    }
+
+    /**
+     * Parsedown element for text display mode
+     *
+     * @param  array $attributes
+     * @param  bool $reset
+     * @return array
+     */
+    protected function textParsedownElement(array $attributes, $reset = true)
+    {
+        if ($reset) {
+            $this->reset();
+        }
+
+        $text = $attributes['title'] ?? '';
+        if ($text === '') {
+            $text = $attributes['alt'] ?? '';
+            if ($text === '') {
+                $text = $this->get('filename');
+            }
+        }
+
+        return [
+            'name' => 'p',
+            'attributes' => $attributes,
+            'text' => $text
+        ];
+    }
+
+    /**
+     * Get the thumbnail Medium object
+     *
+     * @return ThumbnailImageMedium|null
+     */
+    protected function getThumbnail()
+    {
+        if (null === $this->_thumbnail) {
+            $types = $this->thumbnailTypes;
+
+            if ($this->thumbnailType !== 'auto') {
+                array_unshift($types, $this->thumbnailType);
+            }
+
+            foreach ($types as $type) {
+                $thumb = $this->get("thumbnails.{$type}", false);
+                if ($thumb) {
+                    $image = $thumb instanceof ThumbnailImageMedium ? $thumb : $this->createThumbnail($thumb);
+                    if($image) {
+                        $image->parent = $this;
+                        $this->_thumbnail = $image;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // A thumbnail made from the medium's own file is that same file, so it is
+        // linked the same way: a `url` override on the medium (the page route from
+        // `pages.media_route_urls`, or a media proxy) applies to it too. Without
+        // this the image inside a `lightbox` or `link` pointed at the file on
+        // disk. getgrav/grav#4298.
+        $thumbnail = $this->_thumbnail;
+        if ($thumbnail && $thumbnail->get('filepath') === $this->get('filepath')) {
+            $thumbnail->set('url', $this->get('url'));
+        }
+
+        return $this->_thumbnail;
+    }
+
+    /**
+     * Get value by using dot notation for nested arrays/objects.
+     *
+     * @example $value = $this->get('this.is.my.nested.variable');
+     *
+     * @param string $name Dot separated path to the requested value.
+     * @param mixed $default Default value (or null).
+     * @param string|null $separator Separator, defaults to '.'
+     * @return mixed Value.
+     */
+    abstract public function get($name, mixed $default = null, $separator = null);
+
+        /**
+     * Set value by using dot notation for nested arrays/objects.
+     *
+     * @example $data->set('this.is.my.nested.variable', $value);
+     *
+     * @param string $name Dot separated path to the requested value.
+     * @param mixed $value New value.
+     * @param string|null $separator Separator, defaults to '.'
+     * @return $this
+     */
+    abstract public function set($name, mixed $value, $separator = null);
+
+    /**
+     * @param string $thumb
+     */
+    abstract protected function createThumbnail($thumb);
+
+    /**
+     * @param array $attributes
+     * @return MediaLinkInterface
+     */
+    abstract protected function createLink(array $attributes);
+
+    /**
+     * @return array
+     */
+    abstract protected function getItems(): array;
+}

@@ -1,0 +1,13 @@
+{% import 'macros/kk.html.twig' as kk %}
+{# Opening hours table. Pass compact: true for the footer version #}
+<table class="hours{{ compact ? ' hours-compact' : '' }}" data-hours-table>
+    <tbody>
+    {% for h in theme_var('hours') %}
+        <tr data-day="{{ h.day|lower }}">
+            <th scope="row">{{ compact ? h.day|slice(0, 3) : h.day }}</th>
+            <td>{% if h.closed %}Closed{% else %}{{ kk.time12(h.open) }} &ndash; {{ kk.time12(h.close) }}{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if theme_var('hours_note') %}<p class="hours-note">{{ theme_var('hours_note') }}</p>{% endif %}

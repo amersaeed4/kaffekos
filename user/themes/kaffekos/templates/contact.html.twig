@@ -1,0 +1,42 @@
+{% extends 'partials/base.html.twig' %}
+{% import 'macros/kk.html.twig' as kk %}
+{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block content %}
+{% set biz = theme_var('business') %}
+{% set c = header.contact ?? {} %}
+<section class="section">
+    {% if page.content|striptags|trim %}
+        <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
+    {% endif %}
+    <div class="wrap contact-grid">
+        <div class="contact-form card">
+            <h2>{{ c.form_title ?: 'Send us a message' }}</h2>
+            {% if c.form_intro %}<p>{{ c.form_intro }}</p>{% endif %}
+            {% include 'forms/form.html.twig' %}
+        </div>
+        <aside class="contact-side">
+            <div class="card">
+                <h2>{{ c.info_title ?: 'Find us' }}</h2>
+                <ul class="contact-list">
+                    <li>{{ kk.icon('pin', 22) }}<span>{{ biz.address|e('html')|nl2br }}</span></li>
+                    {% if biz.phone %}<li>{{ kk.icon('phone', 22) }}<a href="tel:{{ biz.phone|replace({' ': ''}) }}">{{ biz.phone }}</a></li>{% endif %}
+                    {% if biz.whatsapp %}<li>{{ kk.icon('whatsapp', 22) }}<a href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener">Message us on WhatsApp</a></li>{% endif %}
+                    {% if biz.email %}<li>{{ kk.icon('mail', 22) }}<a href="mailto:{{ biz.email }}">{{ biz.email }}</a></li>{% endif %}
+                </ul>
+                {% if biz.maps_url %}<a class="btn btn-outline btn-block" href="{{ biz.maps_url }}" target="_blank" rel="noopener">Get directions</a>{% endif %}
+            </div>
+            <div class="card">
+                <h2>{{ kk.icon('clock', 22) }} Opening hours</h2>
+                {% include 'partials/hours.html.twig' with {compact: false} %}
+                <p class="open-badge open-badge-dark" data-open-status><span class="dot"></span><span data-open-text></span></p>
+            </div>
+        </aside>
+    </div>
+    {% if (c.show_map is null or c.show_map) and biz.lat and biz.lng %}
+        <div class="wrap wrap-wide contact-map">
+            <iframe title="Map showing the Kaffekos location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                src="https://www.google.com/maps?q={{ biz.lat }},{{ biz.lng }}&amp;z=16&amp;output=embed"></iframe>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

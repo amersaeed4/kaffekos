@@ -1,0 +1,38 @@
+{% import 'macros/kk.html.twig' as kk %}
+{% set biz = theme_var('business') %}
+{# "Visit us" block: hours + address + map. Pass: eyebrow, title, text #}
+<section class="section section-navy visit">
+    <div class="wrap visit-grid">
+        <div class="visit-info">
+            {% if eyebrow %}<p class="eyebrow eyebrow-light">{{ eyebrow }}</p>{% endif %}
+            <h2>{{ title ?: 'Visit us' }}</h2>
+            {% if text %}<p class="lead">{{ text }}</p>{% endif %}
+
+            <div class="visit-cols">
+                <div>
+                    <h3>{{ kk.icon('pin', 18) }} Address</h3>
+                    <address>{{ biz.address|e('html')|nl2br }}</address>
+                    <p class="visit-links">
+                        {% if biz.phone %}<a href="tel:{{ biz.phone|replace({' ': ''}) }}">{{ biz.phone }}</a>{% endif %}
+                        {% if biz.email %}<a href="mailto:{{ biz.email }}">{{ biz.email }}</a>{% endif %}
+                    </p>
+                </div>
+                <div>
+                    <h3>{{ kk.icon('clock', 18) }} Opening hours</h3>
+                    {% include 'partials/hours.html.twig' with {compact: false} %}
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                {% if biz.maps_url %}<a class="btn btn-primary" href="{{ biz.maps_url }}" target="_blank" rel="noopener">Get directions</a>{% endif %}
+                {% if biz.whatsapp %}<a class="btn btn-ghost" href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener">Chat on WhatsApp</a>{% endif %}
+            </div>
+        </div>
+        <div class="visit-map">
+            {% if biz.lat and biz.lng %}
+                <iframe title="Map showing the Kaffekos location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                    src="https://www.google.com/maps?q={{ biz.lat }},{{ biz.lng }}&amp;z=16&amp;output=embed"></iframe>
+            {% endif %}
+        </div>
+    </div>
+</section>

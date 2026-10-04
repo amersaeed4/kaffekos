@@ -1,0 +1,10 @@
+{% extends 'partials/base.html.twig' %}
+{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block content %}
+<section class="section">
+    <div class="wrap wrap-menu">
+        {% include 'partials/menu-section.html.twig' with {cat: page, currency: theme_var('menu.currency'), show_images: true} %}
+        <p class="center"><a class="btn btn-outline" href="{{ page.parent.url }}">&larr; Back to the full menu</a></p>
+    </div>
+</section>
+{% endblock %}

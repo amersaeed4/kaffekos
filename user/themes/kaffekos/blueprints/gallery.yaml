@@ -1,0 +1,50 @@
+title: Gallery Page
+extends@: default
+
+form:
+  fields:
+    tabs:
+      fields:
+        content:
+          fields:
+            content:
+              label: Introduction (optional)
+            gallery_help:
+              type: spacer
+              title: Easiest way to add photos
+              text: 'Upload photos in Page Media below and save. Every photo uploaded here appears in the gallery automatically. To add captions or control the exact order, use the "Photos & Captions" tab instead.'
+        banner:
+          type: tab
+          title: Page Banner
+          fields:
+            header.banner.image:
+              type: filepicker
+              label: Banner photo (optional)
+              preview_images: true
+              help: 'Wide photo behind the page title. Upload it on the first tab (Page Media) and pick it here. If empty, a warm navy banner with a Nordic pattern is shown.'
+            header.banner.eyebrow:
+              type: text
+              label: Small line above the title
+            header.banner.subtitle:
+              type: textarea
+              rows: 2
+              label: Line under the title
+
+        photos:
+          type: tab
+          title: Photos & Captions
+          fields:
+            header.photos:
+              type: list
+              label: Photos with captions
+              style: vertical
+              collapsed: true
+              help: 'Leave this empty to show all uploaded photos. Once you add one here, only these are shown, in this order.'
+              fields:
+                .image:
+                  type: filepicker
+                  label: Photo
+                  preview_images: true
+                .caption:
+                  type: text
+                  label: Caption (optional)

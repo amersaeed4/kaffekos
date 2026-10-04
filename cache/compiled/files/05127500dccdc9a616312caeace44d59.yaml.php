@@ -1,0 +1,27 @@
+<?php
+return [
+    '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
+    'filename' => '/Users/amer/Sites/kaffekos1/user/plugins/github-markdown-alerts/github-markdown-alerts.yaml',
+    'modified' => 1790904721,
+    'size' => 418,
+    'data' => [
+        'enabled' => true,
+        'include_css' => true,
+        'enable_octicons' => true,
+        'wrapper_class' => 'md-alert md-alert--',
+        'title_class' => 'md-alert-title',
+        'body_class' => 'md-alert-body',
+        'colors' => [
+            'note-border' => '#316dca',
+            'note-title' => '#316dca',
+            'tip-border' => '#347d39',
+            'tip-title' => '#347d39',
+            'important-border' => '#8256d0',
+            'important-title' => '#8256d0',
+            'warning-border' => '#c69026',
+            'warning-title' => '#c69026',
+            'caution-border' => '#c93c37',
+            'caution-title' => '#c93c37'
+        ]
+    ]
+];

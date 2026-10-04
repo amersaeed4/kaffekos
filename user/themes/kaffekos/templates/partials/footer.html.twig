@@ -1,0 +1,64 @@
+{% import 'macros/kk.html.twig' as kk %}
+{% set biz = theme_var('business') %}
+{% set social = theme_var('social') %}
+{% set hours = theme_var('hours') %}
+<footer class="site-footer">
+    <div class="pattern-band" aria-hidden="true"></div>
+    <div class="wrap footer-grid">
+        <div class="footer-brand">
+            <a class="brand brand-light" href="{{ base_url == '' ? '/' : base_url }}">
+                <img src="{{ logo_url }}" alt="" width="52" height="52">
+                <span class="brand-text">
+                    <span class="brand-name">{{ theme_var('brand.wordmark') ?: site.title }}</span>
+                    {% if theme_var('brand.tagline') %}<span class="brand-tag">{{ theme_var('brand.tagline') }}</span>{% endif %}
+                </span>
+            </a>
+            <p>{{ theme_var('footer.about') }}</p>
+            <ul class="social">
+                {% set social_names = {instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn', x: 'X'} %}
+                {% for key in ['instagram', 'facebook', 'tiktok', 'youtube', 'linkedin', 'x'] %}
+                    {% if social[key] %}
+                        <li><a href="{{ social[key] }}" target="_blank" rel="noopener" aria-label="{{ social_names[key] }}">{{ kk.icon(key, 20) }}</a></li>
+                    {% elseif key != 'x' %}
+                        <li><span class="is-soon" title="{{ social_names[key] }} - coming soon" role="img" aria-label="{{ social_names[key] }} (coming soon)">{{ kk.icon(key, 20) }}</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if biz.whatsapp %}
+                    <li><a href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener" aria-label="WhatsApp">{{ kk.icon('whatsapp', 20) }}</a></li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="footer-title">Explore</h3>
+            <ul class="footer-links">
+                {% for p in pages.children.visible %}
+                    <li><a href="{{ p.url }}">{{ p.menu }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="footer-title">Find us</h3>
+            <address class="footer-address">
+                {{ biz.address|e('html')|nl2br }}
+            </address>
+            <ul class="footer-links">
+                {% if biz.phone %}<li><a href="tel:{{ biz.phone|replace({' ': ''}) }}">{{ kk.icon('phone', 16) }} {{ biz.phone }}</a></li>{% endif %}
+                {% if biz.email %}<li><a href="mailto:{{ biz.email }}">{{ kk.icon('mail', 16) }} {{ biz.email }}</a></li>{% endif %}
+                {% if biz.maps_url %}<li><a href="{{ biz.maps_url }}" target="_blank" rel="noopener">{{ kk.icon('pin', 16) }} Get directions</a></li>{% endif %}
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="footer-title">Opening hours</h3>
+            {% include 'partials/hours.html.twig' with {compact: true} %}
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="wrap">
+            <span>&copy; {{ 'now'|date('Y') }} {{ theme_var('footer.copyright') }}</span>
+            {% if theme_var('footer.tagline') %}<span class="footer-kos">{{ theme_var('footer.tagline') }}</span>{% endif %}
+        </div>
+    </div>
+</footer>

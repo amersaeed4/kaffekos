@@ -1,0 +1,215 @@
+# XSS heuristics (Security::detectXss and friends).
+#
+# These settings tune a DENYLIST. It is advisory defense-in-depth for catching
+# careless content early and for auditing existing content with `bin/grav
+# security` — it is NOT the control that protects Grav against XSS, and it will
+# never be complete. Escaping at output is the real boundary: Twig autoescaping,
+# the Twig sandbox (twig_sandbox below), and the DOM sanitizer for SVG.
+#
+# Do not loosen these expecting output escaping to compensate, and do not treat a
+# clean scan as proof that content is safe to emit raw. If you found a payload
+# these patterns miss, see the note in Security.php before filing it as a
+# vulnerability — the fix belongs at whatever sink renders it unescaped.
+xss_whitelist:
+  - admin.super
+xss_enabled:
+  on_events: true
+  invalid_protocols: true
+  moz_binding: true
+  html_inline_styles: true
+  dangerous_tags: true
+xss_invalid_protocols:
+  - javascript
+  - livescript
+  - vbscript
+  - mocha
+  - feed
+  - data
+xss_dangerous_tags:
+  - applet
+  - meta
+  - xml
+  - blink
+  - link
+  - style
+  - script
+  - embed
+  - object
+  - iframe
+  - frame
+  - frameset
+  - ilayer
+  - layer
+  - bgsound
+  - title
+  - base
+  - isindex
+  # GHSA-w8cg-7jcj-4vv2: svg/math allow inline scripting via XML namespaces
+  # and event-handler attributes; flag them as dangerous in user-editable
+  # content so the on_events regex bypass (now fixed for GHSA-9695) has
+  # belt-and-suspenders coverage.
+  - svg
+  - math
+uploads_dangerous_extensions:
+  - php
+  - php2
+  - php3
+  - php4
+  - php5
+  - phar
+  - phtml
+  - html
+  - htm
+  - shtml
+  - shtm
+  - js
+  - exe
+  # GHSA-w4rc-p66m-x6qq: writing these into a page directory (e.g. via a
+  # form upload with destination: self@) turns an upload into arbitrary
+  # page-content takeover. Block by default alongside the Form 9.1.0 fix.
+  - md
+  - yaml
+  - yml
+  - json
+  - twig
+  - ini
+  # GHSA-66xf-ggf4-6hmc: the browser renders these and runs the script in
+  # them exactly as it does for the html/htm/shtml entries above, so an
+  # upload under one of these names is stored XSS. `.svgz` is an SVG the
+  # sanitizer cannot read, being gzipped, so it is denied outright.
+  - xhtml
+  - xht
+  - svgz
+  # Same reasoning as the php/php2-5 entries: a server whose PHP handler is
+  # mapped over these suffixes executes them.
+  - php7
+  - php8
+  - pht
+  - phtm
+  - phps
+sanitize_svg: true
+# Content security for editor-authored page content.
+#
+# Editor Twig can assemble markup the raw-source validator can't see — a payload
+# built at render time from string concatenation, e.g. `{{ "on" ~ "error" }}` or
+# `<s{{ "c"~"r"~"i"~"p"~"t" }}>`, passes the blueprint XSS validator (it inspects
+# the source) and would resolve to a live `onerror=`/`<script>`. Grav closes that
+# gap at SAVE time: Security::detectXssInEditorContent renders the sandboxed
+# content-Twig pass in isolation and rejects the save if it produces flagged
+# markup. Because that check runs before any shortcode/plugin/theme markup is
+# assembled, it only ever inspects the editor's own output — trusted plugin
+# markup can never trip it, and there is no render-time cost. (GHSA-2c4f-86xc-cr74)
+
+# Twig in Content — gate for editor-authored Twig inside page content.
+# Applies to Twig::processPage() and Twig::processString(). Theme templates
+# on disk are unaffected by these settings.
+#
+# Three layers, evaluated in order:
+#
+#   1. twig_content.process_enabled — the master gate. If false, page-content
+#      Twig is not parsed at all. `process: { twig: true }` in frontmatter
+#      and `system.pages.frontmatter.process_twig` in system.yaml are both
+#      ignored. Ships enabled since 2.0.19 — set it to false to close Twig
+#      in content site-wide. This gate also provides the per-page default
+#      for `process.twig`, so with it on, Twig in content renders across the
+#      site with no frontmatter at all (per-page frontmatter still overrides).
+#   2. twig_sandbox.enabled — when the gate is open, restricts what page-
+#      content Twig can do (allowlisted tags / filters / functions / methods
+#      / properties below). Violations soft-fail with a placeholder + a
+#      logs/security.log entry. Disabling the sandbox removes the only layer
+#      of SSTI protection on editor-authored content — any site member with
+#      page-edit access (or anyone who compromises the file system) can
+#      execute arbitrary PHP via Twig.
+#   3. twig_sandbox.config_denied_paths — when the sandbox is on and
+#      twig_content.config_access is true, redacts specific config subtrees
+#      from the `config` Twig variable.
+#
+# twig_content.editor_enabled: when false (default), only users with the
+# `admin.pages_twig` permission can toggle `process: twig` in the page
+# editor. When true, anyone with page-edit access can.
+#
+# twig_content.config_access: when false (default), the `config` Twig
+# variable is empty inside sandboxed renders. When true, `config` is the
+# SandboxConfig facade with config_denied_paths redaction applied.
+twig_content:
+  process_enabled: true
+  editor_enabled: false
+  config_access: false
+
+twig_sandbox:
+  enabled: true
+  # Twig sandbox allowlists & config redaction now ship as code defaults in
+  # Grav\Common\Twig\Sandbox\SandboxDefaults (security-config audit 2026-08-12).
+  # Keeping the ~300-line security baseline out of this user-editable file fixes
+  # a real hazard: Grav merges leaf lists by REPLACEMENT, so a site that copied a
+  # list here to tweak it used to freeze that list against every later core
+  # change, including security tightenings. The keys below are now purely
+  # ADDITIVE over the defaults: a site can only widen the policy, never silently
+  # drop a shipped entry. To TIGHTEN below the defaults, name the members under
+  # the matching `denied_*` key. View the effective policy in the Admin "Twig in
+  # Content" report.
+  #
+  # Additive widenings use the same shapes as the defaults: flat lists for
+  # tags/filters/functions; list-of-rows (`- class:` / `methods:`) for
+  # methods/properties. Plugins may also append via onBuildTwigSandboxPolicy.
+  allowed_tags: []
+  allowed_filters: []
+  allowed_functions: []
+  allowed_methods: []
+  allowed_properties: []
+  # Explicit tightening below the shipped defaults. A denied_* entry wins over
+  # the defaults, over allowed_* additions, and over plugin event additions.
+  # tags/filters/functions: flat lists of member names. methods/properties:
+  # list-of-rows; a row whose `methods:` is '*' denies the whole class.
+  denied_tags: []
+  denied_filters: []
+  denied_functions: []
+  denied_methods: []
+  denied_properties: []
+  # Extra dot-notation config prefixes to redact from sandboxed renders, ADDED
+  # to the built-in defaults (plugins, streams, security, backups, scheduler,
+  # system.cache.redis.password — see SandboxDefaults::configDeniedPaths).
+  # e.g. a plugin that stores secrets under `site.integrations.*`.
+  # (GHSA-j274-39qw-32c9, GHSA-p597-crqc-m349)
+  config_denied_paths: []
+# Constraints applied to the Twig `read_file()` function. The function is
+# enforced to operate only on Grav stream URIs (e.g. `theme://foo.md`); raw
+# filesystem paths are always rejected. After the stream is resolved the
+# resulting realpath must live inside a realpath of one of the stream's
+# configured roots — this is the actual traversal defence and is immune to
+# encoded `..` tricks because every form of traversal collapses to a single
+# canonical absolute path.
+read_file:
+  # Streams that read_file may resolve. Defaults cover content-reading needs
+  # (active theme, all themes, page tree, user data) without exposing
+  # accounts, configs, logs, cache, vendor, system, etc. Add more carefully.
+  # `user-data` is deliberately absent: user://data is application state (form
+  # submissions, scheduler history, notifications), not content, and a page
+  # editor is not granted read access to it. A site that genuinely keeps
+  # includable content there can add it back, accepting that everything else
+  # under user://data becomes readable at the same time.
+  allowed_streams:
+    - theme
+    - themes
+    - page
+  # File extensions read_file will read. Restricted to text/content formats
+  # by design — adding `php`, `yaml`, `env`, `htaccess`, etc. here is a
+  # foot-gun and not recommended.
+  allowed_extensions:
+    - md
+    - markdown
+    - txt
+    - html
+    - htm
+    - css
+    - json
+    - csv
+    - xml
+    - svg
+  # Maximum file size in bytes. Files larger than this return false rather
+  # than being slurped into memory. Set to 0 to disable the size cap.
+  max_size: 1048576
+# NOTE: `salt:` was removed in v2.0.0-beta.2 (GHSA-3f29-pqwf-v4j4). The equivalent
+# HMAC key is now stored in `user/config/security-private.php`, outside the Config
+# tree, so sandboxed Twig cannot read it via `grav.config.get(...)`. On upgrade,
+# any legacy `salt:` in `user/config/security.yaml` is migrated automatically.

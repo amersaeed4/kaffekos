@@ -1,0 +1,9 @@
+{# Centered section heading. Pass: eyebrow, title, subtitle, light #}
+{% if eyebrow or title or subtitle %}
+<div class="section-head{{ light ? ' on-dark' : '' }}">
+    {% if eyebrow %}<p class="eyebrow">{{ eyebrow }}</p>{% endif %}
+    {% if title %}<h2>{{ title }}</h2>{% endif %}
+    {% if subtitle %}<p class="lead">{{ subtitle }}</p>{% endif %}
+    <div class="knot" aria-hidden="true"><span></span></div>
+</div>
+{% endif %}

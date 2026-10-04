@@ -1,0 +1,379 @@
+<?php
+
+/**
+ * @package    Grav\Common\File
+ *
+ * @copyright  Copyright (c) 2015 - 2026 Trilby Media, LLC. All rights reserved.
+ * @license    MIT License; see LICENSE file for details.
+ */
+
+namespace Grav\Common\File;
+
+use Exception;
+use Grav\Common\Debugger;
+use Grav\Common\Grav;
+use Grav\Common\Utils;
+use RocketTheme\Toolbox\File\PhpFile;
+use RuntimeException;
+use Throwable;
+use function function_exists;
+use function get_class;
+
+/**
+ * Trait CompiledFile
+ * @package Grav\Common\File
+ */
+trait CompiledFile
+{
+    /**
+     * Get/set parsed file contents.
+     *
+     * @param mixed $var
+     * @return array
+     */
+    public function content(mixed $var = null)
+    {
+        try {
+            $filename = $this->filename;
+            // If nothing has been loaded, attempt to get pre-compiled version of the file first.
+            if ($var === null && $this->raw === null && $this->content === null) {
+                // Read straight from the source, without reading or writing a compiled file.
+                if (!$this->usesCompiledCache()) {
+                    $this->content = $this->readUncompiled();
+
+                    return parent::content($var);
+                }
+
+                $key = md5($filename);
+                $file = PhpFile::instance(CACHE_DIR . "compiled/files/{$key}{$this->extension}.php");
+                $cacheFilename = $file->filename();
+
+                // Always check file modification time for cache invalidation.
+                // This respects Grav's cache.check.method setting and user expectations.
+                // filemtime() is cheap and ensures changes are detected.
+                $modified = $this->modified();
+
+                $class = get_class($this);
+                $corrupt = false;
+
+                // Fast path: include the compiled file directly (served from opcache when
+                // enabled) and use it as long as it still matches the source file.
+                if ($modified && is_file($cacheFilename)) {
+                    try {
+                        $cache = (array)include $cacheFilename;
+
+                        if (($cache['@class'] ?? null) === $class
+                            && ($cache['modified'] ?? null) === $modified
+                            && ($cache['filename'] ?? null) === $filename
+                            && ($cache['size'] ?? null) === filesize($filename)
+                            && isset($cache['data'])
+                        ) {
+                            $this->content = $cache['data'];
+
+                            return parent::content($var);
+                        }
+                    } catch (Throwable $e) {
+                        // If the compiled file is broken, we can safely ignore the error and continue:
+                        // the slow path below regenerates it from the source file.
+                        $corrupt = true;
+                        $this->logCorruptCache($cacheFilename, $filename, $e);
+                    }
+                }
+
+                // Check if the source file exists before getting its size
+                if (!is_file($filename)) {
+                    return parent::content($var);
+                }
+
+                $size = filesize($filename);
+                try {
+                    // A file the fast path already failed to include is not read a second time.
+                    $cache = !$corrupt && $file->exists() ? $file->content() : null;
+                } catch (Throwable $e) {
+                    // A corrupt or partially written compiled cache file (e.g. from a
+                    // concurrent regeneration race) can throw while being read/included —
+                    // including ParseError, which is an Error and would otherwise escape
+                    // this method's outer `catch (Exception)` as a fatal. Treat it as a
+                    // cache miss and regenerate from the raw source below, mirroring the
+                    // fast-path `catch (Throwable)` above.
+                    $cache = null;
+                    $this->logCorruptCache($cacheFilename, $filename, $e);
+                }
+
+                // Load real file if cache isn't up to date (or is invalid).
+                if (!isset($cache['@class'])
+                    || $cache['@class'] !== $class
+                    || $cache['modified'] !== $modified
+                    || ($cache['size'] ?? null) !== $size
+                    || $cache['filename'] !== $filename
+                ) {
+                    // Attempt to lock the file for writing.
+                    try {
+                        $locked = $file->lock(false);
+                    } catch (Exception $e) {
+                        $locked = false;
+
+                        /** @var Debugger $debugger */
+                        $debugger = Grav::instance()['debugger'];
+                        $debugger->addMessage(sprintf('%s(): Cannot obtain a lock for compiling cache file for %s: %s', __METHOD__, $this->filename, $e->getMessage()), 'warning');
+                    }
+
+                    // Decode RAW file into compiled array.
+                    $data = (array)$this->decode($this->raw());
+                    $cache = [
+                        '@class' => $class,
+                        'filename' => $filename,
+                        'modified' => $modified,
+                        'size' => $size,
+                        'data' => $data
+                    ];
+
+                    // If compiled file wasn't already locked by another process, save it.
+                    if ($locked) {
+                        $this->saveCompiled($file, $cache);
+                    }
+                }
+                $file->free();
+
+                $this->content = $cache['data'];
+            }
+        } catch (Exception $e) {
+            throw new RuntimeException(sprintf('Failed to read %s: %s', Utils::basename($filename), $e->getMessage()), 500, $e);
+        }
+
+        return parent::content($var);
+    }
+
+    /**
+     * Tell whether reads go through the compiled cache file (cache/compiled/files).
+     *
+     * @return bool
+     */
+    protected function usesCompiledCache(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Read and decode the source file, for reads that skip the compiled cache.
+     *
+     * @return array
+     */
+    protected function readUncompiled(): array
+    {
+        return (array)$this->decode($this->raw());
+    }
+
+    /**
+     * Save file.
+     *
+     * @param  mixed  $data  Optional data to be saved, usually array.
+     * @return void
+     * @throws RuntimeException
+     */
+    public function save(mixed $data = null)
+    {
+        // Make sure that the cache file is always up to date!
+        $key = md5($this->filename);
+        $file = PhpFile::instance(CACHE_DIR . "compiled/files/{$key}{$this->extension}.php");
+        try {
+            $locked = $file->lock();
+        } catch (Exception $e) {
+            $locked = false;
+
+            /** @var Debugger $debugger */
+            $debugger = Grav::instance()['debugger'];
+            $debugger->addMessage(sprintf('%s(): Cannot obtain a lock for compiling cache file for %s: %s', __METHOD__, $this->filename, $e->getMessage()), 'warning');
+        }
+
+        parent::save($data);
+
+        if ($locked) {
+            $modified = $this->modified();
+            $filename = $this->filename;
+            $class = get_class($this);
+            $size = filesize($filename);
+
+            // windows doesn't play nicely with this as it can't read when locked
+            if (!Utils::isWindows()) {
+                // Reload data from the filesystem. This ensures that we always cache the correct data (see issue #2282).
+                $this->raw = $this->content = null;
+                $data = (array)$this->decode($this->raw());
+            }
+
+            // Decode data into compiled array.
+            $cache = [
+                '@class' => $class,
+                'filename' => $filename,
+                'modified' => $modified,
+                'size' => $size,
+                'data' => $data
+            ];
+
+            $this->saveCompiled($file, $cache);
+        }
+    }
+
+    /**
+     * Serialize file.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        // Intentionally omit 'raw' and 'content' so a serialized
+        // CompiledFile (e.g. stored inside the session user) does not
+        // freeze a stale snapshot of the file's data across requests.
+        // The compiled cache on disk + opcache make re-reading cheap.
+        return [
+            'filename',
+            'extension',
+            'settings'
+        ];
+    }
+
+    /**
+     * Unserialize file.
+     */
+    public function __wakeup()
+    {
+        // Drop any data fields carried over from an older session blob.
+        // The current __sleep no longer serializes raw/content, but
+        // existing sessions written by older code can still restore
+        // stale data here and would otherwise short-circuit the cache
+        // re-read in content(), making admin permission changes invisible
+        // until the session is destroyed.
+        $this->raw = null;
+        $this->content = null;
+
+        if (!isset(static::$instances[$this->filename])) {
+            static::$instances[$this->filename] = $this;
+        }
+    }
+
+    /**
+     * Write the compiled array to disk so that no other process can ever read a partial file.
+     *
+     * The compiled file is include()d by every request without a lock, so it must go from
+     * "old complete file" to "new complete file" in one step. Writing through the locked
+     * handle would truncate the file first and fill it afterwards, and a request that
+     * includes it in between sees a syntax error. Writing to a temporary name next to the
+     * target and renaming over it is atomic on every filesystem Grav runs on. The flock
+     * taken by the caller stays what it always was: a mutex so that parallel requests do
+     * not all do the same work. It is released before the rename because Windows will not
+     * replace a file that still has an open handle.
+     *
+     * A cache file that cannot be written is a cache miss, not an error: the data has
+     * already been decoded from the source, so the request goes on and the next one tries
+     * again. The failure is reported to the debugger like a failed lock is.
+     *
+     * @param PhpFile $file  Locked compiled cache file.
+     * @param array $cache   Compiled payload to store.
+     */
+    private function saveCompiled(PhpFile $file, array $cache): void
+    {
+        $cacheFilename = $file->filename();
+
+        // Let the PhpFile encode the payload, then write the raw PHP ourselves.
+        $file->content($cache);
+        $raw = $file->raw();
+
+        do {
+            $tmp = $cacheFilename . '.' . bin2hex(random_bytes(4)) . '.tmp';
+        } while (file_exists($tmp));
+
+        $written = @file_put_contents($tmp, $raw) !== false;
+
+        // Release the lock and close the handle before the rename.
+        $file->unlock();
+
+        if (!$written || @rename($tmp, $cacheFilename) === false) {
+            @unlink($tmp);
+
+            try {
+                /** @var Debugger $debugger */
+                $debugger = Grav::instance()['debugger'];
+                $debugger->addMessage(sprintf('%s(): Cannot write compiled cache file for %s', __METHOD__, $this->filename), 'warning');
+            } catch (Throwable) {
+                // Best-effort reporting only.
+            }
+
+            return;
+        }
+
+        // Invalidate old bytecode; the decoded data is already available to this request.
+        // Let OPcache compile the new file when a later request actually includes it.
+        if (function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN)) {
+            // Silence error if function exists, but is restricted.
+            @opcache_invalidate($cacheFilename, true);
+        }
+    }
+
+    /**
+     * Record that a compiled cache file could not be read and is being regenerated.
+     *
+     * Regenerating silently is the correct behaviour, but doing it without a trace
+     * makes a *recurring* corruption problem invisible to an operator — the compiled
+     * file is valid again by the time anyone looks at it. A file that another process
+     * is regenerating right now is not corruption though, only a moment in a write we
+     * are about to wait out, so that case stays quiet: a warning in the log should
+     * always mean something an operator needs to look at. The logger is resolved
+     * defensively and the whole call is guarded, so logging a degraded cache can
+     * never itself become the fatal we are recovering from.
+     *
+     * @param string $cacheFilename Compiled file that could not be read.
+     * @param string $filename      Source file it was compiled from.
+     * @param Throwable $e          Failure encountered while reading it.
+     */
+    private function logCorruptCache(string $cacheFilename, string $filename, Throwable $e): void
+    {
+        try {
+            if ($this->isBeingRegenerated($cacheFilename)) {
+                return;
+            }
+
+            $log = Grav::instance()['log'] ?? null;
+            if ($log) {
+                $log->warning(sprintf(
+                    '%s(): Corrupt compiled cache %s for %s (%s); regenerating from source.',
+                    __METHOD__,
+                    $cacheFilename,
+                    $filename,
+                    $e->getMessage()
+                ));
+            }
+        } catch (Throwable) {
+            // Logging is best-effort: never let it mask the recovery it is reporting.
+        }
+    }
+
+    /**
+     * Tell whether another process currently holds the write lock on a compiled cache file.
+     *
+     * Writers take an exclusive flock on the file for the duration of the regeneration, so
+     * a shared lock that would block means a write is in flight. On a filesystem without
+     * lock support the probe cannot tell and answers no, which errs on the side of logging.
+     *
+     * @param string $cacheFilename
+     * @return bool
+     */
+    private function isBeingRegenerated(string $cacheFilename): bool
+    {
+        $handle = @fopen($cacheFilename, 'rb');
+        if (!$handle) {
+            return false;
+        }
+
+        try {
+            $wouldBlock = 0;
+            $acquired = flock($handle, LOCK_SH | LOCK_NB, $wouldBlock);
+            if ($acquired) {
+                flock($handle, LOCK_UN);
+            }
+
+            return !$acquired && $wouldBlock === 1;
+        } finally {
+            fclose($handle);
+        }
+    }
+}

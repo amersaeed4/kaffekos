@@ -1,0 +1,58 @@
+title: Contact Page
+extends@: default
+
+form:
+  fields:
+    tabs:
+      fields:
+        content:
+          fields:
+            content:
+              label: Introduction (shown above the form)
+            contact_help:
+              type: spacer
+              title: Where do the messages go?
+              text: 'Address, phone, hours and map come from Themes → Kaffekos (Site Settings). Messages are emailed to the address set in Plugins → Email and also saved in the admin Form Data list.'
+        banner:
+          type: tab
+          title: Page Banner
+          fields:
+            header.banner.image:
+              type: filepicker
+              label: Banner photo (optional)
+              preview_images: true
+              help: 'Wide photo behind the page title. Upload it on the first tab (Page Media) and pick it here. If empty, a warm navy banner with a Nordic pattern is shown.'
+            header.banner.eyebrow:
+              type: text
+              label: Small line above the title
+            header.banner.subtitle:
+              type: textarea
+              rows: 2
+              label: Line under the title
+
+        form_tab:
+          type: tab
+          title: Form Texts
+          fields:
+            header.contact.form_title:
+              type: text
+              label: Form heading
+              placeholder: Send us a message
+            header.contact.form_intro:
+              type: textarea
+              rows: 2
+              label: Text above the form
+            header.contact.info_title:
+              type: text
+              label: Visit heading
+              placeholder: Find us
+            header.contact.show_map:
+              type: toggle
+              label: Show the map
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool

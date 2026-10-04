@@ -1,0 +1,58 @@
+{% extends 'partials/base.html.twig' %}
+{% import 'macros/kk.html.twig' as kk %}
+
+{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+
+{% block content %}
+{% set story_img = header.story_image ? page.media[header.story_image] : null %}
+<section class="section">
+    <div class="wrap {{ story_img ? 'split' : 'wrap-narrow' }}">
+        {% if story_img %}
+            <div class="split-media"><div class="frame">{{ kk.img(story_img, 720, 860, page.title) }}</div></div>
+        {% endif %}
+        <div class="split-text prose">{{ page.content|raw }}</div>
+    </div>
+</section>
+
+{% set vals = header.values ?? {} %}
+{% if vals.items %}
+<section class="section section-sand">
+    <div class="wrap">
+        {% include 'partials/section-head.html.twig' with {eyebrow: null, title: vals.title, subtitle: null} %}
+        <div class="features">
+            {% for f in vals.items %}
+                <div class="feature">
+                    <div class="feature-icon">{{ kk.icon(f.icon ?: 'heart', 30) }}</div>
+                    <h3>{{ f.title }}</h3>
+                    <p>{{ f.text }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% set team = header.team ?? {} %}
+{% if (team.enabled is null or team.enabled) and team.members %}
+<section class="section">
+    <div class="wrap">
+        {% include 'partials/section-head.html.twig' with {eyebrow: null, title: team.title, subtitle: team.subtitle} %}
+        <div class="team">
+            {% for m in team.members %}
+                {% set photo = m.photo ? page.media[m.photo] : null %}
+                <div class="member">
+                    <div class="member-photo">
+                        {% if photo %}{{ kk.img(photo, 400, 400, m.name) }}{% else %}<span>{{ m.name|slice(0,1) }}</span>{% endif %}
+                    </div>
+                    <h3>{{ m.name }}</h3>
+                    {% if m.role %}<p class="role">{{ m.role }}</p>{% endif %}
+                    {% if m.bio %}<p>{{ m.bio }}</p>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% include 'partials/visit.html.twig' with {eyebrow: 'Velkommen', title: 'Come say hello', text: ''} %}
+{% endblock %}

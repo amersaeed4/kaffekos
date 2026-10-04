@@ -1,0 +1,9 @@
+{% extends 'partials/base.html.twig' %}
+{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block content %}
+<section class="section">
+    <div class="wrap wrap-narrow prose">
+        {{ page.content|raw }}
+    </div>
+</section>
+{% endblock %}

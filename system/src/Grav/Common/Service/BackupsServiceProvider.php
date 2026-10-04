@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @package    Grav\Common\Service
+ *
+ * @copyright  Copyright (c) 2015 - 2026 Trilby Media, LLC. All rights reserved.
+ * @license    MIT License; see LICENSE file for details.
+ */
+
+namespace Grav\Common\Service;
+
+use Grav\Common\Backup\Backups;
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
+
+/**
+ * Class BackupsServiceProvider
+ * @package Grav\Common\Service
+ */
+class BackupsServiceProvider implements ServiceProviderInterface
+{
+    /**
+     * @param Container $container
+     * @return void
+     */
+    public function register(Container $container)
+    {
+        $container['backups'] = function () {
+            // setup() is called lazily by the methods that need the backup directory,
+            // so building the service doesn't stat/create it on every request.
+            return new Backups();
+        };
+    }
+}

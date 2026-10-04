@@ -1,0 +1,32 @@
+<table id="data-table" class="table">
+    <colgroup>
+        <col width="20" />
+        <col width="80" />
+    </colgroup>
+    <thead>
+    <tr>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for type, directory in directories %}
+        {%- set title = options.directories[type]['title'] ?? options.directories[type]['collection']['title'] ?? directory.title -%}
+        {%- if title matches '/\{/' -%}
+            {# Editor-controlled title from frontmatter: render via the sandboxed
+               evaluate_twig path, not template_from_string. GHSA-623v-m3c4-3pw8. #}
+            {%- set title = evaluate_twig(title)|trim -%}
+        {%- endif -%}
+        {%- set description = options.directories[type]['description'] ?? options.directories[type]['collection']['description'] ?? directory.description -%}
+
+        <tr>
+            <td>
+                <a href="{{ url(directory_url ~ '/directory:' ~ type)|e }}">{{ title|e }}</a>
+            </td>
+            <td>
+                {{ description|e }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

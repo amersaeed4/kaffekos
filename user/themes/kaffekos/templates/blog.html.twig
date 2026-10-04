@@ -1,0 +1,30 @@
+{% extends 'partials/base.html.twig' %}
+{% import 'macros/kk.html.twig' as kk %}
+{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block content %}
+<section class="section">
+    {% if page.content|striptags|trim %}
+        <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
+    {% endif %}
+    <div class="wrap">
+        <div class="posts">
+            {% for post in page.children.published.order('date', 'desc') %}
+                {% set cover = post.header.cover ? post.media[post.header.cover] : null %}
+                <article class="post-card">
+                    <a class="post-cover" href="{{ post.url }}">
+                        {% if cover %}{{ kk.img(cover, 800, 520, post.title) }}{% else %}<span class="post-cover-empty">{{ kk.icon('cup', 40) }}</span>{% endif %}
+                    </a>
+                    <div class="post-body">
+                        <time datetime="{{ post.date|date('Y-m-d') }}">{{ post.date|date('j F Y') }}</time>
+                        <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+                        <p>{{ post.header.summary ?: post.summary|striptags }}</p>
+                        <a class="link-arrow" href="{{ post.url }}">Read more {{ kk.icon('arrow', 18) }}</a>
+                    </div>
+                </article>
+            {% else %}
+                <p class="center">No posts yet. Check back soon.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

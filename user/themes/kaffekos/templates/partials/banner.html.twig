@@ -1,0 +1,11 @@
+{% import 'macros/kk.html.twig' as kk %}
+{# Title banner used by all inner pages. Optional photo from Page Banner tab. #}
+{% set bimg = header.banner.image ? page.media[header.banner.image] : null %}
+<section class="page-banner{{ bimg ? ' has-photo' : '' }}"{% if bimg %} style="--banner: url('{{ kk.imgurlfit(bimg, 2000, 2000) }}')"{% endif %}>
+    <div class="wrap">
+        {% if header.banner.eyebrow %}<p class="eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
+        <h1>{{ page.title }}</h1>
+        {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
+    </div>
+    <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
+</section>

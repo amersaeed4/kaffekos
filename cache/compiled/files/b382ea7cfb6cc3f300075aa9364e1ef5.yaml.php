@@ -1,0 +1,103 @@
+<?php
+return [
+    '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
+    'filename' => '/Users/amer/Sites/kaffekos1/user/plugins/flex-objects/blueprints.yaml',
+    'modified' => 1790904721,
+    'size' => 1802,
+    'data' => [
+        'name' => 'Flex Objects',
+        'slug' => 'flex-objects',
+        'type' => 'plugin',
+        'testing' => false,
+        'version' => '1.4.16',
+        'description' => 'Flex Objects plugin allows you to manage Flex Objects in Grav Admin.',
+        'icon' => 'list-alt',
+        'author' => [
+            'name' => 'Trilby Media',
+            'email' => 'hello@trilby.media'
+        ],
+        'homepage' => 'https://github.com/trilbymedia/grav-plugin-flex-objects',
+        'keywords' => 'grav, plugin, crud, directory',
+        'bugs' => 'https://github.com/trilbymedia/grav-plugin-flex-objects/issues',
+        'docs' => 'https://github.com/trilbymedia/grav-plugin-flex-objects/blob/develop/README.md',
+        'license' => 'MIT',
+        'compatibility' => [
+            'grav' => [
+                0 => '2.0'
+            ]
+        ],
+        'dependencies' => [
+            0 => [
+                'name' => 'grav',
+                'version' => '>=2.0.0'
+            ],
+            1 => [
+                'name' => 'form',
+                'version' => '>=6.0.0'
+            ],
+            2 => [
+                'name' => 'api',
+                'version' => '>=1.0.28'
+            ]
+        ],
+        'form' => [
+            'validation' => 'loose',
+            'fields' => [
+                'enabled' => [
+                    'type' => 'toggle',
+                    'label' => 'PLUGIN_ADMIN.PLUGIN_STATUS',
+                    'highlight' => 1,
+                    'default' => 0,
+                    'options' => [
+                        1 => 'PLUGIN_ADMIN.ENABLED',
+                        0 => 'PLUGIN_ADMIN.DISABLED'
+                    ],
+                    'validate' => [
+                        'type' => 'bool'
+                    ]
+                ],
+                'built_in_css' => [
+                    'type' => 'toggle',
+                    'label' => 'PLUGIN_FLEX_OBJECTS.USE_BUILT_IN_CSS',
+                    'highlight' => 1,
+                    'default' => 1,
+                    'options' => [
+                        1 => 'PLUGIN_ADMIN.ENABLED',
+                        0 => 'PLUGIN_ADMIN.DISABLED'
+                    ],
+                    'validate' => [
+                        'type' => 'bool'
+                    ]
+                ],
+                'security_section' => [
+                    'type' => 'section',
+                    'title' => 'PLUGIN_FLEX_OBJECTS.SECURITY_SECTION',
+                    'underline' => true
+                ],
+                'security.restrict_page_frontmatter' => [
+                    'type' => 'toggle',
+                    'label' => 'PLUGIN_FLEX_OBJECTS.SECURITY.RESTRICT_PAGE_FRONTMATTER',
+                    'help' => 'PLUGIN_FLEX_OBJECTS.SECURITY.RESTRICT_PAGE_FRONTMATTER_HELP',
+                    'highlight' => 1,
+                    'default' => 1,
+                    'options' => [
+                        1 => 'PLUGIN_ADMIN.ENABLED',
+                        0 => 'PLUGIN_ADMIN.DISABLED'
+                    ],
+                    'validate' => [
+                        'type' => 'bool'
+                    ]
+                ],
+                'directories' => [
+                    'type' => 'flex-objects',
+                    'label' => 'PLUGIN_FLEX_OBJECTS.DIRECTORIES',
+                    'array' => true,
+                    'ignore_empty' => true,
+                    'validate' => [
+                        'type' => 'array'
+                    ]
+                ]
+            ]
+        ]
+    ]
+];

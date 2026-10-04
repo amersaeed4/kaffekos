@@ -1,0 +1,430 @@
+title: Home Page
+extends@: default
+
+form:
+  fields:
+    tabs:
+      fields:
+
+        banner:
+          unset@: true
+
+        content:
+          title: Page & Photos
+          fields:
+            content:
+              unset@: true
+            media_help:
+              type: spacer
+              title: Upload your photos here first
+              text: 'Drop photos into "Page Media" below and save. They then appear in the photo pickers on the other tabs (Hero, Welcome, ...).'
+
+        hero:
+          type: tab
+          title: 1 · Hero
+          fields:
+            header.hero.image:
+              type: filepicker
+              label: Background photo
+              preview_images: true
+              help: 'Big photo behind the headline. Best: wide, landscape, at least 1800px. Leave empty to show the illustrated Nordic landscape.'
+            header.hero.focus:
+              type: select
+              label: Which part of the photo stays visible
+              help: 'The photo is cropped to fit the screen. Choose which part to keep: useful when a sign or the main subject is at the top or bottom of your photo.'
+              default: '40%'
+              options:
+                '10%': Top
+                '25%': Upper part
+                '40%': Middle
+                '60%': Lower part
+                '90%': Bottom
+            header.hero.eyebrow:
+              type: text
+              label: Small line above the headline
+              placeholder: 'Norwegian Coffee House · Lahore'
+            header.hero.title:
+              type: text
+              label: Headline
+              placeholder: 'Nordic warmth, brewed in Lahore.'
+            header.hero.subtitle:
+              type: textarea
+              rows: 3
+              label: Sub-headline
+            header.hero.btn1_label:
+              type: text
+              label: First button text
+            header.hero.btn1_url:
+              type: text
+              label: First button link
+              placeholder: /menu
+            header.hero.btn2_label:
+              type: text
+              label: Second button text
+            header.hero.btn2_url:
+              type: text
+              label: Second button link
+              placeholder: /contact
+            header.hero.show_open_badge:
+              type: toggle
+              label: Show "Open now / Closed" badge
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+
+        welcome:
+          type: tab
+          title: 2 · Welcome
+          fields:
+            header.intro.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.intro.eyebrow:
+              type: text
+              label: Small heading
+            header.intro.title:
+              type: text
+              label: Heading
+            header.intro.text:
+              type: markdown
+              label: Text
+              help: 'Blank line = new paragraph. **bold** and *italic* work.'
+              validate:
+                type: textarea
+            header.intro.image:
+              type: filepicker
+              label: Photo
+              preview_images: true
+            header.intro.image2:
+              type: filepicker
+              label: Second, smaller photo (optional)
+              preview_images: true
+            header.intro.link_label:
+              type: text
+              label: Link text
+            header.intro.link_url:
+              type: text
+              label: Link address
+            header.intro.stats:
+              type: list
+              label: Numbers (e.g. "100% Arabica")
+              style: vertical
+              collapsed: true
+              fields:
+                .value:
+                  type: text
+                  label: Big text
+                .label:
+                  type: text
+                  label: Small text
+
+        coffee:
+          type: tab
+          title: 3 · Our Coffee
+          fields:
+            header.coffee.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.coffee.eyebrow:
+              type: text
+              label: Small heading
+            header.coffee.title:
+              type: text
+              label: Heading
+            header.coffee.text:
+              type: markdown
+              label: Text
+              help: 'Blank line = new paragraph. **bold** and *italic* work.'
+              validate:
+                type: textarea
+            header.coffee.image:
+              type: filepicker
+              label: Main product photo (the pack)
+              preview_images: true
+              help: 'Upload to Page Media first. A transparent PNG (no background) looks best.'
+            header.coffee.image2:
+              type: filepicker
+              label: Second product photo (the tin, optional)
+              preview_images: true
+              help: 'Shown in front of the main photo. Also best as a transparent PNG.'
+            header.coffee.caption:
+              type: text
+              label: Small caption under the products (optional)
+            header.coffee.facts:
+              type: list
+              label: Small facts (e.g. "Since 1892")
+              style: vertical
+              collapsed: true
+              fields:
+                .value:
+                  type: text
+                  label: Big text
+                .label:
+                  type: text
+                  label: Small text
+            header.coffee.link_label:
+              type: text
+              label: Link text
+            header.coffee.link_url:
+              type: text
+              label: Link address
+
+        highlights:
+          type: tab
+          title: 4 · Highlights
+          fields:
+            header.highlights.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.highlights.title:
+              type: text
+              label: Heading
+            header.highlights.subtitle:
+              type: textarea
+              rows: 2
+              label: Sub-heading
+            header.highlights.items:
+              type: list
+              label: Highlights (icon boxes)
+              style: vertical
+              collapsed: true
+              fields:
+                .icon:
+                  type: select
+                  label: Icon
+                  default: cup
+                  options:
+                    cup: Coffee cup
+                    bean: Coffee bean
+                    bun: Pastry / bun
+                    cake: Cake
+                    heart: Heart
+                    leaf: Leaf
+                    sun: Sun
+                    snow: Snowflake
+                    wifi: Wi-Fi
+                    users: People
+                    book: Book
+                    music: Music
+                    star: Star
+                    clock: Clock
+                    pin: Location pin
+                .title:
+                  type: text
+                  label: Title
+                .text:
+                  type: textarea
+                  rows: 3
+                  label: Text
+
+        menu:
+          type: tab
+          title: 5 · Menu Favourites
+          fields:
+            menu_help:
+              type: spacer
+              title: Which items are shown here?
+              text: 'Items you tick "Show on Home page" on in the Menu section appear here automatically.'
+            header.featured.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.featured.show_prices:
+              type: toggle
+              label: Show prices on these cards
+              highlight: 0
+              default: 0
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.featured.title:
+              type: text
+              label: Heading
+            header.featured.subtitle:
+              type: textarea
+              rows: 2
+              label: Sub-heading
+            header.featured.limit:
+              type: number
+              label: Maximum items to show
+              default: 6
+              size: x-small
+              validate:
+                min: 3
+                max: 12
+            header.featured.button_label:
+              type: text
+              label: Button text
+              placeholder: See the full menu
+
+        quote:
+          type: tab
+          title: 6 · "Kos" Banner
+          fields:
+            header.quote.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.quote.word:
+              type: text
+              label: Big word
+              placeholder: kos
+            header.quote.pronunciation:
+              type: text
+              label: Pronunciation / small tag
+              placeholder: '/kuːs/ · noun · Norwegian'
+            header.quote.text:
+              type: textarea
+              rows: 3
+              label: Meaning / quote
+            header.quote.image:
+              type: filepicker
+              label: Background photo (optional)
+              preview_images: true
+
+        gallery:
+          type: tab
+          title: 7 · Photo Strip
+          fields:
+            gallery_help:
+              type: spacer
+              title: Where do the photos come from?
+              text: 'The newest photos from your Gallery page are used automatically.'
+            header.photostrip.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.photostrip.title:
+              type: text
+              label: Heading
+            header.photostrip.subtitle:
+              type: textarea
+              rows: 2
+              label: Sub-heading
+            header.photostrip.count:
+              type: number
+              label: How many photos
+              default: 6
+              size: x-small
+              validate:
+                min: 3
+                max: 12
+
+        reviews:
+          type: tab
+          title: 8 · Guest Reviews
+          fields:
+            header.reviews.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.reviews.title:
+              type: text
+              label: Heading
+            header.reviews.subtitle:
+              type: text
+              label: Sub-heading
+            header.reviews.items:
+              type: list
+              label: Reviews
+              style: vertical
+              collapsed: true
+              fields:
+                .name:
+                  type: text
+                  label: Guest name
+                .info:
+                  type: text
+                  label: Small text under name (e.g. Google review)
+                .rating:
+                  type: select
+                  label: Stars
+                  default: '5'
+                  options:
+                    '5': 5 stars
+                    '4': 4 stars
+                    '3': 3 stars
+                .text:
+                  type: textarea
+                  rows: 4
+                  label: Review
+
+        visit:
+          type: tab
+          title: 9 · Visit Us
+          fields:
+            visit_help:
+              type: spacer
+              title: Address, hours and map come from Site Settings
+              text: 'Change them under Themes → Kaffekos → Contact & Location / Opening Hours.'
+            header.visit.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.visit.eyebrow:
+              type: text
+              label: Small heading
+            header.visit.title:
+              type: text
+              label: Heading
+            header.visit.text:
+              type: textarea
+              rows: 3
+              label: Text

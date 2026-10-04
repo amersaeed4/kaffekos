@@ -1,0 +1,18 @@
+{% import 'macros/kk.html.twig' as kk %}
+{# One menu item. Pass: item, image (media or null), currency, show_image, card (true = big photo card), show_price (false hides the price) #}
+<article class="menu-item{{ card ? ' menu-card' : '' }}{{ image and show_image ? ' has-image' : '' }}">
+    {% if image and show_image %}
+        <div class="menu-item-img">{{ (card ? kk.img(image, 480, 360, item.name) : kk.img(image, 192, 192, item.name)) }}</div>
+    {% endif %}
+    <div class="menu-item-body">
+        <div class="menu-item-top">
+            <h3>{{ item.name }}</h3>
+            {% if item.price and show_price is not same as(false) %}
+                <span class="menu-dots" aria-hidden="true"></span>
+                <span class="menu-price">{{ kk.price(item.price, currency) }}</span>
+            {% endif %}
+        </div>
+        {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+        {% if item.badge %}<span class="badge badge-{{ item.badge|lower }}">{{ item.badge }}</span>{% endif %}
+    </div>
+</article>

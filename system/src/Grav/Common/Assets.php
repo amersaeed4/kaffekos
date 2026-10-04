@@ -1,0 +1,798 @@
+<?php
+
+/**
+ * @package    Grav\Common
+ *
+ * @copyright  Copyright (c) 2015 - 2026 Trilby Media, LLC. All rights reserved.
+ * @license    MIT License; see LICENSE file for details.
+ */
+
+namespace Grav\Common;
+
+use Closure;
+use Grav\Common\Assets\Pipeline;
+use Grav\Common\Assets\Traits\LegacyAssetsTrait;
+use Grav\Common\Assets\Traits\TestingAssetsTrait;
+use Grav\Common\Config\Config;
+use Grav\Framework\Object\PropertyObject;
+use RocketTheme\Toolbox\ResourceLocator\UniformResourceLocator;
+use function array_slice;
+use function call_user_func_array;
+use function func_get_args;
+use function is_array;
+
+/**
+ * Class Assets
+ * @package Grav\Common
+ */
+class Assets extends PropertyObject
+{
+    use TestingAssetsTrait;
+    use LegacyAssetsTrait;
+
+    const LINK = 'link';
+    const CSS = 'css';
+    const JS = 'js';
+    const JS_MODULE = 'js_module';
+    const LINK_COLLECTION = 'assets_link';
+    const CSS_COLLECTION = 'assets_css';
+    const JS_COLLECTION = 'assets_js';
+    const JS_MODULE_COLLECTION = 'assets_js_module';
+    const LINK_TYPE = Assets\Link::class;
+    const CSS_TYPE = Assets\Css::class;
+    const JS_TYPE = Assets\Js::class;
+    const JS_MODULE_TYPE = Assets\JsModule::class;
+    const INLINE_CSS_TYPE = Assets\InlineCss::class;
+    const INLINE_JS_TYPE = Assets\InlineJs::class;
+    const INLINE_JS_MODULE_TYPE = Assets\InlineJsModule::class;
+
+    /** @const Regex to match CSS and JavaScript files */
+    const DEFAULT_REGEX = '/.\.(css|js)$/i';
+
+    /** @const Regex to match CSS files */
+    const CSS_REGEX = '/.\.css$/i';
+
+    /** @const Regex to match JavaScript files */
+    const JS_REGEX = '/.\.js$/i';
+
+    /** @const Regex to match JavaScriptModyle files */
+    const JS_MODULE_REGEX = '/.\.mjs$/i';
+
+    /** @var string */
+    protected $assets_dir;
+    /** @var string */
+    protected $assets_url;
+
+    /** @var array */
+    protected $assets_link = [];
+    /** @var array */
+    protected $assets_css = [];
+    /** @var array */
+    protected $assets_js = [];
+    /** @var array  */
+    protected $assets_js_module = [];
+
+
+
+    // Following variables come from the configuration:
+    /** @var bool */
+    protected $css_pipeline;
+    /** @var bool */
+    protected $css_pipeline_include_externals;
+    /** @var bool */
+    protected $css_pipeline_before_excludes;
+    /** @var bool */
+    protected $js_pipeline;
+    /** @var bool */
+    protected $js_pipeline_include_externals;
+    /** @var bool */
+    protected $js_pipeline_before_excludes;
+    /** @var bool */
+    protected $js_module_pipeline;
+    /** @var bool */
+    protected $js_module_pipeline_include_externals;
+    /** @var bool */
+    protected $js_module_pipeline_before_excludes;
+    /** @var array */
+    protected $pipeline_options = [];
+
+    /** @var Closure|string */
+    protected $fetch_command;
+    /** @var string */
+    protected $autoload;
+    /** @var bool */
+    protected $enable_asset_timestamp;
+    /** @var array|null */
+    protected $collections;
+    /** @var string */
+    protected $timestamp;
+    /** @var array Keeping track for order counts (for sorting) */
+    protected $order = [];
+    /** @var array[] Assets added while recording (see startRecording()), one list per recording in progress. */
+    protected $recording = [];
+    /** @var int Depth of addType() calls, so only the outermost call of an addition is recorded. */
+    protected $addDepth = 0;
+
+    /**
+     * Start recording the assets added from now on, so they can be added again later without
+     * running the code that added them. Page uses it for modules whose output it caches.
+     *
+     * @return void
+     * @internal
+     */
+    public function startRecording(): void
+    {
+        $this->recording[] = [];
+    }
+
+    /**
+     * Stop recording and return the additions recorded since startRecording().
+     *
+     * @return array<int,array{0:string,1:string,2:string|string[],3:array}>
+     * @internal
+     */
+    public function stopRecording(): array
+    {
+        $recorded = array_pop($this->recording) ?? [];
+
+        // A recording inside another one: the outer render made these additions too.
+        if ($this->recording) {
+            $outer = array_key_last($this->recording);
+            $this->recording[$outer] = array_merge($this->recording[$outer], $recorded);
+        }
+
+        return $recorded;
+    }
+
+    /**
+     * Add again the assets returned by stopRecording(), in the same order and with the same
+     * options, so the asset list ends up as if the recorded code had run again.
+     *
+     * @param array $recorded
+     * @return void
+     * @internal
+     */
+    public function replay(array $recorded): void
+    {
+        foreach ($recorded as $call) {
+            if ($this->isReplayable($call)) {
+                $this->addType($call[0], $call[1], $call[2], $call[3]);
+            }
+        }
+    }
+
+    /**
+     * Whether every recorded addition can be replayed. The calls come back from the cache, so
+     * only the asset types Assets itself adds are ever created from them.
+     *
+     * @param array $recorded
+     * @return bool
+     * @internal
+     */
+    public function canReplay(array $recorded): bool
+    {
+        foreach ($recorded as $call) {
+            if (!$this->isReplayable($call)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $call
+     * @return bool
+     */
+    private function isReplayable($call): bool
+    {
+        $types = [
+            static::LINK_TYPE => static::LINK_COLLECTION,
+            static::CSS_TYPE => static::CSS_COLLECTION,
+            static::INLINE_CSS_TYPE => static::CSS_COLLECTION,
+            static::JS_TYPE => static::JS_COLLECTION,
+            static::INLINE_JS_TYPE => static::JS_COLLECTION,
+            static::JS_MODULE_TYPE => static::JS_MODULE_COLLECTION,
+            static::INLINE_JS_MODULE_TYPE => static::JS_MODULE_COLLECTION,
+        ];
+
+        return is_array($call) && count($call) === 4 && is_string($call[1]) && ($types[$call[1]] ?? null) === $call[0]
+            && (is_string($call[2]) || is_array($call[2])) && is_array($call[3]);
+    }
+
+    /**
+     * Keys of every asset currently added, to tell whether code removed any.
+     *
+     * @return string[]
+     * @internal
+     */
+    public function getAssetKeys(): array
+    {
+        return array_merge(
+            array_keys($this->assets_link),
+            array_keys($this->assets_css),
+            array_keys($this->assets_js),
+            array_keys($this->assets_js_module)
+        );
+    }
+
+    /**
+     * Initialization called in the Grav lifecycle to initialize the Assets with appropriate configuration
+     *
+     * @return void
+     */
+    public function init()
+    {
+        $grav = Grav::instance();
+        /** @var Config $config */
+        $config = $grav['config'];
+
+        $asset_config = (array)$config->get('system.assets');
+
+        /** @var UniformResourceLocator $locator */
+        $locator = $grav['locator'];
+        $this->assets_dir = $locator->findResource('asset://');
+        $this->assets_url = $locator->findResource('asset://', false);
+
+        $this->config($asset_config);
+
+        // Register any preconfigured collections
+        foreach ((array) $this->collections as $name => $collection) {
+            $this->registerCollection($name, (array)$collection);
+        }
+    }
+
+    /**
+     * Set up configuration options.
+     *
+     * All the class properties except 'js' and 'css' are accepted here.
+     * Also, an extra option 'autoload' may be passed containing an array of
+     * assets and/or collections that will be automatically added on startup.
+     *
+     * @param  array $config Configurable options.
+     * @return $this
+     */
+    public function config(array $config)
+    {
+        foreach ($config as $key => $value) {
+            if ($this->hasProperty($key)) {
+                $this->setProperty($key, $value);
+            } elseif (Utils::startsWith($key, 'css_') || Utils::startsWith($key, 'js_')) {
+                $this->pipeline_options[$key] = $value;
+            }
+        }
+
+        // Add timestamp if it's enabled
+        if ($this->enable_asset_timestamp) {
+            $this->timestamp = Grav::instance()['cache']->getKey();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an asset or a collection of assets.
+     *
+     * It automatically detects the asset type (JavaScript, CSS or collection).
+     * You may add more than one asset passing an array as argument.
+     *
+     * @param string|string[] $asset
+     * @return $this
+     */
+    public function add($asset)
+    {
+        if (!$asset) {
+            return $this;
+        }
+
+        $args = func_get_args();
+
+        // More than one asset
+        if (is_array($asset)) {
+            foreach ($asset as $index => $location) {
+                $params = array_slice($args, 1);
+                if (is_array($location)) {
+                    $params = array_shift($params);
+                    if (is_numeric($params)) {
+                        $params = [ 'priority' => $params ];
+                    }
+                    $params = [array_replace_recursive([], $location, $params)];
+                    $location = $index;
+                }
+
+                $params = array_merge([$location], $params);
+                call_user_func_array($this->add(...), $params);
+            }
+        } elseif (isset($this->collections[$asset])) {
+            array_shift($args);
+            $args = array_merge([$this->collections[$asset]], $args);
+            call_user_func_array($this->add(...), $args);
+        } else {
+            // Get extension
+            $path = parse_url($asset, PHP_URL_PATH);
+            $extension = $path ? Utils::pathinfo($path, PATHINFO_EXTENSION) : '';
+
+            // JavaScript or CSS
+            if ($extension !== '') {
+                $extension = strtolower($extension);
+                if ($extension === 'css') {
+                    call_user_func_array($this->addCss(...), $args);
+                } elseif ($extension === 'js') {
+                    call_user_func_array($this->addJs(...), $args);
+                } elseif ($extension === 'mjs') {
+                    call_user_func_array($this->addJsModule(...), $args);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $collection
+     * @param string $type
+     * @param string|string[] $asset
+     * @param array $options
+     * @return $this
+     */
+    protected function addType($collection, $type, $asset, $options)
+    {
+        if ($this->recording && $this->addDepth === 0) {
+            $this->recording[array_key_last($this->recording)][] = [$collection, $type, $asset, $options];
+        }
+
+        $this->addDepth++;
+        try {
+            return $this->addTypeNow($collection, $type, $asset, $options);
+        } finally {
+            $this->addDepth--;
+        }
+    }
+
+    /**
+     * @param string $collection
+     * @param string $type
+     * @param string|string[] $asset
+     * @param array $options
+     * @return $this
+     */
+    private function addTypeNow($collection, $type, $asset, $options)
+    {
+        if (is_array($asset)) {
+            foreach ($asset as $index => $location) {
+                $assetOptions = $options;
+                if (is_array($location)) {
+                    $assetOptions = array_replace_recursive([], $options, $location);
+                    $location = $index;
+                }
+                $this->addType($collection, $type, $location, $assetOptions);
+            }
+
+            return $this;
+        }
+
+        if ($this->isValidType($type) && isset($this->collections[$asset])) {
+            $this->addType($collection, $type, $this->collections[$asset], $options);
+            return $this;
+        }
+
+        // If pipeline disabled, set to position if provided, else after
+        if (isset($options['pipeline'])) {
+            if ($options['pipeline'] === false) {
+
+                $exclude_type = $this->getBaseType($type);
+
+                $excludes = strtolower($exclude_type . '_pipeline_before_excludes');
+                if ($this->{$excludes}) {
+                    $default = 'after';
+                } else {
+                    $default = 'before';
+                }
+
+                $options['position'] ??= $default;
+            }
+
+            unset($options['pipeline']);
+        }
+
+        // Add timestamp
+        $timestamp_override = $options['timestamp'] ?? true;
+
+        if (filter_var($timestamp_override, FILTER_VALIDATE_BOOLEAN)) {
+            $options['timestamp'] = $this->timestamp;
+        } else {
+            $options['timestamp'] = null;
+        }
+
+        // Set order
+        $group = $options['group'] ?? 'head';
+        $position = $options['position'] ?? 'pipeline';
+
+        $orderKey = "{$type}|{$group}|{$position}";
+        if (!isset($this->order[$orderKey])) {
+           $this->order[$orderKey] = 0;
+        }
+
+        $options['order'] = $this->order[$orderKey]++;
+
+        // Create asset of correct type
+        $asset_object = new $type();
+
+        // If exists
+        if ($asset_object->init($asset, $options)) {
+            $this->$collection[md5($asset)] = $asset_object;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a CSS asset or a collection of assets.
+     *
+     * @return $this
+     */
+    public function addLink($asset)
+    {
+        return $this->addType($this::LINK_COLLECTION, $this::LINK_TYPE, $asset, $this->unifyLegacyArguments(func_get_args(), $this::LINK_TYPE));
+    }
+
+    /**
+     * Add a CSS asset or a collection of assets.
+     *
+     * @return $this
+     */
+    public function addCss($asset)
+    {
+        return $this->addType($this::CSS_COLLECTION, $this::CSS_TYPE, $asset, $this->unifyLegacyArguments(func_get_args(), $this::CSS_TYPE));
+    }
+
+    /**
+     * Add an Inline CSS asset or a collection of assets.
+     *
+     * @return $this
+     */
+    public function addInlineCss($asset)
+    {
+        return $this->addType($this::CSS_COLLECTION, $this::INLINE_CSS_TYPE, $asset, $this->unifyLegacyArguments(func_get_args(), $this::INLINE_CSS_TYPE));
+    }
+
+    /**
+     * Add a JS asset or a collection of assets.
+     *
+     * @return $this
+     */
+    public function addJs($asset)
+    {
+        return $this->addType($this::JS_COLLECTION, $this::JS_TYPE, $asset, $this->unifyLegacyArguments(func_get_args(), $this::JS_TYPE));
+    }
+
+    /**
+     * Add an Inline JS asset or a collection of assets.
+     *
+     * @return $this
+     */
+    public function addInlineJs($asset)
+    {
+        return $this->addType($this::JS_COLLECTION, $this::INLINE_JS_TYPE, $asset, $this->unifyLegacyArguments(func_get_args(), $this::INLINE_JS_TYPE));
+    }
+
+        /**
+     * Add a JS asset or a collection of assets.
+     *
+     * @return $this
+     */
+    public function addJsModule($asset)
+    {
+        return $this->addType($this::JS_MODULE_COLLECTION, $this::JS_MODULE_TYPE, $asset, $this->unifyLegacyArguments(func_get_args(), $this::JS_MODULE_TYPE));
+    }
+
+    /**
+     * Add an Inline JS asset or a collection of assets.
+     *
+     * @return $this
+     */
+    public function addInlineJsModule($asset)
+    {
+        return $this->addType($this::JS_MODULE_COLLECTION, $this::INLINE_JS_MODULE_TYPE, $asset, $this->unifyLegacyArguments(func_get_args(), $this::INLINE_JS_MODULE_TYPE));
+    }
+
+    /**
+     * Add/replace collection.
+     *
+     * @param string $collectionName
+     * @param array  $assets
+     * @param bool    $overwrite
+     * @return $this
+     */
+    public function registerCollection($collectionName, array $assets, $overwrite = false)
+    {
+        if ($overwrite || !isset($this->collections[$collectionName])) {
+            $this->collections[$collectionName] = $assets;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $assets
+     * @param string $key
+     * @param string $value
+     * @param bool $sort
+     * @return array|false
+     */
+    protected function filterAssets($assets, $key, $value, $sort = false)
+    {
+        $results = array_filter($assets, function ($asset) use ($key, $value) {
+
+            if ($key === 'position' && $value === 'pipeline') {
+                $type = $asset->getType();
+                if ($type === 'jsmodule') {
+                    $type = 'js_module';
+                }
+                $type = strtolower($type);
+
+                if ($asset->getRemote() && $this->{$type . '_pipeline_include_externals'} === false && $asset->getProperty('position') === 'pipeline') {
+                    if ($this->{$type . '_pipeline_before_excludes'}) {
+                        $asset->setPosition('after');
+                    } else {
+                        $asset->setPosition('before');
+                    }
+                    return false;
+                }
+            }
+
+            // Direct property access; ArrayAccess on assets goes through the
+            // dot-path machinery, and these keys are always flat.
+            return $asset->getProperty($key) === $value;
+        });
+
+        if ($sort && !empty($results)) {
+            $results = $this->sortAssets($results);
+        }
+
+
+        return $results;
+    }
+
+    /**
+     * @param array $assets
+     * @return array
+     */
+    protected function sortAssets($assets)
+    {
+        uasort($assets, static fn($a, $b) => $b->getProperty('priority') <=> $a->getProperty('priority') ?: $a->getProperty('order') <=> $b->getProperty('order'));
+
+        return $assets;
+    }
+
+    /**
+     * @param string $type
+     * @param string $group
+     * @param array $attributes
+     * @return string
+     */
+    public function render($type, $group = 'head', $attributes = [])
+    {
+        $before_output = '';
+        $pipeline_output = '';
+        $after_output = '';
+
+        $assets = 'assets_' . $type;
+        $pipeline_enabled = $type . '_pipeline';
+        $render_pipeline = 'render' . ucfirst($type);
+
+        $group_assets = $this->filterAssets($this->$assets, 'group', $group);
+        $pipeline_assets = $this->filterAssets($group_assets, 'position', 'pipeline', true);
+        $before_assets = $this->filterAssets($group_assets, 'position', 'before', true);
+        $after_assets = $this->filterAssets($group_assets, 'position', 'after', true);
+
+        // Pipeline
+        if ($this->{$pipeline_enabled} ?? false) {
+            $options = array_merge($this->pipeline_options, ['timestamp' => $this->timestamp]);
+
+            $grouped_pipeline_assets = $this->splitPipelineAssetsByAttribute($pipeline_assets, 'loading');
+
+            foreach ($grouped_pipeline_assets as $pipeline_group) {
+                if (empty($pipeline_group['assets'])) {
+                    continue;
+                }
+
+                $group_attributes = array_merge($attributes, $pipeline_group['attributes']);
+
+                $pipeline = new Pipeline($options);
+                $result = $pipeline->$render_pipeline($pipeline_group['assets'], $group, $group_attributes);
+
+                if ($result === false) {
+                    // No assets to render
+                    continue;
+                }
+
+                $pipeline_output .= $result;
+            }
+        } else {
+            foreach ($pipeline_assets as $asset) {
+                $pipeline_output .= $asset->render();
+            }
+        }
+
+        // Before Pipeline
+        foreach ($before_assets as $asset) {
+            $before_output .= $asset->render();
+        }
+
+        // After Pipeline
+        foreach ($after_assets as $asset) {
+            $after_output .= $asset->render();
+        }
+
+        return $before_output . $pipeline_output . $after_output;
+    }
+
+
+    /**
+     * Build the CSS link tags.
+     *
+     * @param  string $group name of the group
+     * @param  array  $attributes
+     * @return string
+     */
+    public function css($group = 'head', $attributes = [], $include_link = true)
+    {
+        $output = '';
+
+        if ($include_link) {
+            $output = $this->link($group, $attributes);
+        }
+
+        $output .= $this->render(self::CSS, $group, $attributes);
+
+        return $output;
+    }
+
+    /**
+     * Build the CSS link tags.
+     *
+     * @param  string $group name of the group
+     * @param  array  $attributes
+     * @return string
+     */
+    public function link($group = 'head', $attributes = [])
+    {
+        return $this->render(self::LINK, $group, $attributes);
+    }
+
+    /**
+     * Build the JavaScript script tags.
+     *
+     * @param  string $group name of the group
+     * @param  array  $attributes
+     * @return string
+     */
+    public function js($group = 'head', $attributes = [], $include_js_module = true)
+    {
+        $output = $this->render(self::JS, $group, $attributes);
+
+        if ($include_js_module) {
+            $output .= $this->jsModule($group, $attributes);
+        }
+
+        return $output;
+    }
+
+    /**
+     * Build the Javascript Modules tags
+     *
+     * @param string $group
+     * @param array $attributes
+     * @return string
+     */
+    public function jsModule($group = 'head', $attributes = [])
+    {
+        return $this->render(self::JS_MODULE, $group, $attributes);
+    }
+
+    /**
+     * @param string $group
+     * @param array $attributes
+     * @return string
+     */
+    public function all($group = 'head', $attributes = [])
+    {
+        $output = $this->css($group, $attributes, false);
+        $output .= $this->link($group, $attributes);
+        $output .= $this->js($group, $attributes, false);
+        $output .= $this->jsModule($group, $attributes);
+        return $output;
+    }
+
+    /**
+     * @param class-string $type
+     * @return bool
+     */
+    protected function isValidType($type)
+    {
+        return in_array($type, [self::CSS_TYPE, self::JS_TYPE, self::JS_MODULE_TYPE]);
+    }
+
+    /**
+     * @param class-string $type
+     * @return string
+     */
+    protected function getBaseType($type)
+    {
+        $base_type = match ($type) {
+            $this::JS_TYPE, $this::INLINE_JS_TYPE => $this::JS,
+            $this::JS_MODULE_TYPE, $this::INLINE_JS_MODULE_TYPE => $this::JS_MODULE,
+            default => $this::CSS,
+        };
+
+        return $base_type;
+    }
+
+    /**
+     * Split pipeline assets into ordered groups based on the value of a given attribute.
+     *
+     * This preserves the original order of the assets while ensuring assets that require
+     * special handling (such as different loading strategies) are rendered separately.
+     *
+     * @param array $assets
+     * @param string $attribute
+     * @return array<int, array{assets: array, attributes: array}>
+     */
+    protected function splitPipelineAssetsByAttribute(array $assets, string $attribute): array
+    {
+        $groups = [];
+        $currentAssets = [];
+        $currentValue = null;
+        $hasCurrentGroup = false;
+
+        foreach ($assets as $key => $asset) {
+            $value = null;
+
+            if (method_exists($asset, 'hasNestedProperty')) {
+                if ($asset->hasNestedProperty($attribute)) {
+                    $value = $asset->getNestedProperty($attribute);
+                } elseif ($asset->hasNestedProperty('attributes.' . $attribute)) {
+                    $value = $asset->getNestedProperty('attributes.' . $attribute);
+                }
+            }
+
+            if ($value === null && isset($asset[$attribute])) {
+                $value = $asset[$attribute];
+            }
+
+            if ($value === '' || $value === false) {
+                $value = null;
+            }
+
+            if (!$hasCurrentGroup) {
+                $currentAssets = [$key => $asset];
+                $currentValue = $value;
+                $hasCurrentGroup = true;
+                continue;
+            }
+
+            if ($value === $currentValue) {
+                $currentAssets[$key] = $asset;
+                continue;
+            }
+
+            $groups[] = [
+                'assets' => $currentAssets,
+                'attributes' => $currentValue !== null ? [$attribute => $currentValue] : []
+            ];
+
+            $currentAssets = [$key => $asset];
+            $currentValue = $value;
+        }
+
+        if ($hasCurrentGroup) {
+            $groups[] = [
+                'assets' => $currentAssets,
+                'attributes' => $currentValue !== null ? [$attribute => $currentValue] : []
+            ];
+        }
+
+        return $groups;
+    }
+}

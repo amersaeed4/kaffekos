@@ -1,0 +1,90 @@
+---
+GRAV:
+  FRONTMATTER_ERROR_PAGE: "---\nNosaukums: %1$s\n---\n\n# Kļūda: Nederīgs Frontmatter\n\nCeļš: `%2$s`\n\n**%3$s**\n\n```\n%4$s\n```"
+  INFLECTOR_ORDINALS:
+    'default': '.'
+    'first': '.'
+    'second': '.'
+    'third': '.'
+  NICETIME:
+    NO_DATE_PROVIDED: Nav norādīts datums
+    BAD_DATE: Nederīgs datums
+    AGO: iepriekš
+    FROM_NOW: no šī brīža
+    JUST_NOW: tikko
+    SECOND: sekundes
+    MINUTE: minūte
+    HOUR: stunda
+    DAY: diena
+    WEEK: nedēļa
+    MONTH: mēnesis
+    YEAR: gads
+    DECADE: dekāde
+    SEC: s
+    MIN: m
+    HR: st
+    WK: ned
+    MO: mēn.
+    YR: g.
+    DEC: dec
+    SECOND_PLURAL: sekundes
+    MINUTE_PLURAL: minūtes
+    HOUR_PLURAL: stundas
+    DAY_PLURAL: dienas
+    WEEK_PLURAL: nedēļas
+    MONTH_PLURAL: mēneši
+    YEAR_PLURAL: gadi
+    DECADE_PLURAL: desmitgades
+    SEC_PLURAL: s
+    MIN_PLURAL: m
+    HR_PLURAL: st.
+    WK_PLURAL: ned.
+    MO_PLURAL: mēn.
+    YR_PLURAL: g.
+    DEC_PLURAL: d
+  FORM:
+    VALIDATION_FAIL: '<b>Validācija neizdevās:</b>'
+    INVALID_INPUT: 'Nederīga ievade'
+    MISSING_REQUIRED_FIELD: 'Laukā trūkst datu'
+    XSS_ISSUES: "Atrastas iespējamas XSS problēmas laukā '%s'"
+  MONTHS_OF_THE_YEAR:
+    - 'Janvāris'
+    - 'Februāris'
+    - 'Marts'
+    - 'Aprīlis'
+    - 'Maijs'
+    - 'Jūnijs'
+    - 'Jūlijs'
+    - 'Augusts'
+    - 'Septembris'
+    - 'Oktobris'
+    - 'Novembris'
+    - 'Decembris'
+  DAYS_OF_THE_WEEK:
+    - 'Pirmdiena'
+    - 'Otrdiena'
+    - 'Trešdiena'
+    - 'Ceturtdiena'
+    - 'Piektdiena'
+    - 'Sestdiena'
+    - 'Svētdiena'
+  YES: "Jā"
+  NO: "Nē"
+  CRON:
+    EVERY: katru
+    EVERY_HOUR: katru stundu
+    EVERY_MINUTE: katru minūti
+    EVERY_DAY_OF_WEEK: katru nedēļas dienu
+    EVERY_DAY_OF_MONTH: katru mēneša dienu
+    EVERY_MONTH: katru mēnesi
+    TEXT_PERIOD: Katru <b />
+    ERROR1: Marķieris %s nav atbalstīts!
+    ERROR2: Nederīgs elementu skaits
+    ERROR3: jquery_element nevajadzētu definēt jqCron iestatījumos
+    ERROR4: Neatpazīta izteiksme
+
+PLUGIN_ADMIN:
+    MEDIA: "Multivide"
+    MEDIA_TYPES: "Mēdiju veidi"
+    IMAGE_OPTIONS: "Attēla uzstādījumi"
+    FILE_EXTENSION: "Faila paplašinājums"

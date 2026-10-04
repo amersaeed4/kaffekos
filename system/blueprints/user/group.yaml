@@ -1,0 +1,63 @@
+title: Group
+rules:
+  slug:
+    pattern: '[a-zA-Zа-яA-Я0-9_\-]+'
+    min: 1
+    max: 200
+
+form:
+  validation: loose
+
+  fields:
+    groupname:
+      type: text
+      size: large
+      label: PLUGIN_ADMIN.GROUP_NAME
+      flex-disabled@: exists
+      flex-readonly@: exists
+      validate:
+        required: true
+        rule: slug
+
+    readableName:
+      type: text
+      size: large
+      label: PLUGIN_ADMIN.DISPLAY_NAME
+
+    description:
+      type: text
+      size: large
+      label: PLUGIN_ADMIN.DESCRIPTION
+
+    icon:
+      type: text
+      size: small
+      label: PLUGIN_ADMIN.ICON
+
+    enabled:
+      type: toggle
+      label: PLUGIN_ADMIN.ENABLED
+      highlight: 1
+      default: 1
+      options:
+        1: PLUGIN_ADMIN.YES
+        0: PLUGIN_ADMIN.NO
+      validate:
+        type: bool
+
+    access:
+      # A group's access map is granted to every member, so writing it is a
+      # super-only capability — same as the account form's groups/access fields.
+      # `check_authorize` below only drives how the classic admin renders the
+      # permission rows; `security@` is what actually strips the field from a
+      # non-super's submitted data via Blueprint::dynamicSecurity(), so without
+      # it an `admin.users` operator could save `admin.super: true` onto a group
+      # they belong to and escalate. (GHSA-xhfv-7758-r9hx)
+      security@: admin.super
+      type: permissions
+      check_authorize: false
+      label: PLUGIN_ADMIN.PERMISSIONS
+      ignore_empty: true
+      validate:
+        type: array
+        value_type: bool

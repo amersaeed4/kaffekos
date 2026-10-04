@@ -1,0 +1,30 @@
+{% import 'macros/kk.html.twig' as kk %}
+{% set cta_label = theme_var('header.cta_label') %}
+{% set cta_url = theme_var('header.cta_url') %}
+{% set wordmark = theme_var('brand.wordmark') ?: site.title %}
+<header class="site-header" id="site-header">
+    <div class="wrap header-inner">
+        <a class="brand" href="{{ base_url == '' ? '/' : base_url }}" aria-label="{{ site.title }} home">
+            <img src="{{ logo_url }}" alt="" width="44" height="44">
+            <span class="brand-text">
+                <span class="brand-name">{{ wordmark }}</span>
+                {% if theme_var('brand.tagline') %}<span class="brand-tag">{{ theme_var('brand.tagline') }}</span>{% endif %}
+            </span>
+        </a>
+
+        <nav class="main-nav" id="main-nav" aria-label="Main">
+            <ul>
+                {% for p in pages.children.visible %}
+                    <li><a href="{{ p.url }}" class="{{ p.active or p.activeChild ? 'active' : '' }}">{{ p.menu }}</a></li>
+                {% endfor %}
+            </ul>
+            {% if cta_label %}
+                <a class="btn btn-primary nav-cta" href="{{ kk.href(cta_url) }}">{{ cta_label }}</a>
+            {% endif %}
+        </nav>
+
+        <button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>

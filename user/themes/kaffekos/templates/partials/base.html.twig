@@ -1,0 +1,76 @@
+{% import 'macros/kk.html.twig' as kk %}
+{% set biz = theme_var('business') %}
+{% set social = theme_var('social') %}
+{% set colors = theme_var('colors') %}
+{% set hours = theme_var('hours') %}
+{% set logo = theme_var('custom_logo') %}
+{% set logo_first = (logo is iterable and logo|length > 0) ? logo|first : null %}
+{% set logo_url = logo_first.name|default(null) ? url('theme://images/logo/' ~ logo_first.name) : url('theme://images/kk-logo.png') %}
+{% set favicon = theme_var('custom_favicon') %}
+{% set favicon_first = (favicon is iterable and favicon|length > 0) ? favicon|first : null %}
+{% set favicon_url = favicon_first.name|default(null) ? url('theme://images/favicon/' ~ favicon_first.name) : url('theme://images/kk-logo.png') %}
+{% set page_title = page.title and page.route != '/' and page.route != '/home' ? page.title ~ ' | ' ~ site.title : site.title ~ ' | ' ~ (theme_var('brand.tagline') ?: 'Coffee House') %}
+{% set page_desc = page.metadata.description.content|default(header.hero.subtitle|default(header.banner.subtitle|default(header.summary|default(site.metadata.description)))) %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title|e('html') }}</title>
+    <meta name="description" content="{{ page_desc|striptags|e('html_attr') }}">
+    <meta name="theme-color" content="{{ colors.navy|default('#0f2747') }}">
+    <link rel="canonical" href="{{ page.url(true, true) }}">
+    <link rel="icon" href="{{ favicon_url }}">
+    <link rel="apple-touch-icon" href="{{ favicon_url }}">
+    <meta property="og:site_name" content="{{ site.title|e('html_attr') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ page_title|e('html_attr') }}">
+    <meta property="og:description" content="{{ page_desc|striptags|e('html_attr') }}">
+    <meta property="og:url" content="{{ page.url(true, true) }}">
+    {% block og_image %}<meta property="og:image" content="{{ url('theme://images/kk-logo.png', true) }}">{% endblock %}
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ url('theme://fonts/fraunces-normal.woff2') }}">
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ url('theme://fonts/dm-sans-normal.woff2') }}">
+    {% do assets.addCss('theme://css/kaffekos.css', 100) %}
+    {{ assets.css()|raw }}
+    <style>
+        :root {
+            --navy: {{ colors.navy|default('#0f2747') }};
+            --red: {{ colors.red|default('#ba0c2f') }};
+            --gold: {{ colors.gold|default('#c99a5b') }};
+            --cream: {{ colors.cream|default('#fbf6ec') }};
+            --sand: {{ colors.sand|default('#f1e6d2') }};
+            --ink: {{ colors.ink|default('#2b1a10') }};
+            --pattern: url('{{ url('theme://images/pattern-star.svg') }}');
+        }
+    </style>
+
+    {% include 'partials/jsonld.html.twig' %}
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<a class="skip-link" href="#main">Skip to content</a>
+
+{% if theme_var('announcement.enabled') and theme_var('announcement.text') %}
+    {% set ann_link = theme_var('announcement.link') %}
+    <div class="announce">
+        {% if ann_link %}<a href="{{ kk.href(ann_link) }}">{{ theme_var('announcement.text') }} {{ kk.icon('arrow', 16) }}</a>
+        {% else %}<span>{{ theme_var('announcement.text') }}</span>{% endif %}
+    </div>
+{% endif %}
+
+{% include 'partials/header.html.twig' %}
+
+<main id="main">
+    {% block hero %}{% endblock %}
+    {% block content %}{% endblock %}
+</main>
+
+{% include 'partials/footer.html.twig' %}
+
+<script type="application/json" id="kk-hours">{{ hours|json_encode|raw }}</script>
+{% do assets.addJs('theme://js/kaffekos.js', {group: 'bottom', loading: 'defer'}) %}
+{{ assets.js('bottom')|raw }}
+</body>
+</html>

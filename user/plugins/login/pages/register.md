@@ -1,0 +1,65 @@
+---
+title: Register User
+login_redirect_here: false
+cache_control: private, no-cache, must-revalidate
+
+form:
+
+  fields:
+    fullname:
+      id: fullname
+      type: text
+      validate:
+        required: true
+
+
+    username:
+      id: username
+      type: text
+      validate:
+        required: true
+        message: PLUGIN_LOGIN.USERNAME_NOT_VALID
+        config-pattern@: system.username_regex
+
+    email:
+      id: email
+      type: email
+      validate:
+        required: true
+        message: PLUGIN_LOGIN.EMAIL_VALIDATION_MESSAGE
+
+    password1:
+      id: password1
+      type: password
+      label: PLUGIN_LOGIN.ENTER_PASSWORD
+      validate:
+        required: true
+        message: PLUGIN_LOGIN.PASSWORD_VALIDATION_MESSAGE
+        config-pattern@: system.pwd_regex
+
+    password2:
+      id: password2
+      type: password
+      label: PLUGIN_LOGIN.ENTER_PASSWORD_AGAIN
+      validate:
+        required: true
+        message: PLUGIN_LOGIN.PASSWORD_VALIDATION_MESSAGE
+        config-pattern@: system.pwd_regex
+
+  buttons:
+      -
+          type: submit
+          value: PLUGIN_LOGIN.BTN_REGISTER
+      -
+          type: reset
+          value: PLUGIN_LOGIN.BTN_RESET
+
+  process:
+      register_user: true
+      message: PLUGIN_LOGIN.REGISTRATION_THANK_YOU
+      reset: true
+---
+
+# [translate=PLUGIN_LOGIN.REGISTER_PAGE_HEADING /]
+
+[translate=PLUGIN_LOGIN.REGISTER_PAGE_DESC /]

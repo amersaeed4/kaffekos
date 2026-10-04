@@ -1,0 +1,26 @@
+{# Structured data so Google can show Kaffekos with address, hours and photos #}
+{% set biz = theme_var('business') %}
+{% set social = theme_var('social') %}
+{% set days = {'monday': 'Monday', 'tuesday': 'Tuesday', 'wednesday': 'Wednesday', 'thursday': 'Thursday', 'friday': 'Friday', 'saturday': 'Saturday', 'sunday': 'Sunday'} %}
+{% set specs = [] %}
+{% for h in theme_var('hours') if h.day and not h.closed and h.open and h.close %}
+    {% set specs = specs|merge([{'@type': 'OpeningHoursSpecification', 'dayOfWeek': h.day|capitalize, 'opens': h.open, 'closes': h.close}]) %}
+{% endfor %}
+{% set same = [] %}
+{% for k, v in social if v %}{% set same = same|merge([v]) %}{% endfor %}
+{% set data = {
+    '@context': 'https://schema.org',
+    '@type': 'CafeOrCoffeeShop',
+    'name': site.title,
+    'url': base_url_absolute ~ '/',
+    'image': url('theme://images/kk-logo.png', true),
+    'telephone': biz.phone,
+    'email': biz.email,
+    'priceRange': biz.price_range,
+    'servesCuisine': ['Coffee', 'Norwegian', 'Bakery'],
+    'address': {'@type': 'PostalAddress', 'streetAddress': (biz.address|default('')|replace({"\n": ', '})), 'addressLocality': 'Lahore', 'addressCountry': 'PK'},
+    'geo': {'@type': 'GeoCoordinates', 'latitude': biz.lat, 'longitude': biz.lng},
+    'openingHoursSpecification': specs,
+    'sameAs': same
+} %}
+<script type="application/ld+json">{{ data|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>

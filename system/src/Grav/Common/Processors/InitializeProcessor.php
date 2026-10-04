@@ -1,0 +1,567 @@
+<?php
+
+/**
+ * @package    Grav\Common\Processors
+ *
+ * @copyright  Copyright (c) 2015 - 2026 Trilby Media, LLC. All rights reserved.
+ * @license    MIT License; see LICENSE file for details.
+ */
+
+namespace Grav\Common\Processors;
+
+use Grav\Common\Config\CompiledBase;
+use Grav\Common\Config\Config;
+use Grav\Common\Debugger;
+use Grav\Common\Errors\Errors;
+use Grav\Common\Grav;
+use Grav\Common\Page\Pages;
+use Grav\Common\Plugins;
+use Grav\Common\Session;
+use Grav\Common\Uri;
+use Grav\Common\Utils;
+use Grav\Framework\File\Formatter\YamlFormatter;
+use Grav\Framework\File\YamlFile;
+use Grav\Framework\Psr7\Response;
+use Grav\Framework\Session\Exceptions\SessionException;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
+use function defined;
+use function in_array;
+
+/**
+ * Class InitializeProcessor
+ * @package Grav\Common\Processors
+ */
+class InitializeProcessor extends ProcessorBase
+{
+    /** @var string */
+    public $id = '_init';
+    /** @var string */
+    public $title = 'Initialize';
+
+    /** @var bool */
+    protected static $cli_initialized = false;
+
+    /**
+     * @param Grav $grav
+     * @return void
+     */
+    public static function initializeCli(Grav $grav)
+    {
+        if (!static::$cli_initialized) {
+            static::$cli_initialized = true;
+
+            $instance = new static($grav);
+            $instance->processCli();
+        }
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $this->startTimer('_init', 'Initialize');
+
+        // Load configuration.
+        $config = $this->initializeConfig();
+
+        // Initialize logger.
+        $this->initializeLogger($config);
+
+        // Initialize error handlers.
+        $this->initializeErrors();
+
+        // Initialize debugger.
+        $debugger = $this->initializeDebugger();
+
+        // Debugger can return response right away.
+        $response = $this->handleDebuggerRequest($debugger, $request);
+        if ($response) {
+            $this->stopTimer('_init');
+
+            return $response;
+        }
+
+        // Initialize output buffering.
+        $this->initializeOutputBuffering($config);
+
+        // Set timezone, locale.
+        $this->initializeLocale($config);
+
+        // Load plugins.
+        $this->initializePlugins();
+
+        // Load pages.
+        $this->initializePages($config);
+
+        // Load accounts (decides class to be used).
+        // TODO: remove in 2.0.
+        $this->container['accounts'];
+
+        // Initialize session (used by URI, see issue #3269).
+        $this->initializeSession($config);
+
+        // Initialize URI (uses session, see issue #3269).
+        $this->initializeUri($config);
+
+        // Grav may return redirect response right away.
+        $redirectCode = (int)$config->get('system.pages.redirect_trailing_slash', 1);
+        if ($redirectCode) {
+            $response = $this->handleRedirectRequest($request, $redirectCode > 300 ? $redirectCode : null);
+            if ($response) {
+                $this->stopTimer('_init');
+
+                return $response;
+            }
+        }
+
+        $this->stopTimer('_init');
+
+        // Wrap call to next handler so that debugger can profile it.
+        /** @var Response $response */
+        $response = $debugger->profile(static fn() => $handler->handle($request));
+
+        // Log both request and response and return the response.
+        return $debugger->logRequest($request, $response);
+    }
+
+    public function processCli(): void
+    {
+        // Load configuration.
+        $config = $this->initializeConfig();
+
+        // Initialize logger.
+        $this->initializeLogger($config);
+
+        // Disable debugger.
+        $this->container['debugger']->enabled(false);
+
+        // Set timezone, locale.
+        $this->initializeLocale($config);
+
+        // Load plugins.
+        $this->initializePlugins();
+
+        // Load pages.
+        $this->initializePages($config);
+
+        // Initialize URI.
+        $this->initializeUri($config);
+
+        // Load accounts (decides class to be used).
+        // TODO: remove in 2.0.
+        $this->container['accounts'];
+    }
+
+    /**
+     * @return Config
+     */
+    protected function initializeConfig(): Config
+    {
+        $this->startTimer('_init_config', 'Configuration');
+
+        // Initialize Configuration
+        $grav = $this->container;
+
+        /** @var Config $config */
+        $config = $grav['config'];
+        $config->init();
+        $grav['plugins']->setup();
+
+        if (defined('GRAV_SCHEMA') && $config->get('versions') === null) {
+            $filename = USER_DIR . 'config/versions.yaml';
+            if (!is_file($filename)) {
+                $versions = [
+                    'core' => [
+                        'grav' => [
+                            'version' => GRAV_VERSION,
+                            'schema' => GRAV_SCHEMA
+                        ]
+                    ]
+                ];
+                $config->set('versions', $versions);
+
+                // Non-fatal: the value is already set in memory for this request
+                // and the write is retried on the next one. A read-only
+                // user/config must not be able to take the site down here, before
+                // the logger, the error handler and the Problems plugin exist to
+                // report it. (#3688, same window as #4260)
+                try {
+                    $file = new YamlFile($filename, new YamlFormatter(['inline' => 4]));
+                    $file->save($versions);
+                } catch (Throwable $e) {
+                    CompiledBase::logCacheWriteFailure($filename, $e->getMessage());
+                }
+            }
+        }
+
+        // Override configuration using the environment. The gate has to read
+        // exactly what the loop below reads: a SAPI that populates only
+        // $_SERVER (Apache SetEnv, nginx fastcgi_param) would otherwise skip
+        // the whole feature with nothing logged, and an empty value must fall
+        // through rather than shadow a working getenv(). (#4279)
+        $prefix = 'GRAV_CONFIG';
+        $vars = $_ENV + $_SERVER;
+        if (!empty($vars[$prefix]) || getenv($prefix)) {
+            $cPrefix = $prefix . '__';
+            $aPrefix = $prefix . '_ALIAS__';
+            $cLen = strlen($cPrefix);
+            $aLen = strlen($aPrefix);
+
+            $keys = $aliases = [];
+            $env = $vars;
+            foreach ($env as $key => $value) {
+                if (!str_starts_with((string) $key, $prefix)) {
+                    continue;
+                }
+                if (str_starts_with((string) $key, $cPrefix)) {
+                    $key = str_replace('__', '.', substr((string) $key, $cLen));
+                    $keys[$key] = $value;
+                } elseif (str_starts_with((string) $key, $aPrefix)) {
+                    $key = substr((string) $key, $aLen);
+                    $aliases[$key] = $value;
+                }
+            }
+            $list = [];
+            foreach ($keys as $key => $value) {
+                foreach ($aliases as $alias => $real) {
+                    $key = str_replace($alias, $real, $key);
+                }
+                $value = static::castEnvironmentValue($value);
+                $list[$key] = $value;
+                $config->set($key, $value);
+            }
+        }
+
+        $this->stopTimer('_init_config');
+
+        return $config;
+    }
+
+    /**
+     * @param Config $config
+     * @return Logger|null
+     */
+    protected function initializeLogger(Config $config): ?Logger
+    {
+        // The default file handler needs no setup here, so the logger service can stay
+        // lazy and only gets built when something actually logs. Only the syslog
+        // handler requires replacing the default handler up front.
+        if ($config->get('system.log.handler', 'file') !== 'syslog') {
+            return null;
+        }
+
+        $this->startTimer('_init_logger', 'Logger');
+
+        $grav = $this->container;
+
+        // Initialize Logging
+        /** @var Logger $log */
+        $log = $grav['log'];
+        $log->popHandler();
+
+        $facility = $config->get('system.log.syslog.facility', 'local6');
+        $tag = $config->get('system.log.syslog.tag', 'grav');
+        $logHandler = new SyslogHandler($tag, $facility);
+        $formatter = new LineFormatter("%channel%.%level_name%: %message% %extra%");
+        $logHandler->setFormatter($formatter);
+
+        $log->pushHandler($logHandler);
+
+        $this->stopTimer('_init_logger');
+
+        return $log;
+    }
+
+    /**
+     * @return Errors
+     */
+    protected function initializeErrors(): Errors
+    {
+        $this->startTimer('_init_errors', 'Error Handlers Reset');
+
+        $grav = $this->container;
+
+        // Initialize Error Handlers
+        /** @var Errors $errors */
+        $errors = $grav['errors'];
+        $errors->resetHandlers();
+
+        $this->stopTimer('_init_errors');
+
+        return $errors;
+    }
+
+    /**
+     * @return Debugger
+     */
+    protected function initializeDebugger(): Debugger
+    {
+        $this->startTimer('_init_debugger', 'Init Debugger');
+
+        $grav = $this->container;
+
+        /** @var Debugger $debugger */
+        $debugger = $grav['debugger'];
+        $debugger->init();
+
+        $this->stopTimer('_init_debugger');
+
+        return $debugger;
+    }
+
+    /**
+     * @param Debugger $debugger
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface|null
+     */
+    protected function handleDebuggerRequest(Debugger $debugger, ServerRequestInterface $request): ?ResponseInterface
+    {
+        // Clockwork integration.
+        $clockwork = $debugger->getClockwork();
+        if ($clockwork) {
+            $server = $request->getServerParams();
+//            $baseUri = str_replace('\\', '/', dirname(parse_url($server['SCRIPT_NAME'], PHP_URL_PATH)));
+//            if ($baseUri === '/') {
+//                $baseUri = '';
+//            }
+            $requestTime = $server['REQUEST_TIME_FLOAT'] ?? GRAV_REQUEST_TIME;
+
+            $request = $request->withAttribute('request_time', $requestTime);
+
+            // Handle clockwork API calls.
+            $uri = $request->getUri();
+            if (Utils::contains($uri->getPath(), '/__clockwork/')) {
+                return $debugger->debuggerRequest($request);
+            }
+
+            $this->container['clockwork'] = $clockwork;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param Config $config
+     */
+    protected function initializeOutputBuffering(Config $config): void
+    {
+        $this->startTimer('_init_ob', 'Initialize Output Buffering');
+
+        // Use output buffering to prevent headers from being sent too early.
+        ob_start();
+
+        $this->stopTimer('_init_ob');
+    }
+
+    /**
+     * @param Config $config
+     */
+    protected function initializeLocale(Config $config): void
+    {
+        $this->startTimer('_init_locale', 'Initialize Locale');
+
+        // Initialize the timezone.
+        $timezone = $config->get('system.timezone');
+        if ($timezone) {
+            date_default_timezone_set($timezone);
+        }
+
+        $grav = $this->container;
+        $grav->setLocale();
+
+        $this->stopTimer('_init_locale');
+    }
+
+    protected function initializePlugins(): Plugins
+    {
+        $this->startTimer('_init_plugins_load', 'Load Plugins');
+
+        $grav = $this->container;
+
+        /** @var Plugins $plugins */
+        $plugins = $grav['plugins'];
+        $plugins->init();
+
+        $this->stopTimer('_init_plugins_load');
+
+        return $plugins;
+    }
+
+    protected function initializePages(Config $config): Pages
+    {
+        $this->startTimer('_init_pages_register', 'Load Pages');
+
+        $grav = $this->container;
+
+        /** @var Pages $pages */
+        $pages = $grav['pages'];
+        // Upgrading from older Grav versions won't work without checking if the method exists.
+        if (method_exists($pages, 'register')) {
+            $pages->register();
+        }
+
+        $this->stopTimer('_init_pages_register');
+
+        return $pages;
+    }
+
+
+    protected function initializeUri(Config $config): void
+    {
+        $this->startTimer('_init_uri', 'Initialize URI');
+
+        $grav = $this->container;
+
+        /** @var Uri $uri */
+        $uri = $grav['uri'];
+        $uri->init();
+
+        $this->stopTimer('_init_uri');
+    }
+
+    protected function handleRedirectRequest(RequestInterface $request, ?int $code = null): ?ResponseInterface
+    {
+        if (!in_array($request->getMethod(), ['GET', 'HEAD'])) {
+            return null;
+        }
+
+        // Redirect pages with trailing slash if configured to do so.
+        $uri = $request->getUri();
+        $path = $uri->getPath() ?: '/';
+        $root = $this->container['uri']->rootUrl();
+
+        // The raw PSR-7 path is the path PHP was reached at, which is not necessarily
+        // the URL the visitor typed. With `system.custom_base_url` the public base can
+        // differ from the physical one, and behind a proxy that strips the base before
+        // forwarding, the request carries no base at all -- so building the redirect
+        // target from the raw path drops it and sends visitors outside the site (#3822).
+        //
+        // Uri has already resolved this: `init()` maps the physical base onto the public
+        // one, so `uri(true)` is the public path. Prefer it, and only prepend the base
+        // when it genuinely is not there -- prepending onto an already-remapped path
+        // would double it up.
+        if ($root !== '' && $root !== '/' && str_starts_with($root, '/')) {
+            $publicPath = explode('?', $this->container['uri']->uri(true), 2)[0] ?: '/';
+
+            if (!static::pathHasBase($publicPath, $root)) {
+                $publicPath = rtrim($root, '/') . $publicPath;
+            }
+
+            $path = $publicPath;
+            $uri = $uri->withPath($path);
+        }
+
+        if ($path !== $root && $path !== $root . '/' && Utils::endsWith($path, '/')) {
+            // A real folder, such as user/pages. The web server adds this slash itself
+            // (Apache's mod_dir, nginx, Caddy), so taking it off again sends the visitor
+            // round in a redirect loop (#4325). Leave it and let the request 404.
+            if (static::isFolderOnDisk(substr(rtrim($path, '/'), strlen(rtrim($root, '/'))))) {
+                return null;
+            }
+
+            // Use permanent redirect for SEO reasons.
+            return $this->container->getRedirectResponse((string)$uri->withPath(rtrim($path, '/')), $code);
+        }
+
+        return null;
+    }
+
+    /**
+     * Is `$relative` (a URL path below the site root) a real folder in the web root?
+     *
+     * `..` is refused so the check cannot be used to probe for folders outside the site.
+     *
+     * @param string $relative
+     * @return bool
+     */
+    protected static function isFolderOnDisk(string $relative): bool
+    {
+        $relative = trim(rawurldecode($relative), '/');
+        if ($relative === '' || in_array('..', explode('/', $relative), true)) {
+            return false;
+        }
+
+        return is_dir(GRAV_WEBROOT . '/' . $relative);
+    }
+
+    /**
+     * Does `$path` lie at, or under, the base path `$base`?
+     *
+     * Compares whole path segments rather than raw text. A plain prefix test would
+     * report `/subscribe` as already being under a base of `/sub`, which silently
+     * skips restoring the base for every page whose first segment merely starts with
+     * the same letters -- the original bug, still present but only on those routes.
+     *
+     * @param string $path
+     * @param string $base
+     * @return bool
+     */
+    protected static function pathHasBase(string $path, string $base): bool
+    {
+        $base = rtrim($base, '/');
+
+        return $path === $base || str_starts_with($path, $base . '/');
+    }
+
+    /**
+     * Coerce a `GRAV_CONFIG__*` environment override to the type it plainly means.
+     *
+     * Environment variables are always strings, so `GRAV_CONFIG__system__cache__enabled=false`
+     * would otherwise reach the config as the string `"false"` -- and the `(bool)` casts
+     * used throughout core (e.g. `Cache::init()`) treat any non-empty, non-`"0"` string
+     * as true, silently doing the opposite of what was asked. Only the two boolean
+     * literals are coerced, case-insensitively; numbers and every other string are
+     * passed through unchanged, matching the previous behaviour.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    protected static function castEnvironmentValue(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            if (strcasecmp($value, 'true') === 0) {
+                return true;
+            }
+            if (strcasecmp($value, 'false') === 0) {
+                return false;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param Config $config
+     */
+    protected function initializeSession(Config $config): void
+    {
+        // FIXME: Initialize session should happen later after plugins have been loaded. This is a workaround to fix session issues in AWS.
+        if (isset($this->container['session']) && $config->get('system.session.initialize', true)) {
+            $this->startTimer('_init_session', 'Start Session');
+
+            /** @var Session $session */
+            $session = $this->container['session'];
+
+            try {
+                $session->init();
+            } catch (SessionException) {
+                $session->init();
+                $message = 'Session corruption detected, restarting session...';
+                $this->addMessage($message);
+                $this->container['messages']->add($message, 'error');
+            }
+
+            $this->stopTimer('_init_session');
+        }
+    }
+}

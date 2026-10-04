@@ -1,0 +1,1252 @@
+<?php
+
+/**
+ * @package    Grav\Installer
+ *
+ * @copyright  Copyright (c) 2015 - 2026 Trilby Media, LLC. All rights reserved.
+ * @license    MIT License; see LICENSE file for details.
+ */
+
+namespace Grav\Installer;
+
+use Composer\Autoload\ClassLoader;
+use Grav\Common\Cache;
+use Grav\Common\Filesystem\Folder;
+use Grav\Common\GPM\GPM;
+use Grav\Common\GPM\Installer;
+use Grav\Common\Grav;
+use Grav\Common\Plugins;
+use Grav\Common\Yaml;
+use RuntimeException;
+use Throwable;
+use function basename;
+use function class_exists;
+use function count;
+use function dirname;
+use function explode;
+use function function_exists;
+use function file_get_contents;
+use function glob;
+use function iterator_to_array;
+use function is_dir;
+use function is_file;
+use function method_exists;
+use function is_string;
+use function json_decode;
+use function array_map;
+use function array_pad;
+use function array_key_exists;
+use function sprintf;
+use function strtolower;
+use function strpos;
+use function preg_match;
+use const GRAV_ROOT;
+
+/**
+ * Grav installer.
+ *
+ * NOTE: This class can be initialized during upgrade from an older version of Grav. Make sure it runs there!
+ */
+final class Install
+{
+    /** @var int Installer version. */
+    public $version = 1;
+
+    /** @var array */
+    public $requires = [
+        'php' => [
+            'name' => 'PHP',
+            'versions' => [
+                '8.1' => '8.1.0',
+                '8.0' => '8.0.0',
+                '7.4' => '7.4.1',
+                '7.3' => '7.3.6',
+                '' => '8.0.13'
+            ]
+        ],
+        'grav' => [
+            'name' => 'Grav',
+            'versions' => [
+                '1.7' => '1.7.51',
+                '' => '1.7.51'
+            ]
+        ],
+        'plugins' => [
+            'admin' => [
+                'name' => 'Admin',
+                'optional' => true,
+                'versions' => [
+                    '1.9' => '1.9.0',
+                    '' => '1.9.13'
+                ]
+            ],
+            'email' => [
+                'name' => 'Email',
+                'optional' => true,
+                'versions' => [
+                    '3.0' => '3.0.0',
+                    '' => '3.0.10'
+                ]
+            ],
+            'form' => [
+                'name' => 'Form',
+                'optional' => true,
+                'versions' => [
+                    '4.1' => '4.1.0',
+                    '4.0' => '4.0.0',
+                    '3.0' => '3.0.0',
+                    '' => '4.1.2'
+                ]
+            ],
+            'login' => [
+                'name' => 'Login',
+                'optional' => true,
+                'versions' => [
+                    '3.3' => '3.3.0',
+                    '3.0' => '3.0.0',
+                    '' => '3.3.6'
+                ]
+            ],
+        ]
+    ];
+
+    /** @var array */
+    public $ignores = [
+        'backup',
+        'cache',
+        'images',
+        'logs',
+        'tmp',
+        'user',
+        '.htaccess',
+        'robots.txt'
+    ];
+
+    /** @var array */
+    private $classMap = [
+        InstallException::class => __DIR__ . '/InstallException.php',
+        Versions::class => __DIR__ . '/Versions.php',
+        VersionUpdate::class => __DIR__ . '/VersionUpdate.php',
+        VersionUpdater::class => __DIR__ . '/VersionUpdater.php',
+        YamlUpdater::class => __DIR__ . '/YamlUpdater.php',
+    ];
+
+    /** @var string|null */
+    private $zip;
+
+    /** @var string|null */
+    private $location;
+
+    /** @var VersionUpdater|null */
+    private $updater;
+
+    /** @var static */
+    private static $instance;
+    /** @var bool */
+    private static $allowPendingOverride = false;
+    /** @var bool */
+    private static $allowIncompatibleOverride = false;
+    /** @var callable|null */
+    private $progressCallback = null;
+    /** @var array|null */
+    private $pendingPreflight = null;
+
+    /**
+     * @return static
+     */
+    public static function instance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new static();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * @deprecated No-op stub kept for backward compatibility with pre-2.0 upgrade scripts.
+     */
+    public static function forceSafeUpgrade(?bool $state = true): void
+    {
+    }
+
+    private function __construct()
+    {
+    }
+
+    public static function allowPendingPackageOverride(?bool $state = true): void
+    {
+        if ($state === null) {
+            self::$allowPendingOverride = false;
+        } else {
+            self::$allowPendingOverride = (bool)$state;
+        }
+    }
+
+    public static function allowIncompatibleOverride(?bool $state = true): void
+    {
+        if ($state === null) {
+            self::$allowIncompatibleOverride = false;
+        } else {
+            self::$allowIncompatibleOverride = (bool)$state;
+        }
+    }
+
+    private function ensureLocation(): void
+    {
+        if (null === $this->location) {
+            $path = realpath(__DIR__);
+            if ($path) {
+                $this->location = dirname($path, 4);
+            }
+        }
+    }
+
+    /**
+     * @param string|null $zip
+     * @return $this
+     */
+    public function setZip(?string $zip)
+    {
+        $this->zip = $zip;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $zip
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
+    public function __invoke(?string $zip)
+    {
+        $this->zip = $zip;
+
+        $failedRequirements = $this->checkRequirements();
+        if ($failedRequirements) {
+            $error = ['Following requirements have failed:'];
+
+            foreach ($failedRequirements as $name => $req) {
+                $error[] = "{$req['title']} >= <strong>v{$req['minimum']}</strong> required, you have <strong>v{$req['installed']}</strong>";
+            }
+
+            $errors = implode("<br />\n", $error);
+            if (\defined('GRAV_CLI') && GRAV_CLI) {
+                $errors = "\n\n" . strip_tags($errors) . "\n\n";
+
+                // Check for PHP CLI vs web mismatch
+                $phpFailed = isset($failedRequirements['php']);
+                if ($phpFailed) {
+                    $errors .= <<<ERR
+Note: Your CLI PHP version may differ from your web server's PHP version.
+If your web server runs PHP 8.3+, upgrade via the Admin panel instead.
+Or configure your hosting to use PHP 8.3 for CLI (check your hosting control panel).
+You can also try: php8.3 bin/gpm self-upgrade
+
+ERR;
+                }
+
+                $errors .= <<<ERR
+Please install Grav 1.7.51 first by running following commands:
+
+wget -q https://getgrav.org/download/core/grav-update/1.7.51 -O tmp/grav-update-v1.7.51.zip
+bin/gpm direct-install -y tmp/grav-update-v1.7.51.zip
+rm tmp/grav-update-v1.7.51.zip
+ERR;
+            }
+
+            throw new RuntimeException($errors);
+        }
+
+        $this->prepare();
+        $this->install();
+        $this->finalize();
+    }
+
+    public function setProgressCallback(?callable $callback): self
+    {
+        $this->progressCallback = $callback;
+
+        return $this;
+    }
+
+    private function relayProgress(string $stage, string $message, ?int $percent = null): void
+    {
+        if ($this->progressCallback) {
+            ($this->progressCallback)($stage, $message, $percent);
+        }
+    }
+
+    /**
+     * NOTE: This method can only be called after $grav['plugins']->init().
+     *
+     * @return array List of failed requirements. If the list is empty, installation can go on.
+     */
+    public function checkRequirements(): array
+    {
+        $results = [];
+
+        $this->checkVersion($results, 'php', 'php', $this->requires['php'], PHP_VERSION);
+        $this->checkVersion($results, 'grav', 'grav', $this->requires['grav'], GRAV_VERSION);
+        $this->checkPlugins($results, $this->requires['plugins']);
+
+        return $results;
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     */
+    public function prepare(): void
+    {
+        // Locate the new Grav update and the target site from the filesystem.
+        $this->ensureLocation();
+        $location = realpath(__DIR__);
+        $target = realpath(GRAV_ROOT . '/index.php');
+
+        if (!$location) {
+            throw new RuntimeException('Internal Error', 500);
+        }
+
+        if ($target && dirname($location, 4) === dirname($target)) {
+            // We cannot copy files into themselves, abort!
+            throw new RuntimeException('Grav has already been installed here!', 400);
+        }
+
+        // Load the installer classes.
+        foreach ($this->classMap as $class_name => $path) {
+            // Make sure that none of the Grav\Installer classes have been loaded, otherwise installation may fail!
+            if (class_exists($class_name, false)) {
+                throw new RuntimeException(sprintf('Cannot update Grav, class %s has already been loaded!', $class_name), 500);
+            }
+
+            require $path;
+        }
+
+        $this->legacySupport();
+
+        $this->location = dirname($location, 4);
+
+        $versions = Versions::instance(USER_DIR . 'config/versions.yaml');
+        $this->updater = new VersionUpdater('core/grav', __DIR__ . '/updates', $this->getVersion(), $versions);
+
+        $this->updater->preflight();
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     */
+    public function install(): void
+    {
+        if (!$this->location) {
+            throw new RuntimeException('Oops, installer was run without prepare()!', 500);
+        }
+
+        $installResult = false;
+        $rootFiles = [];
+
+        try {
+            if (null === $this->updater) {
+                $versions = Versions::instance(USER_DIR . 'config/versions.yaml');
+                $this->updater = new VersionUpdater('core/grav', __DIR__ . '/updates', $this->getVersion(), $versions);
+            }
+
+            // Update user/config/version.yaml before copying the files to avoid frontend from setting the version schema.
+            $this->updater->install();
+
+            $targetVersion = $this->getVersion();
+            if (null === $this->pendingPreflight) {
+                $this->pendingPreflight = $this->runPreflightChecks($targetVersion);
+            }
+            if (!empty($this->pendingPreflight['blocking'] ?? [])) {
+                $this->relayProgress('error', 'Upgrade blocked by preflight checks.', null);
+                Installer::setError('Upgrade preflight checks failed.');
+
+                return;
+            }
+            $this->relayProgress('installing', 'Running Grav standard installer...', null);
+
+            // Top-level files are replaced below by this (new) installer rather than
+            // by the already-loaded Installer class, whose older versions unlink a
+            // file before copying the new one in. On Windows that loses index.php:
+            // it is held open by the request running the upgrade, so the unlink is
+            // only pending, the copy fails, and the file vanishes when the request ends.
+            $rootFiles = $this->packageRootFiles();
+
+            $installResult = Installer::install(
+                $this->zip ?? '',
+                GRAV_ROOT,
+                ['sophisticated' => true, 'overwrite' => true, 'ignore_symlinks' => true, 'ignores' => array_merge($this->ignores, $rootFiles)],
+                $this->location,
+                !($this->zip && is_file($this->zip))
+            );
+
+            $this->relayProgress('complete', 'Grav standard installer finished.', 100);
+        } catch (Throwable $e) {
+            // Catch Throwable (not just Exception): a PHP Error/TypeError from the
+            // file operations on a newer runtime must still be reported, not lost.
+            Installer::setError($e->getMessage() !== '' ? $e->getMessage() : ('Unexpected ' . get_class($e)));
+            $this->logInstallError('Exception during Grav core install', $e);
+        } finally {
+            self::$allowPendingOverride = false;
+        }
+
+        $errorCode = Installer::lastErrorCode();
+
+        // Any non-OK state is a failure. The previous check let a non-zip integer
+        // error code (e.g. a leftover/unknown code) slip through as "success",
+        // which is exactly how a real failure surfaced later as a contextless code.
+        $success = $installResult && !is_string($errorCode) && (int) $errorCode === Installer::OK;
+
+        if (!$success) {
+            $message = Installer::lastErrorMsg();
+            $this->relayProgress('error', 'Grav install failed: ' . $message, null);
+            $this->logInstallError('Grav core install failed: ' . $message . ' (code: ' . var_export($errorCode, true) . ')');
+
+            throw new RuntimeException($message);
+        }
+
+        foreach ($rootFiles as $name) {
+            if (!self::replaceFile($this->location . DS . $name, GRAV_ROOT . DS . $name)) {
+                $message = sprintf('Could not replace %s, so the previous copy was kept. Copy %s from the update package by hand to finish the upgrade.', $name, $name);
+                $this->relayProgress('warning', $message, null);
+                $this->logInstallError($message);
+            }
+        }
+    }
+
+    /**
+     * Regular files at the top of the update package, minus the ones the upgrade must not touch.
+     *
+     * @return string[]
+     */
+    private function packageRootFiles(): array
+    {
+        $files = [];
+        foreach (new \DirectoryIterator((string) $this->location) as $file) {
+            $name = $file->getFilename();
+            if ($file->isFile() && !$file->isLink() && !in_array($name, $this->ignores, true)) {
+                $files[] = $name;
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Replace a file without deleting the original first, so a failed replace keeps the old copy.
+     *
+     * Kept in step with Installer::replaceFile(). This copy is the one that runs
+     * during an upgrade, because the Installer class loaded then is the old one.
+     *
+     * @param string $source
+     * @param string $target
+     * @return bool False when the original was left in place.
+     */
+    private static function replaceFile(string $source, string $target): bool
+    {
+        // Replace a symlink (bin/grav sandbox) with the file itself; never write through it.
+        if (is_link($target)) {
+            $link = readlink($target);
+            @unlink($target);
+            if (@copy($source, $target)) {
+                return true;
+            }
+            if ($link !== false) {
+                @symlink($link, $target);
+            }
+
+            return false;
+        }
+
+        // Write beside the target and rename over it, which swaps it in atomically.
+        $tmp = dirname($target) . DS . '.' . basename($target) . '.' . uniqid('', false) . '.tmp';
+        if (@copy($source, $tmp)) {
+            if (@rename($tmp, $target)) {
+                return true;
+            }
+            @unlink($tmp);
+        }
+
+        // Windows refuses the rename while the target is open; overwriting it in place may still work.
+        return @copy($source, $target);
+    }
+
+    /**
+     * Log an install failure to logs/grav.log. Best effort only — logging must
+     * never derail the upgrade, so any failure here is swallowed.
+     *
+     * @param string         $message
+     * @param Throwable|null  $e
+     * @return void
+     */
+    private function logInstallError(string $message, ?Throwable $e = null): void
+    {
+        try {
+            $log = Grav::instance()['log'] ?? null;
+            if (!$log || !is_callable([$log, 'error'])) {
+                return;
+            }
+
+            $context = ['target_version' => $this->getVersion(), 'from' => GRAV_VERSION];
+            if (null !== $e) {
+                $context['exception'] = get_class($e);
+                $context['where'] = $e->getFile() . ':' . $e->getLine();
+                $context['trace'] = $e->getTraceAsString();
+            }
+
+            $log->error('GPM install: ' . $message, $context);
+        } catch (Throwable) {
+            // Never let logging interfere with the install flow.
+        }
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     */
+    public function finalize(): void
+    {
+        $start = microtime(true);
+        $this->relayProgress('finalizing', 'Running postflight tasks...', null);
+        // Finalize can be run without installing Grav first.
+        if (null === $this->updater) {
+            $versions = Versions::instance(USER_DIR . 'config/versions.yaml');
+            $this->updater = new VersionUpdater('core/grav', __DIR__ . '/updates', GRAV_VERSION, $versions);
+            $this->updater->install();
+        }
+
+        $this->updater->postflight();
+
+        $this->ensureExecutablePermissions();
+
+        Cache::clearCache('all');
+
+        clearstatcache();
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+
+        $elapsed = microtime(true) - $start;
+        $this->relayProgress('finalizing', sprintf('Postflight tasks complete in %.3fs.', $elapsed), null);
+    }
+
+    /**
+     * @param array $results
+     * @param string $type
+     * @param string $name
+     * @param array $check
+     * @param string|null $version
+     * @return void
+     */
+    protected function checkVersion(array &$results, $type, $name, array $check, $version): void
+    {
+        if (null === $version && !empty($check['optional'])) {
+            return;
+        }
+
+        $major = $minor = 0;
+        $versions = $check['versions'] ?? [];
+        foreach ($versions as $major => $minor) {
+            if (!$major || version_compare($version ?? '0', $major, '<')) {
+                continue;
+            }
+
+            if (version_compare($version ?? '0', $minor, '>=')) {
+                return;
+            }
+
+            break;
+        }
+
+        if (!$major) {
+            $minor = reset($versions);
+        }
+
+        $recommended = end($versions);
+
+        if (version_compare($recommended, $minor, '<=')) {
+            $recommended = null;
+        }
+
+        $results[$name] = [
+            'type' => $type,
+            'name' => $name,
+            'title' => $check['name'] ?? $name,
+            'installed' => $version,
+            'minimum' => $minor,
+            'recommended' => $recommended
+        ];
+    }
+
+    /**
+     * @param array $results
+     * @param array $plugins
+     * @return void
+     */
+    protected function checkPlugins(array &$results, array $plugins): void
+    {
+        if (!class_exists('Plugins')) {
+            return;
+        }
+
+        foreach ($plugins as $name => $check) {
+            $plugin = Plugins::get($name);
+            if (!$plugin) {
+                $this->checkVersion($results, 'plugin', $name, $check, null);
+                continue;
+            }
+
+            $blueprint = $plugin->blueprints();
+            $version = (string)$blueprint->get('version');
+            $check['name'] = ($blueprint->get('name') ?? $check['name'] ?? $name) . ' Plugin';
+            $this->checkVersion($results, 'plugin', $name, $check, $version);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getVersion(): string
+    {
+        $definesFile = "{$this->location}/system/defines.php";
+        $content = file_get_contents($definesFile);
+        if (false === $content) {
+            return '';
+        }
+
+        // Match GRAV_VERSION regardless of single/double quotes around the name or value.
+        preg_match('/define\(\s*[\'"]GRAV_VERSION[\'"]\s*,\s*[\'"]([^\'"]+)[\'"]\s*\);/mu', $content, $matches);
+
+        $version = $matches[1] ?? '';
+        if ('' === $version) {
+            // Never fail silently: an empty version poisons the preflight checks below.
+            $this->relayProgress('warning', "Could not read GRAV_VERSION from {$definesFile}.", null);
+        }
+
+        return $version;
+    }
+
+
+
+    protected function legacySupport(): void
+    {
+        // Support install for Grav 1.6.0 - 1.6.20 by loading the original class from the older version of Grav.
+        class_exists(\Grav\Console\Cli\CacheCommand::class, true);
+    }
+
+    private function ensureExecutablePermissions(): void
+    {
+        $executables = [
+            'bin/grav',
+            'bin/plugin',
+            'bin/gpm',
+            'bin/composer.phar'
+        ];
+
+        foreach ($executables as $relative) {
+            $path = GRAV_ROOT . '/' . $relative;
+            if (!is_file($path) || is_link($path)) {
+                continue;
+            }
+
+            $mode = @fileperms($path);
+            $current = $mode !== false ? ($mode & 0777) : 0644;
+            if (($current & 0111) === 0111) {
+                continue;
+            }
+
+            @chmod($path, $current | 0111);
+        }
+    }
+
+    /**
+     * @deprecated Always returns null; snapshots removed in 2.0.
+     */
+    public function getLastManifest(): ?array
+    {
+        return null;
+    }
+
+    public function generatePreflightReport(): array
+    {
+        $this->ensureLocation();
+        $version = $this->getVersion();
+
+        $report = $this->runPreflightChecks($version ?: GRAV_VERSION);
+        $this->pendingPreflight = $report;
+
+        return $report;
+    }
+
+    public function getPreflightReport(): ?array
+    {
+        return $this->pendingPreflight;
+    }
+
+    private function runPreflightChecks(string $targetVersion): array
+    {
+        $start = microtime(true);
+        $this->relayProgress('initializing', 'Running preflight checks...', null);
+        $report = [
+            'warnings' => [],
+            'psr_log_conflicts' => [],
+            'monolog_conflicts' => [],
+            'plugins_pending' => [],
+            'incompatible_packages' => [],
+            'is_major_minor_upgrade' => $this->isMajorMinorUpgrade($targetVersion),
+            'blocking' => [],
+        ];
+
+        $report['plugins_pending'] = $this->detectPendingPackageUpdates();
+        $report['psr_log_conflicts'] = $this->detectPsrLogConflicts();
+        $report['monolog_conflicts'] = $this->detectMonologConflicts();
+
+        if ($report['plugins_pending']) {
+            if (self::$allowPendingOverride) {
+                $report['warnings'][] = 'Pending plugin/theme updates ignored for this upgrade run.';
+            } elseif ($report['is_major_minor_upgrade']) {
+                $report['blocking'][] = 'Pending plugin/theme updates detected. Because this is a major Grav upgrade, update them before continuing.';
+            }
+        }
+
+        if ($report['is_major_minor_upgrade']) {
+            $report['incompatible_packages'] = $this->detectIncompatiblePackages($targetVersion);
+
+            if (!empty($report['incompatible_packages']['blocking']) && !self::$allowIncompatibleOverride) {
+                $target = $report['incompatible_packages']['target'];
+                $report['blocking'][] = 'Some enabled plugins/themes have not been marked as compatible with Grav ' . $target . '. Disable them before continuing.';
+            }
+        }
+
+        $elapsed = microtime(true) - $start;
+        $this->relayProgress('initializing', sprintf('Preflight checks complete in %.3fs.', $elapsed), null);
+
+        return $report;
+    }
+
+    /**
+     * Whether the upgrade crosses a release family, which turns on the stricter checks
+     * (pending package updates, packages not marked compatible). Before 2.0 a family is
+     * major.minor, because 1.8 was a breaking line. From 2.0 on a minor release is an
+     * ordinary upgrade and only a new major counts. The rule is repeated here instead of
+     * calling Upgrader::family(), because this class runs from the update package while
+     * the rest of the code is still the installed version.
+     */
+    private function isMajorMinorUpgrade(string $targetVersion, ?string $currentVersion = null): bool
+    {
+        // An unreadable target version must never be treated as a major/minor upgrade,
+        // otherwise it parses to 0.0 and wrongly triggers the incompatible-package gate.
+        if (!preg_match('/^\d+\.\d+/', $targetVersion)) {
+            return false;
+        }
+
+        [$currentMajor, $currentMinor] = array_map('intval', array_pad(explode('.', $currentVersion ?? GRAV_VERSION), 2, 0));
+        [$targetMajor, $targetMinor] = array_map('intval', array_pad(explode('.', $targetVersion), 2, 0));
+
+        if ($currentMajor !== $targetMajor) {
+            return true;
+        }
+
+        return $currentMajor < 2 && $currentMinor !== $targetMinor;
+    }
+
+    private function detectPendingPackageUpdates(): array
+    {
+        $pending = [];
+
+        if (!class_exists(GPM::class)) {
+            return $pending;
+        }
+
+        try {
+            $gpm = new GPM();
+        } catch (Throwable $e) {
+            $this->relayProgress('warning', 'Unable to query GPM: ' . $e->getMessage(), null);
+
+            return $pending;
+        }
+
+        $repoPlugins = $this->packagesToArray($gpm->getRepositoryPlugins());
+        $repoThemes = $this->packagesToArray($gpm->getRepositoryThemes());
+
+        $scanRoot = GRAV_ROOT ?: getcwd();
+
+        $localPlugins = $this->scanLocalPackageVersions($scanRoot . '/user/plugins');
+        foreach ($localPlugins as $slug => $version) {
+            $remote = $repoPlugins[$slug] ?? null;
+            if (!$this->isGpmPackagePublished($remote)) {
+                continue;
+            }
+            $remoteVersion = $this->resolveRemotePackageVersion($remote);
+            if (!$remoteVersion || !$version) {
+                continue;
+            }
+            if (!$this->isPluginEnabled($slug)) {
+                if (str_contains($version, 'dev-')) {
+                    $this->relayProgress('warning', sprintf('Skipping dev plugin %s (%s).', $slug, $version), null);
+                    continue;
+                }
+            }
+
+            if (version_compare($remoteVersion, $version, '>')) {
+                $pending[$slug] = [
+                    'type' => 'plugins',
+                    'current' => $version,
+                    'available' => $remoteVersion,
+                ];
+            }
+        }
+
+        $localThemes = $this->scanLocalPackageVersions($scanRoot . '/user/themes');
+        foreach ($localThemes as $slug => $version) {
+            $remote = $repoThemes[$slug] ?? null;
+            if (!$this->isGpmPackagePublished($remote)) {
+                if (str_contains($version, 'dev-')) {
+                    $this->relayProgress('warning', sprintf('Skipping dev theme %s (%s).', $slug, $version), null);
+                    continue;
+                }
+            }
+            $remoteVersion = $this->resolveRemotePackageVersion($remote);
+            if (!$remoteVersion || !$version) {
+                continue;
+            }
+            if (!$this->isThemeEnabled($slug)) {
+                continue;
+            }
+
+            if (version_compare($remoteVersion, $version, '>')) {
+                $pending[$slug] = [
+                    'type' => 'themes',
+                    'current' => $version,
+                    'available' => $remoteVersion,
+                ];
+            }
+        }
+
+        foreach ($pending as $slug => &$info) {
+            $destination = $scanRoot . '/user/' . $info['type'] . '/' . $slug;
+            // This installer can run against an older installed core during an upgrade.
+            $issue = method_exists(Installer::class, 'getDestinationIssue')
+                ? Installer::getDestinationIssue($destination, $info['type'] === 'themes')
+                : (is_link($destination) ? 'Symbolic link: update its target separately.' : null);
+            if ($issue !== null) {
+                $info['update_blocked'] = $issue;
+            }
+        }
+        unset($info);
+
+        $this->relayProgress('initializing', sprintf('Detected %d updatable packages (including symlinks).', count($pending)), null);
+
+        return $pending;
+    }
+
+    private function scanLocalPackageVersions(string $path): array
+    {
+        $versions = [];
+        if (!is_dir($path)) {
+            return $versions;
+        }
+
+        $entries = glob($path . '/*', GLOB_ONLYDIR) ?: [];
+        foreach ($entries as $dir) {
+            $slug = basename($dir);
+            $version = $this->readBlueprintVersion($dir) ?? $this->readComposerVersion($dir);
+            if ($version !== null) {
+                $versions[$slug] = $version;
+            }
+        }
+
+        return $versions;
+    }
+
+    private function readBlueprintVersion(string $dir): ?string
+    {
+        $file = $dir . '/blueprints.yaml';
+        if (!is_file($file)) {
+            return null;
+        }
+
+        try {
+            $contents = @file_get_contents($file);
+            if ($contents === false) {
+                return null;
+            }
+            $data = Yaml::parse($contents);
+            if (is_array($data) && isset($data['version'])) {
+                return (string)$data['version'];
+            }
+        } catch (Throwable $e) {
+            // ignore parse errors
+        }
+
+        return null;
+    }
+
+    private function readComposerVersion(string $dir): ?string
+    {
+        $file = $dir . '/composer.json';
+        if (!is_file($file)) {
+            return null;
+        }
+
+        $data = json_decode(file_get_contents($file), true);
+        if (is_array($data) && isset($data['version'])) {
+            return (string)$data['version'];
+        }
+
+        return null;
+    }
+
+    private function packagesToArray($packages): array
+    {
+        if (!$packages) {
+            return [];
+        }
+
+        if (is_array($packages)) {
+            return $packages;
+        }
+
+        if ($packages instanceof \Traversable) {
+            return iterator_to_array($packages, true);
+        }
+
+        return [];
+    }
+
+    private function resolveRemotePackageVersion($package): ?string
+    {
+        if (!$package) {
+            return null;
+        }
+
+        if (is_array($package)) {
+            return $package['version'] ?? null;
+        }
+
+        if (is_object($package)) {
+            if (isset($package->version)) {
+                return (string)$package->version;
+            }
+            if (method_exists($package, 'offsetGet')) {
+                try {
+                    return (string)$package->offsetGet('version');
+                } catch (Throwable $e) {
+                    return null;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function detectPsrLogConflicts(): array
+    {
+        $conflicts = [];
+        $pluginRoots = glob(GRAV_ROOT . '/user/plugins/*', GLOB_ONLYDIR) ?: [];
+        foreach ($pluginRoots as $path) {
+            $composerFile = $path . '/composer.json';
+            if (!is_file($composerFile)) {
+                continue;
+            }
+
+            $json = json_decode(file_get_contents($composerFile), true);
+            if (!is_array($json)) {
+                continue;
+            }
+
+            $slug = basename($path);
+            if (!$this->isPluginEnabled($slug)) {
+                continue;
+            }
+            $rawConstraint = $json['require']['psr/log'] ?? ($json['require-dev']['psr/log'] ?? null);
+            if (!$rawConstraint) {
+                continue;
+            }
+
+            $constraint = strtolower((string)$rawConstraint);
+            $compatible = $constraint === '*'
+                || false !== strpos($constraint, '3')
+                || false !== strpos($constraint, '4')
+                || (false !== strpos($constraint, '>=') && preg_match('/>=\s*3/', $constraint));
+
+            if ($compatible) {
+                continue;
+            }
+
+            $conflicts[$slug] = [
+                'composer' => $composerFile,
+                'requires' => $rawConstraint,
+            ];
+        }
+
+        return $conflicts;
+    }
+
+    private function detectMonologConflicts(): array
+    {
+        $conflicts = [];
+        $pluginRoots = glob(GRAV_ROOT . '/user/plugins/*', GLOB_ONLYDIR) ?: [];
+        $pattern = '/->add(?:Debug|Info|Notice|Warning|Error|Critical|Alert|Emergency)\s*\(/i';
+
+        foreach ($pluginRoots as $path) {
+            $slug = basename($path);
+            if (!$this->isPluginEnabled($slug)) {
+                continue;
+            }
+
+            $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
+            $filter = new \RecursiveCallbackFilterIterator($directory, static function ($current, $key, $iterator) {
+                // Skip hidden files/dirs (starting with .)
+                if ($current->getFilename()[0] === '.') {
+                    return false;
+                }
+                if ($iterator->hasChildren()) {
+                    // Exclude vendor and node_modules directories
+                    return !in_array($current->getFilename(), ['vendor', 'node_modules'], true);
+                }
+                // Only include PHP files
+                return $current->getExtension() === 'php';
+            });
+
+            $iterator = new \RecursiveIteratorIterator($filter);
+
+            foreach ($iterator as $file) {
+                $contents = @file_get_contents($file->getPathname());
+                if ($contents === false) {
+                    continue;
+                }
+
+                if (preg_match($pattern, $contents, $match)) {
+                    $relative = str_replace(GRAV_ROOT . '/', '', $file->getPathname());
+                    $conflicts[$slug][] = [
+                        'file' => $relative,
+                        'method' => trim($match[0]),
+                    ];
+                }
+            }
+        }
+
+        return $conflicts;
+    }
+
+    private function isPluginEnabled(string $slug, ?string $root = null): bool
+    {
+        $configPath = ($root ?? GRAV_ROOT) . '/user/config/plugins/' . $slug . '.yaml';
+        if (is_file($configPath)) {
+            try {
+                $contents = @file_get_contents($configPath);
+                if ($contents !== false) {
+                    $data = Yaml::parse($contents);
+                    if (is_array($data) && array_key_exists('enabled', $data)) {
+                        return (bool)$data['enabled'];
+                    }
+                }
+            } catch (Throwable $e) {
+                // ignore parse errors
+            }
+        }
+
+        return true;
+    }
+
+    private function isThemeEnabled(string $slug, ?string $root = null): bool
+    {
+        $configPath = ($root ?? GRAV_ROOT) . '/user/config/system.yaml';
+        if (is_file($configPath)) {
+            try {
+                $contents = @file_get_contents($configPath);
+                if ($contents !== false) {
+                    $data = Yaml::parse($contents);
+                    if (is_array($data)) {
+                        $active = $data['pages']['theme'] ?? ($data['system']['pages']['theme'] ?? null);
+                        if ($active !== null) {
+                            return $active === $slug;
+                        }
+                    }
+                }
+            } catch (Throwable $e) {
+                // ignore parse errors
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Detect installed plugins/themes not compatible with the target Grav version.
+     *
+     * @param string $targetVersion Target Grav version (e.g. '1.8.0')
+     * @return array{blocking: array, warnings: array, target: string}
+     */
+    private function detectIncompatiblePackages(string $targetVersion, ?string $root = null): array
+    {
+        // A target version we cannot parse must not flag every package as incompatible.
+        if (!preg_match('/^(\d+)\.(\d+)/', $targetVersion, $tv)) {
+            return ['blocking' => [], 'warnings' => [], 'target' => $targetVersion];
+        }
+        $targetMajorMinor = $tv[1] . '.' . $tv[2];
+
+        $blocking = [];
+        $warnings = [];
+        $scanRoot = $root ?? GRAV_ROOT ?? getcwd();
+
+        // Scan plugins
+        $pluginDirs = glob($scanRoot . '/user/plugins/*', GLOB_ONLYDIR) ?: [];
+        foreach ($pluginDirs as $dir) {
+            $slug = basename($dir);
+            $compat = $this->readBlueprintCompatibility($dir);
+
+            if (in_array($targetMajorMinor, $compat['grav'], true)) {
+                continue;
+            }
+
+            $version = $this->readBlueprintVersion($dir) ?? 'unknown';
+            $enabled = $this->isPluginEnabled($slug, $scanRoot);
+
+            $entry = [
+                'type' => 'plugin',
+                'version' => $version,
+                'compatibility' => $compat,
+                'enabled' => $enabled,
+            ];
+
+            if ($enabled) {
+                $blocking[$slug] = $entry;
+            } else {
+                $warnings[$slug] = $entry;
+            }
+        }
+
+        // Scan themes
+        $themeDirs = glob($scanRoot . '/user/themes/*', GLOB_ONLYDIR) ?: [];
+        foreach ($themeDirs as $dir) {
+            $slug = basename($dir);
+            $compat = $this->readBlueprintCompatibility($dir);
+
+            if (in_array($targetMajorMinor, $compat['grav'], true)) {
+                continue;
+            }
+
+            $version = $this->readBlueprintVersion($dir) ?? 'unknown';
+            $active = $this->isThemeEnabled($slug, $scanRoot);
+
+            $entry = [
+                'type' => 'theme',
+                'version' => $version,
+                'compatibility' => $compat,
+                'enabled' => $active,
+            ];
+
+            if ($active) {
+                $blocking[$slug] = $entry;
+            } else {
+                $warnings[$slug] = $entry;
+            }
+        }
+
+        return [
+            'blocking' => $blocking,
+            'warnings' => $warnings,
+            'target' => $targetMajorMinor,
+        ];
+    }
+
+    /**
+     * Read the compatible Grav versions from a package's blueprints.yaml.
+     *
+     * @param string $dir Package directory
+     * @return array{grav: string[], api: string[]}
+     */
+    private function readBlueprintCompatibility(string $dir): array
+    {
+        $file = $dir . '/blueprints.yaml';
+        if (!is_file($file)) {
+            return ['grav' => [], 'api' => []];
+        }
+
+        try {
+            $contents = @file_get_contents($file);
+            if ($contents === false) {
+                return ['grav' => [], 'api' => []];
+            }
+            $data = Yaml::parse($contents);
+            if (!is_array($data)) {
+                return ['grav' => [], 'api' => []];
+            }
+
+            if (isset($data['compatibility']['grav']) && is_array($data['compatibility']['grav'])) {
+                return [
+                    'grav' => array_map('strval', $data['compatibility']['grav']),
+                    'api'  => isset($data['compatibility']['api']) && is_array($data['compatibility']['api'])
+                        ? array_map('strval', $data['compatibility']['api'])
+                        : [],
+                ];
+            }
+
+            return $this->inferCompatibleVersions($data['dependencies'] ?? []);
+        } catch (Throwable $e) {
+            return ['grav' => [], 'api' => []];
+        }
+    }
+
+    /**
+     * Infer compatible Grav versions from a package's dependency list.
+     *
+     * @param array $dependencies
+     * @return array{grav: string[], api: string[]}
+     */
+    private function inferCompatibleVersions(array $dependencies): array
+    {
+        foreach ($dependencies as $dep) {
+            if (!is_array($dep) || ($dep['name'] ?? '') !== 'grav') {
+                continue;
+            }
+            $version = $dep['version'] ?? '';
+
+            if (!preg_match('/(\d+\.\d+(?:\.\d+)?)/', $version, $m)) {
+                continue;
+            }
+
+            if (version_compare($m[1], '2.0', '>=')) {
+                return ['grav' => ['2.0'], 'api' => []];
+            }
+
+            if (version_compare($m[1], '1.8', '>=')) {
+                return ['grav' => ['1.8'], 'api' => []];
+            }
+
+            return ['grav' => ['1.7'], 'api' => []];
+        }
+
+        return ['grav' => ['1.7'], 'api' => []];
+    }
+
+    private function isGpmPackagePublished($package): bool
+    {
+        if (is_object($package) && method_exists($package, 'getData')) {
+            $data = $package->getData();
+            if ($data instanceof \Grav\Common\Data\Data) {
+                $published = $data->get('published');
+
+                return $published !== false;
+            }
+        }
+
+        if (is_array($package)) {
+            if (array_key_exists('published', $package)) {
+                return $package['published'] !== false;
+            }
+
+            return true;
+        }
+
+        if (is_object($package) && property_exists($package, 'published')) {
+            return $package->published !== false;
+        }
+
+        return true;
+    }
+}

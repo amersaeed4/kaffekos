@@ -1,0 +1,200 @@
+{% extends 'partials/base.html.twig' %}
+{% import 'macros/kk.html.twig' as kk %}
+
+{% set hero = header.hero ?? {} %}
+{% set hero_img = hero.image ? page.media[hero.image] : null %}
+
+{% block body_class %}is-home{% endblock %}
+
+{% block og_image %}{% if hero_img %}<meta property="og:image" content="{{ url(kk.imgurl(hero_img, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
+
+{% block hero %}
+<section class="hero"{% if hero_img %} style="--hero: url('{{ kk.imgurlfit(hero_img, 2400, 3200) }}'); --hero-y: {{ hero.focus ?: '40%' }}"{% endif %}>
+    <div class="hero-shade"></div>
+    <div class="wrap hero-content">
+        {% if hero.eyebrow %}<p class="eyebrow eyebrow-light">{{ hero.eyebrow }}</p>{% endif %}
+        <h1>{{ hero.title|default(page.title) }}</h1>
+        {% if hero.subtitle %}<p class="lead">{{ hero.subtitle }}</p>{% endif %}
+        <div class="hero-actions">
+            {% if hero.btn1_label %}<a class="btn btn-primary btn-lg" href="{{ kk.href(hero.btn1_url ?: '/menu') }}">{{ hero.btn1_label }}</a>{% endif %}
+            {% if hero.btn2_label %}<a class="btn btn-ghost btn-lg" href="{{ kk.href(hero.btn2_url ?: '/contact') }}">{{ hero.btn2_label }}</a>{% endif %}
+        </div>
+        {% if hero.show_open_badge is null or hero.show_open_badge %}
+            <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>Opening hours below</span></p>
+        {% endif %}
+    </div>
+    <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
+</section>
+{% endblock %}
+
+{% block content %}
+
+{# ------------------------------------------------------------- WELCOME #}
+{% set intro = header.intro ?? {} %}
+{% if (intro.enabled is null or intro.enabled) and (intro.title or intro.text) %}
+    {% set intro_img = intro.image ? page.media[intro.image] : null %}
+    {% set intro_img2 = intro.image2 ? page.media[intro.image2] : null %}
+    <section class="section section-welcome">
+        <div class="wrap split">
+            <div class="split-media">
+                {% if intro_img %}<div class="frame">{{ kk.img(intro_img, 720, 860, intro.title) }}</div>{% endif %}
+                {% if intro_img2 %}<div class="frame frame-small">{{ kk.img(intro_img2, 360, 360, '') }}</div>{% endif %}
+            </div>
+            <div class="split-text">
+                {% if intro.eyebrow %}<p class="eyebrow">{{ intro.eyebrow }}</p>{% endif %}
+                <h2>{{ intro.title }}</h2>
+                <div class="prose">{{ intro.text|markdown(false)|raw }}</div>
+                {% if intro.link_label %}
+                    <a class="link-arrow" href="{{ kk.href(intro.link_url ?: '/about') }}">{{ intro.link_label }} {{ kk.icon('arrow', 18) }}</a>
+                {% endif %}
+                {% if intro.stats %}
+                    <ul class="stats">
+                        {% for s in intro.stats %}
+                            <li><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+{# ---------------------------------------------------------- OUR COFFEE #}
+{% set cf = header.coffee ?? {} %}
+{% if (cf.enabled is null or cf.enabled) and (cf.title or cf.text) %}
+    {% set cf_img = cf.image ? page.media[cf.image] : null %}
+    {% set cf_img2 = cf.image2 ? page.media[cf.image2] : null %}
+    <section class="section section-navy coffee">
+        <div class="wrap coffee-grid">
+            <div class="coffee-text">
+                {% if cf.eyebrow %}<p class="eyebrow eyebrow-light">{{ cf.eyebrow }}</p>{% endif %}
+                <h2>{{ cf.title }}</h2>
+                <div class="prose">{{ cf.text|markdown(false)|raw }}</div>
+                {% if cf.facts %}
+                    <ul class="stats stats-light">
+                        {% for f in cf.facts %}<li><strong>{{ f.value }}</strong><span>{{ f.label }}</span></li>{% endfor %}
+                    </ul>
+                {% endif %}
+                {% if cf.link_label %}
+                    {% set cf_url = cf.link_url ?: '#' %}
+                    <a class="btn btn-ghost" href="{{ kk.href(cf_url) }}"{% if cf_url starts with 'http' %} target="_blank" rel="noopener"{% endif %}>{{ cf.link_label }} {{ kk.icon('arrow', 18) }}</a>
+                {% endif %}
+            </div>
+            {% if cf_img or cf_img2 %}
+                <div class="coffee-media">
+                    <div class="coffee-halo" aria-hidden="true"></div>
+                    <div class="coffee-products">
+                        {{ kk.imgfit(cf_img, 640, 760, 'Hausbrandt Gourmet 100% Arabica coffee beans', 'product product-main') }}
+                        {{ kk.imgfit(cf_img2, 560, 760, 'Hausbrandt Sublime 100% Arabica coffee beans', 'product product-second') }}
+                    </div>
+                    {% if cf.caption %}<p class="coffee-caption">{{ cf.caption }}</p>{% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endif %}
+
+{# ---------------------------------------------------------- HIGHLIGHTS #}
+{% set hl = header.highlights ?? {} %}
+{% if (hl.enabled is null or hl.enabled) and hl.items %}
+    <section class="section section-sand">
+        <div class="wrap">
+            {% include 'partials/section-head.html.twig' with {eyebrow: null, title: hl.title, subtitle: hl.subtitle} %}
+            <div class="features">
+                {% for f in hl.items %}
+                    <div class="feature">
+                        <div class="feature-icon">{{ kk.icon(f.icon ?: 'cup', 30) }}</div>
+                        <h3>{{ f.title }}</h3>
+                        <p>{{ f.text }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+{# --------------------------------------------------- MENU FAVOURITES #}
+{% set ft = header.featured ?? {} %}
+{% if ft.enabled is null or ft.enabled %}
+    {% set menu_page = page.find('/menu') %}
+    {% set picks = kk_featured_items(menu_page, ft.limit ?: 6) %}
+    {% if picks %}
+        <section class="section">
+            <div class="wrap">
+                {% include 'partials/section-head.html.twig' with {eyebrow: 'From our kitchen', title: ft.title, subtitle: ft.subtitle} %}
+                <div class="menu-grid">
+                    {% for pick in picks %}
+                        {% include 'partials/menu-item.html.twig' with {item: pick.item, image: pick.image, currency: theme_var('menu.currency'), show_image: true, card: true, show_price: (ft.show_prices ? true : false)} %}
+                    {% endfor %}
+                </div>
+                <p class="center"><a class="btn btn-outline" href="{{ menu_page.url }}">{{ ft.button_label ?: 'See the full menu' }}</a></p>
+            </div>
+        </section>
+    {% endif %}
+{% endif %}
+
+{# ---------------------------------------------------------------- KOS #}
+{% set q = header.quote ?? {} %}
+{% if (q.enabled is null or q.enabled) and (q.word or q.text) %}
+    {% set q_img = q.image ? page.media[q.image] : null %}
+    <section class="kos"{% if q_img %} style="--kos-bg: url('{{ kk.imgurlfit(q_img, 2000, 2000) }}')"{% endif %}>
+        <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
+        <div class="wrap kos-inner">
+            <p class="kos-word">{{ q.word }}</p>
+            {% if q.pronunciation %}<p class="kos-pron">{{ q.pronunciation }}</p>{% endif %}
+            <p class="kos-text">{{ q.text }}</p>
+        </div>
+        <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
+    </section>
+{% endif %}
+
+{# -------------------------------------------------------- PHOTO STRIP #}
+{% set ps = header.photostrip ?? {} %}
+{% if ps.enabled is null or ps.enabled %}
+    {% set gpage = page.find('/gallery') %}
+    {% set strip = kk_gallery_photos(gpage, ps.count ?: 6) %}
+    {% if strip %}
+        <section class="section section-sand">
+            <div class="wrap">
+                {% include 'partials/section-head.html.twig' with {eyebrow: 'Gallery', title: ps.title, subtitle: ps.subtitle} %}
+            </div>
+            <div class="wrap wrap-wide">
+                <div class="photo-strip">
+                    {% for ph in strip %}
+                        <a href="{{ gpage.url }}" class="photo">{{ kk.img(ph.media, 560, 560, ph.caption ?: 'Kaffekos') }}</a>
+                    {% endfor %}
+                </div>
+                <p class="center"><a class="btn btn-outline" href="{{ gpage.url }}">View the gallery</a></p>
+            </div>
+        </section>
+    {% endif %}
+{% endif %}
+
+{# ------------------------------------------------------------ REVIEWS #}
+{% set rv = header.reviews ?? {} %}
+{% if (rv.enabled is null or rv.enabled) and rv.items %}
+    <section class="section">
+        <div class="wrap">
+            {% include 'partials/section-head.html.twig' with {eyebrow: 'Kind words', title: rv.title, subtitle: rv.subtitle} %}
+            <div class="reviews">
+                {% for r in rv.items %}
+                    <figure class="review">
+                        <div class="stars" aria-label="{{ r.rating ?: 5 }} out of 5 stars">
+                            {% for i in 1..5 %}<span class="{{ i <= (r.rating ?: 5) ? 'on' : '' }}">{{ kk.icon('star', 18) }}</span>{% endfor %}
+                        </div>
+                        <blockquote>{{ r.text }}</blockquote>
+                        <figcaption><strong>{{ r.name }}</strong>{% if r.info %}<span>{{ r.info }}</span>{% endif %}</figcaption>
+                    </figure>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+{# ------------------------------------------------------------- VISIT #}
+{% set v = header.visit ?? {} %}
+{% if v.enabled is null or v.enabled %}
+    {% include 'partials/visit.html.twig' with {eyebrow: v.eyebrow, title: v.title, text: v.text} %}
+{% endif %}
+
+{% endblock %}

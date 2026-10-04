@@ -1,0 +1,113 @@
+title: About Page
+extends@: default
+
+form:
+  fields:
+    tabs:
+      fields:
+        content:
+          fields:
+            content:
+              label: Our story (main text)
+              help: 'Write the main story here. A photo you add to Page Media can be inserted with the image button.'
+            header.story_image:
+              type: filepicker
+              label: Photo shown next to the story
+              preview_images: true
+        banner:
+          type: tab
+          title: Page Banner
+          fields:
+            header.banner.image:
+              type: filepicker
+              label: Banner photo (optional)
+              preview_images: true
+              help: 'Wide photo behind the page title. Upload it on the first tab (Page Media) and pick it here. If empty, a warm navy banner with a Nordic pattern is shown.'
+            header.banner.eyebrow:
+              type: text
+              label: Small line above the title
+            header.banner.subtitle:
+              type: textarea
+              rows: 2
+              label: Line under the title
+
+        values:
+          type: tab
+          title: What We Stand For
+          fields:
+            header.values.title:
+              type: text
+              label: Heading
+            header.values.items:
+              type: list
+              label: Values
+              style: vertical
+              collapsed: true
+              fields:
+                .icon:
+                  type: select
+                  label: Icon
+                  default: heart
+                  options:
+                    cup: Coffee cup
+                    bean: Coffee bean
+                    bun: Pastry / bun
+                    cake: Cake
+                    heart: Heart
+                    leaf: Leaf
+                    sun: Sun
+                    snow: Snowflake
+                    wifi: Wi-Fi
+                    users: People
+                    book: Book
+                    music: Music
+                    star: Star
+                    clock: Clock
+                    pin: Location pin
+                .title:
+                  type: text
+                  label: Title
+                .text:
+                  type: textarea
+                  rows: 3
+                  label: Text
+        team:
+          type: tab
+          title: Team
+          fields:
+            header.team.enabled:
+              type: toggle
+              label: Show the team section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.team.title:
+              type: text
+              label: Heading
+            header.team.subtitle:
+              type: text
+              label: Sub-heading
+            header.team.members:
+              type: list
+              label: People
+              style: vertical
+              collapsed: true
+              fields:
+                .name:
+                  type: text
+                  label: Name
+                .role:
+                  type: text
+                  label: Role
+                .photo:
+                  type: filepicker
+                  label: Photo
+                  preview_images: true
+                .bio:
+                  type: textarea
+                  rows: 3
+                  label: Short bio

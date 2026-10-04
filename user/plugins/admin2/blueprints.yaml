@@ -1,0 +1,41 @@
+name: Admin2
+slug: admin2
+type: plugin
+version: 2.1.27
+description: Modern administration panel for Grav CMS. A redesigned admin experience.
+icon: black-tie
+author:
+  name: Team Grav
+  email: devs@getgrav.org
+  url: https://getgrav.org
+homepage: https://github.com/getgrav/grav-plugin-admin2
+keywords: admin, panel, dashboard, management
+bugs: https://github.com/getgrav/grav-plugin-admin2/issues
+docs: https://github.com/getgrav/grav-plugin-admin2/blob/main/README.md
+license: MIT
+compatibility:
+  grav: ["2.0"]
+
+dependencies:
+  - { name: api, version: ">=1.0.44" }
+
+form:
+  validation: loose
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin Status
+      highlight: 1
+      default: 1
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
+
+    route:
+      type: text
+      label: Admin Route
+      description: The route to access Admin2 (relative to site root).
+      default: /admin2
+      placeholder: /admin2

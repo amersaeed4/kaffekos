@@ -1,0 +1,25 @@
+title: Journal Post
+extends@: default
+
+form:
+  fields:
+    tabs:
+      fields:
+
+        banner:
+          unset@: true
+        content:
+          title: Post
+          fields:
+            content:
+              label: Post text
+            header.summary:
+              type: textarea
+              rows: 3
+              label: Short summary
+              help: 'Shown on the Journal list and when the post is shared. 1–2 sentences.'
+            header.cover:
+              type: filepicker
+              label: Cover photo
+              preview_images: true
+              help: 'Upload to Page Media first, then pick it here.'

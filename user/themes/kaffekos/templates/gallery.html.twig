@@ -1,0 +1,30 @@
+{% extends 'partials/base.html.twig' %}
+{% import 'macros/kk.html.twig' as kk %}
+{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
+{% block content %}
+{% set photos = kk_gallery_photos(page) %}
+<section class="section">
+    {% if page.content|striptags|trim %}
+        <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
+    {% endif %}
+    <div class="wrap wrap-wide">
+        <div class="gallery" data-gallery>
+            {% for ph in photos %}
+                <a class="gallery-item" href="{{ ph.media.cropResize(1800, 1800).quality(82).url }}" data-caption="{{ ph.caption|e('html_attr') }}">
+                    {{ kk.imgfit(ph.media, 700, 1000, ph.caption ?: 'Kaffekos photo') }}
+                    {% if ph.caption %}<span class="gallery-cap">{{ ph.caption }}</span>{% endif %}
+                </a>
+            {% else %}
+                <p class="center">Photos coming soon.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<dialog class="lightbox" id="lightbox" aria-label="Photo viewer">
+    <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+    <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">&#8249;</button>
+    <figure><img src="" alt=""><figcaption></figcaption></figure>
+    <button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">&#8250;</button>
+</dialog>
+{% endblock %}

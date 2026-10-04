@@ -1,0 +1,13 @@
+{# One category block. Pass: cat (page), currency, show_images, show_prices #}
+<section class="menu-section" id="{{ cat.slug }}">
+    <header class="menu-section-head">
+        <h2>{{ cat.title }}</h2>
+        {% if cat.header.description %}<p>{{ cat.header.description }}</p>{% endif %}
+    </header>
+    <div class="menu-grid">
+        {% for item in cat.header.items if item.name and not item.soldout %}
+            {% set image = item.image ? cat.media[item.image] : null %}
+            {% include 'partials/menu-item.html.twig' with {item: item, image: image, currency: currency, show_image: show_images, show_price: show_prices} %}
+        {% endfor %}
+    </div>
+</section>
