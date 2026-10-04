@@ -3,12 +3,12 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'config',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791143910,
+    'timestamp' => 1791146642,
     'check_interval' => 2,
     'directories' => [
-        '/Users/amer/Sites/kaffekos1/user/config' => 1791141833,
+        '/Users/amer/Sites/kaffekos1/user/config' => 1791146640,
         '/Users/amer/Sites/kaffekos1/user/config/plugins' => 1791100445,
-        '/Users/amer/Sites/kaffekos1/user/config/themes' => 1791140846,
+        '/Users/amer/Sites/kaffekos1/user/config/themes' => 1791145992,
         '/Users/amer/Sites/kaffekos1/system/config' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/plugins' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/plugins/form' => 1790904721,
@@ -26,11 +26,13 @@ return [
         '/Users/amer/Sites/kaffekos1/user/themes/kaffekos' => 1791100908
     ],
     'file_mtimes' => [
+        '/Users/amer/Sites/kaffekos1/user/config/admin-next.yaml' => 1791146640,
         '/Users/amer/Sites/kaffekos1/user/config/media.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/config/plugins/email.yaml' => 1791100445,
         '/Users/amer/Sites/kaffekos1/user/config/site.yaml' => 1791100445,
-        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791143910,
+        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791145992,
         '/Users/amer/Sites/kaffekos1/user/config/themes/kaffekos.yaml' => 1791143910,
+        '/Users/amer/Sites/kaffekos1/user/config/themes/quark2.yaml' => 1791145992,
         '/Users/amer/Sites/kaffekos1/user/config/versions.yaml' => 1791099069,
         '/Users/amer/Sites/kaffekos1/system/config/backups.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/system/config/media.yaml' => 1790904721,
@@ -55,6 +57,10 @@ return [
     ],
     'files' => [
         'user/config' => [
+            'admin-next' => [
+                'file' => 'user/config/admin-next.yaml',
+                'modified' => 1791146640
+            ],
             'media' => [
                 'file' => 'user/config/media.yaml',
                 'modified' => 1790904721
@@ -69,11 +75,15 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791143910
+                'modified' => 1791145992
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
                 'modified' => 1791143910
+            ],
+            'themes/quark2' => [
+                'file' => 'user/config/themes/quark2.yaml',
+                'modified' => 1791145992
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',

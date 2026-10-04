@@ -1,10 +1,14 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791143910,
-    'checksum' => '5a3c6539c7f1f4563792c2cc8a297f79',
+    'timestamp' => 1791146642,
+    'checksum' => 'a4299bb7810ea9dbfca1017eef8a499f',
     'files' => [
         'user/config' => [
+            'admin-next' => [
+                'file' => 'user/config/admin-next.yaml',
+                'modified' => 1791146640
+            ],
             'media' => [
                 'file' => 'user/config/media.yaml',
                 'modified' => 1790904721
@@ -19,11 +23,15 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791143910
+                'modified' => 1791145992
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
                 'modified' => 1791143910
+            ],
+            'themes/quark2' => [
+                'file' => 'user/config/themes/quark2.yaml',
+                'modified' => 1791145992
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',
@@ -133,6 +141,15 @@ return [
                 'fontawesome' => [
                     'enabled' => true,
                     'local' => false
+                ],
+                'custom_logo' => [
+                    'user/themes/kaffekos/images/logo/KAFFEKOS TISSUE DESIGN.pdf.png' => [
+                        'name' => 'KAFFEKOS TISSUE DESIGN.pdf.png',
+                        'type' => 'image/png',
+                        'size' => 67225,
+                        'path' => 'user/themes/kaffekos/images/logo/KAFFEKOS TISSUE DESIGN.pdf.png',
+                        'url' => '/kaffekos1/user/themes/kaffekos/images/logo/KAFFEKOS TISSUE DESIGN.pdf.png'
+                    ]
                 ]
             ],
             'kaffekos' => [
@@ -4563,6 +4580,51 @@ node_modules'
             'updates' => [
                 'safe_upgrade' => true,
                 'safe_upgrade_snapshot_limit' => 5
+            ]
+        ],
+        'admin-next' => [
+            'ui' => [
+                'branding' => [
+                    'mode' => 'custom',
+                    'text' => 'Grav',
+                    'logoLight' => 'logo-light-fbcd02c674.png',
+                    'logoDark' => 'logo-dark-d8bdf13970.png',
+                    'logoHeight' => 0,
+                    'title' => 'Kaffekos Admin',
+                    'subtitle' => '',
+                    'showPoweredBy' => false,
+                    'favicon' => 'favicon-favicon-b68ffa71b0.png'
+                ],
+                'defaults' => [
+                    'colorMode' => '',
+                    'accentHue' => 271,
+                    'accentSaturation' => 91,
+                    'darkShade' => 'graphite',
+                    'fontFamily' => 'google-sans',
+                    'fontSize' => 'normal',
+                    'helpMode' => 'tooltip',
+                    'editorMode' => 'normal',
+                    'editorKeymap' => 'default',
+                    'editorStickyToolbar' => true,
+                    'editorFixedHeight' => 0,
+                    'adminLanguage' => 'en-US',
+                    'pagesPerPage' => 20,
+                    'pagesViewMode' => 'miller',
+                    'usersViewMode' => 'cards',
+                    'groupsViewMode' => 'cards',
+                    'pluginsViewMode' => 'cards',
+                    'themesViewMode' => 'cards',
+                    'flexAfterSave' => ''
+                ],
+                'settings' => [
+                    'autoSaveEnabled' => true,
+                    'autoSaveToolbarUndo' => true,
+                    'autoSaveBatchWindowMs' => 0,
+                    'collabEnabled' => true,
+                    'menubarLinks' => [
+                        
+                    ]
+                ]
             ]
         ],
         'versions' => [

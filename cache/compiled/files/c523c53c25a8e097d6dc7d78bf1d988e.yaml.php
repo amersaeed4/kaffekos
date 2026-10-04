@@ -2,7 +2,7 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/accounts/gadmin.yaml',
-    'modified' => 1791143139,
+    'modified' => 1791146613,
     'size' => 460,
     'data' => [
         'state' => 'enabled',

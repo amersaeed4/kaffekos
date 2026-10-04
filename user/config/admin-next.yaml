@@ -1,0 +1,37 @@
+ui:
+  branding:
+    mode: custom
+    text: Grav
+    logoLight: logo-light-fbcd02c674.png
+    logoDark: logo-dark-d8bdf13970.png
+    logoHeight: 0
+    title: 'Kaffekos Admin'
+    subtitle: ''
+    showPoweredBy: false
+    favicon: favicon-favicon-b68ffa71b0.png
+  defaults:
+    colorMode: ''
+    accentHue: 271
+    accentSaturation: 91
+    darkShade: graphite
+    fontFamily: google-sans
+    fontSize: normal
+    helpMode: tooltip
+    editorMode: normal
+    editorKeymap: default
+    editorStickyToolbar: true
+    editorFixedHeight: 0
+    adminLanguage: en-US
+    pagesPerPage: 20
+    pagesViewMode: miller
+    usersViewMode: cards
+    groupsViewMode: cards
+    pluginsViewMode: cards
+    themesViewMode: cards
+    flexAfterSave: ''
+  settings:
+    autoSaveEnabled: true
+    autoSaveToolbarUndo: true
+    autoSaveBatchWindowMs: 0
+    collabEnabled: true
+    menubarLinks: {  }
