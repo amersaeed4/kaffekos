@@ -2,8 +2,8 @@
 title: Home
 hero:
     image: hero-facade.jpg
-    focus: '60%'
-    eyebrow: 'Norwegian Coffee House · Lahore'
+    focus: 40%
+    eyebrow: 'Norwegian Coffee House · Lahore.'
     title: 'Nordic warmth, brewed in Lahore.'
     subtitle: 'Premium Hausbrandt coffee, warm hospitality and a relaxed Scandinavian café feel. A little piece of Norway in the heart of Lahore.'
     btn1_label: 'Explore the menu'
@@ -39,9 +39,15 @@ coffee:
     image2: hausbrandt-sublime.png
     caption: 'Hausbrandt Gourmet and Sublime, 100% Arabica'
     facts:
-        - { value: Hausbrandt, label: 'our only coffee' }
-        - { value: 'Trieste', label: 'Italy' }
-        - { value: '1892', label: 'roasting since' }
+        -
+            value: Hausbrandt
+            label: 'our only coffee'
+        -
+            value: Trieste
+            label: Italy
+        -
+            value: '1892'
+            label: 'roasting since'
     link_label: 'Discover Hausbrandt'
     link_url: 'https://www.hausbrandt.it/en/'
 highlights:

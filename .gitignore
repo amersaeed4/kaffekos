@@ -1,0 +1,15 @@
+# Grav generated folders
+/cache/*
+/logs/*
+/images/*
+/assets/*
+/backup/*
+/tmp/*
+
+# Generated indexes
+/user/data/flex/indexes/
+
+# Dependencies and OS files
+/vendor/
+.DS_Store
+Thumbs.db

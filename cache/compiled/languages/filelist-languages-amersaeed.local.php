@@ -3,7 +3,7 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'languages',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791129190,
+    'timestamp' => 1791130621,
     'check_interval' => 2,
     'directories' => [
         '/Users/amer/Sites/kaffekos1/system/languages' => 1790904721,

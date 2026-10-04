@@ -2,7 +2,7 @@
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledLanguages',
     'code' => 'en',
-    'timestamp' => 1791129190,
+    'timestamp' => 1791130621,
     'checksum' => 'c05bad724cdc54901207db1ce1889005',
     'data' => [
         'en' => [

@@ -3,7 +3,7 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'config',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791129134,
+    'timestamp' => 1791130615,
     'check_interval' => 2,
     'directories' => [
         '/Users/amer/Sites/kaffekos1/user/config' => 1791099135,
@@ -28,7 +28,7 @@ return [
         '/Users/amer/Sites/kaffekos1/user/config/media.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/config/plugins/email.yaml' => 1791100445,
         '/Users/amer/Sites/kaffekos1/user/config/site.yaml' => 1791100445,
-        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791129096,
+        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791130282,
         '/Users/amer/Sites/kaffekos1/user/config/versions.yaml' => 1791099069,
         '/Users/amer/Sites/kaffekos1/system/config/backups.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/system/config/media.yaml' => 1790904721,
@@ -67,7 +67,7 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791129096
+                'modified' => 1791130282
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',

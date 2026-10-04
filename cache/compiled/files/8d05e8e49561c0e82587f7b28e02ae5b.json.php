@@ -2,11 +2,11 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledJsonFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/data/flex/indexes/pages.json',
-    'modified' => 1791129570,
+    'modified' => 1791130617,
     'size' => 4972,
     'data' => [
         'version' => '1.5',
-        'timestamp' => 1791129570,
+        'timestamp' => 1791130617,
         'count' => 20,
         'index' => [
             '' => [
@@ -28,13 +28,13 @@ return [
                 'key' => 'home',
                 'storage_key' => '01.home',
                 'template' => 'home',
-                'storage_timestamp' => 1791128178,
+                'storage_timestamp' => 1791130281,
                 'markdown' => [
                     '' => [
-                        'home' => 1791127887
+                        'home' => 1791130281
                     ]
                 ],
-                'checksum' => '7938ace1a6c89b18d200ae7f0dbf63d7'
+                'checksum' => '2d7a42a56b537f850a99286be9a9e072'
             ],
             '02.about' => [
                 'key' => 'about',
@@ -78,13 +78,13 @@ return [
                 'key' => 'menu/hot-drinks',
                 'storage_key' => '03.menu/01.hot-drinks',
                 'template' => 'menu-category',
-                'storage_timestamp' => 1791128432,
+                'storage_timestamp' => 1791129613,
                 'markdown' => [
                     '' => [
-                        'menu-category' => 1791128432
+                        'menu-category' => 1791129613
                     ]
                 ],
-                'checksum' => 'faf97101e0937f36281bf0f283759f6a'
+                'checksum' => '5c66d868995547559b362a4628a38f0d'
             ],
             '03.menu/02.matchas' => [
                 'key' => 'menu/matchas',
