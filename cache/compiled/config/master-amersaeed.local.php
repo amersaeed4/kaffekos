@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791130615,
-    'checksum' => 'c048220ff80035b224c4c2c4dc0c5850',
+    'timestamp' => 1791140891,
+    'checksum' => '69d32c4ea027b31f348eb4343a2cead8',
     'files' => [
         'user/config' => [
             'media' => [
@@ -19,7 +19,11 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791130282
+                'modified' => 1791140891
+            ],
+            'themes/kaffekos' => [
+                'file' => 'user/config/themes/kaffekos.yaml',
+                'modified' => 1791140891
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',
@@ -135,7 +139,7 @@ return [
                 'enabled' => true,
                 'brand' => [
                     'wordmark' => 'Kaffekos',
-                    'tagline' => 'Coffee, Comfort, Connection'
+                    'tagline' => 'Coffee, Comfort, Connection:'
                 ],
                 'header' => [
                     'cta_label' => 'Visit Us',
@@ -226,6 +230,15 @@ Lahore, Pakistan',
                 ],
                 'menu' => [
                     'currency' => 'Rs.'
+                ],
+                'custom_logo' => [
+                    'user/themes/kaffekos/images/logo/KAFFEKOS TISSUE DESIGN.pdf.png' => [
+                        'name' => 'KAFFEKOS TISSUE DESIGN.pdf.png',
+                        'type' => 'image/png',
+                        'size' => 67225,
+                        'path' => 'user/themes/kaffekos/images/logo/KAFFEKOS TISSUE DESIGN.pdf.png',
+                        'url' => '/kaffekos1/user/themes/kaffekos/images/logo/KAFFEKOS TISSUE DESIGN.pdf.png'
+                    ]
                 ]
             ]
         ],
