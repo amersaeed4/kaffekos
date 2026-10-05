@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791176977,
-    'checksum' => '8072b34c0bc15f298c45d38796c52335',
+    'timestamp' => 1791177194,
+    'checksum' => '9b1edb918a5c051afd426e6129368d00',
     'files' => [
         'user/env/amersaeed.local/config' => [
             'system' => [
@@ -29,11 +29,11 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791176977
+                'modified' => 1791177194
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
-                'modified' => 1791176977
+                'modified' => 1791177194
             ],
             'themes/quark2' => [
                 'file' => 'user/config/themes/quark2.yaml',

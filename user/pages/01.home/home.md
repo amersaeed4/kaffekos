@@ -29,7 +29,7 @@ intro:
             label: 'our home'
         -
             value: 4.8★
-            label: 'on Google (78 reviews)'
+            label: 'on Google (82 reviews)'
 coffee:
     enabled: true
     eyebrow: 'Our coffee'

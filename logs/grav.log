@@ -40,3 +40,6 @@
 [2026-10-04T21:01:53.855508+00:00] grav.DEBUG: API client error: No valid authentication credentials provided. Use an API key, JWT token, or active session. {"status":401,"method":"GET","path":"/kaffekos1/api/v1/systeminfo"} []
 [2026-10-04T21:01:53.884040+00:00] grav.DEBUG: API client error: Invalid or expired refresh token. {"status":401,"method":"POST","path":"/kaffekos1/api/v1/auth/refresh"} []
 [2026-10-05T05:09:37.511670+00:00] grav.DEBUG: API client error: The resource has been modified since you last retrieved it. Please fetch the latest version and try again. {"status":409,"method":"PATCH","path":"/kaffekos1/api/v1/config/themes/kaffekos"} []
+[2026-10-05T05:12:09.150451+00:00] grav.DEBUG: API client error: No changelog found for 'kaffekos'. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/gpm/themes/kaffekos/changelog"} []
+[2026-10-05T05:13:14.564124+00:00] grav.DEBUG: API client error: Thumbnail not found. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/thumbnails/c7a31da017ada0f422474e8475db4e36.jpg"} []
+[2026-10-05T05:13:15.523694+00:00] grav.DEBUG: Flex: User index updated, 1 objects (0 added, 1 updated, 0 removed). [] []
