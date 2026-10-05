@@ -6,7 +6,7 @@ hero:
     eyebrow: 'Norwegian Coffee House · Lahore'
     title: 'Nordic warmth, brewed in Lahore.'
     subtitle: 'Premium Hausbrandt coffee, warm hospitality and a relaxed Scandinavian café feel. A little piece of Norway in the heart of Lahore.'
-    btn1_label: 'Explore the menu'
+    btn1_label: 'Explore the menu >'
     btn1_url: /menu
     btn2_label: 'Find us'
     btn2_url: /contact

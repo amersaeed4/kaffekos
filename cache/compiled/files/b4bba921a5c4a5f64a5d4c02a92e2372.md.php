@@ -2,8 +2,8 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledMarkdownFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/pages/01.home/home.md',
-    'modified' => 1791191249,
-    'size' => 3896,
+    'modified' => 1791198934,
+    'size' => 3898,
     'data' => [
         'header' => [
             'title' => 'Home',
@@ -13,7 +13,7 @@ return [
                 'eyebrow' => 'Norwegian Coffee House · Lahore',
                 'title' => 'Nordic warmth, brewed in Lahore.',
                 'subtitle' => 'Premium Hausbrandt coffee, warm hospitality and a relaxed Scandinavian café feel. A little piece of Norway in the heart of Lahore.',
-                'btn1_label' => 'Explore the menu',
+                'btn1_label' => 'Explore the menu >',
                 'btn1_url' => '/menu',
                 'btn2_label' => 'Find us',
                 'btn2_url' => '/contact',
@@ -141,7 +141,7 @@ hero:
     eyebrow: \'Norwegian Coffee House · Lahore\'
     title: \'Nordic warmth, brewed in Lahore.\'
     subtitle: \'Premium Hausbrandt coffee, warm hospitality and a relaxed Scandinavian café feel. A little piece of Norway in the heart of Lahore.\'
-    btn1_label: \'Explore the menu\'
+    btn1_label: \'Explore the menu >\'
     btn1_url: /menu
     btn2_label: \'Find us\'
     btn2_url: /contact
