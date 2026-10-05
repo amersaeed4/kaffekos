@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791147718,
-    'checksum' => '79b45cae7d3097ba9fc9f2193d30eb6e',
+    'timestamp' => 1791176977,
+    'checksum' => '8072b34c0bc15f298c45d38796c52335',
     'files' => [
         'user/env/amersaeed.local/config' => [
             'system' => [
@@ -29,11 +29,11 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791147647
+                'modified' => 1791176977
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
-                'modified' => 1791143910
+                'modified' => 1791176977
             ],
             'themes/quark2' => [
                 'file' => 'user/config/themes/quark2.yaml',
@@ -182,8 +182,8 @@ return [
                     'ink' => '#2b1a10'
                 ],
                 'business' => [
-                    'phone' => '+92 300 8480123',
-                    'whatsapp' => '923008480123',
+                    'phone' => '+92 325 2333567',
+                    'whatsapp' => '923252333567',
                     'email' => 'info@kaffekos.pk',
                     'address' => 'Kaffekos, Grand Park
 Block A, Phase 1, Johar Town

@@ -3,7 +3,7 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'blueprints',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791147647,
+    'timestamp' => 1791176977,
     'check_interval' => 2,
     'directories' => [
         '/Users/amer/Sites/kaffekos1/system/blueprints/config' => 1790904721,

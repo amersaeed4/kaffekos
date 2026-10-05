@@ -39,3 +39,4 @@
 [2026-10-04T21:01:53.848276+00:00] grav.DEBUG: API client error: No valid authentication credentials provided. Use an API key, JWT token, or active session. {"status":401,"method":"GET","path":"/kaffekos1/api/v1/dashboard/widgets"} []
 [2026-10-04T21:01:53.855508+00:00] grav.DEBUG: API client error: No valid authentication credentials provided. Use an API key, JWT token, or active session. {"status":401,"method":"GET","path":"/kaffekos1/api/v1/systeminfo"} []
 [2026-10-04T21:01:53.884040+00:00] grav.DEBUG: API client error: Invalid or expired refresh token. {"status":401,"method":"POST","path":"/kaffekos1/api/v1/auth/refresh"} []
+[2026-10-05T05:09:37.511670+00:00] grav.DEBUG: API client error: The resource has been modified since you last retrieved it. Please fetch the latest version and try again. {"status":409,"method":"PATCH","path":"/kaffekos1/api/v1/config/themes/kaffekos"} []

@@ -2,15 +2,15 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledMarkdownFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/pages/01.home/home.md',
-    'modified' => 1791148519,
-    'size' => 3897,
+    'modified' => 1791176610,
+    'size' => 3896,
     'data' => [
         'header' => [
             'title' => 'Home',
             'hero' => [
                 'image' => 'hero-facade.jpg',
                 'focus' => '60%',
-                'eyebrow' => 'Norwegian Coffee House · Lahore.',
+                'eyebrow' => 'Norwegian Coffee House · Lahore',
                 'title' => 'Nordic warmth, brewed in Lahore.',
                 'subtitle' => 'Premium Hausbrandt coffee, warm hospitality and a relaxed Scandinavian café feel. A little piece of Norway in the heart of Lahore.',
                 'btn1_label' => 'Explore the menu',
@@ -138,7 +138,7 @@ Roasting coffee in Trieste, Italy since 1892, Hausbrandt is known for premium It
 hero:
     image: hero-facade.jpg
     focus: 60%
-    eyebrow: \'Norwegian Coffee House · Lahore.\'
+    eyebrow: \'Norwegian Coffee House · Lahore\'
     title: \'Nordic warmth, brewed in Lahore.\'
     subtitle: \'Premium Hausbrandt coffee, warm hospitality and a relaxed Scandinavian café feel. A little piece of Norway in the heart of Lahore.\'
     btn1_label: \'Explore the menu\'

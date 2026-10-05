@@ -3,7 +3,7 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'config',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791147718,
+    'timestamp' => 1791176977,
     'check_interval' => 2,
     'directories' => [
         '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config' => 1791147713,
@@ -33,8 +33,8 @@ return [
         '/Users/amer/Sites/kaffekos1/user/config/media.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/config/plugins/email.yaml' => 1791147078,
         '/Users/amer/Sites/kaffekos1/user/config/site.yaml' => 1791100445,
-        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791147647,
-        '/Users/amer/Sites/kaffekos1/user/config/themes/kaffekos.yaml' => 1791143910,
+        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791176977,
+        '/Users/amer/Sites/kaffekos1/user/config/themes/kaffekos.yaml' => 1791176977,
         '/Users/amer/Sites/kaffekos1/user/config/themes/quark2.yaml' => 1791145992,
         '/Users/amer/Sites/kaffekos1/user/config/versions.yaml' => 1791099069,
         '/Users/amer/Sites/kaffekos1/system/config/backups.yaml' => 1790904721,
@@ -84,11 +84,11 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791147647
+                'modified' => 1791176977
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
-                'modified' => 1791143910
+                'modified' => 1791176977
             ],
             'themes/quark2' => [
                 'file' => 'user/config/themes/quark2.yaml',
