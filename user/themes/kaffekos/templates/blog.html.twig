@@ -1,29 +1,119 @@
 {% extends 'partials/base.html.twig' %}
 {% import 'macros/kk.html.twig' as kk %}
-{% block hero %}{% include 'partials/banner.html.twig' %}{% endblock %}
-{% block content %}
-<section class="section">
-    {% if page.content|striptags|trim %}
-        <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
-    {% endif %}
+{% block body_class %}page-events{% endblock %}
+
+{% set kinds = {
+    event:    {label: 'Event',    emoji: '🎉'},
+    activity: {label: 'Activity', emoji: '🎲'},
+    news:     {label: 'News',     emoji: '📣'}
+} %}
+{% set ribbon = ['events', 'activities', 'good company', 'coffee o’clock', 'bring a friend', 'pure kos', 'good vibes only'] %}
+
+{% block hero %}
+{% set total = page.children.published|length %}
+<section class="ev-hero">
+    <span class="ev-shape ev-star s1" aria-hidden="true"></span>
+    <span class="ev-shape ev-ring s2" aria-hidden="true"></span>
+    <span class="ev-shape ev-star s3" aria-hidden="true"></span>
+    <span class="ev-shape ev-blob s4" aria-hidden="true"></span>
+
+    <span class="ev-chip ev-chip-1" aria-hidden="true">📅 <b>{{ total }}</b> {{ total == 1 ? 'post' : 'posts' }}</span>
+    <span class="ev-chip ev-chip-2" aria-hidden="true">☕ <b>100%</b> kos</span>
+
     <div class="wrap">
-        <div class="posts">
-            {% for post in page.children.published.order('date', 'desc') %}
+        {% if header.banner.eyebrow %}<p class="ev-eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
+        <h1 class="ev-title">{{ page.title }}</h1>
+        {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
+    </div>
+</section>
+
+<div class="ev-ribbon" aria-hidden="true">
+    <div class="ev-band">
+        <div class="ev-track">
+            {% for i in 1..2 %}<div class="ev-group">{% for w in ribbon %}<span>{{ w }}</span>{% endfor %}</div>{% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% set posts = page.children.published.order('date', 'desc') %}
+{% set today = 'today'|date('U') %}
+{% set social = theme_var('social') %}
+{% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%'} %}
+{% set used = posts|map(p => p.header.kind ?: 'news') %}
+
+<section class="ev-stage">
+    <div class="wrap">
+        <header class="ev-head">
+            <h2>What’s <mark>on</mark> 🎉</h2>
+            {% if page.content|striptags|trim %}
+                <div class="prose">{{ page.content|raw }}</div>
+            {% else %}
+                <p>Events, activities and news from the café. New things get added all the time, so check back often.</p>
+            {% endif %}
+        </header>
+
+        {% if posts|length > 2 and kinds|filter((v, key) => key in used)|length > 1 %}
+        <div class="ev-filters" role="toolbar" aria-label="Filter posts">
+            <button type="button" class="ev-fchip is-on" data-ev-filter="all" style="--c: var(--ev-saffron)" aria-pressed="true">🌈 All</button>
+            {% for key, k in kinds %}{% if key in used %}
+                <button type="button" class="ev-fchip" data-ev-filter="{{ key }}" style="--c: var(--ev-{{ {event: 'coral', activity: 'lagoon', news: 'plum'}[key] }})" aria-pressed="false">{{ k.emoji }} {{ k.label }}</button>
+            {% endif %}{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="ev-grid" data-events>
+            {% for post in posts %}
+                {% set kind = post.header.kind ?: 'news' %}
+                {% set k = kinds[kind]|default(kinds.news) %}
                 {% set cover = post.header.cover ? post.media[post.header.cover] : null %}
-                <article class="post-card">
-                    <a class="post-cover" href="{{ post.url }}">
-                        {% if cover %}{{ kk.img(cover, 800, 520, post.title) }}{% else %}<span class="post-cover-empty">{{ kk.icon('cup', 40) }}</span>{% endif %}
+                {% set upcoming = post.date > today %}
+                {% set is_today = post.date == today %}
+                {% set feature = loop.first and posts|length > 1 %}
+                <article class="ev-card{{ feature ? ' is-feature' : '' }}" data-kind="{{ kind }}"{% if post.header.cover_focus and focus[post.header.cover_focus] %} style="--focus: {{ focus[post.header.cover_focus] }}"{% endif %}>
+                    <a class="ev-cover" href="{{ post.url }}" tabindex="-1" aria-hidden="true">
+                        {% if cover %}{{ kk.imgfit(cover, 1000, 1000, post.title) }}{% else %}<span class="ev-cover-empty">{{ k.emoji }}</span>{% endif %}
+                        <span class="ev-date"><b>{{ post.date|date('d') }}</b><i>{{ post.date|date('M') }}</i></span>
+                        {% if upcoming %}<span class="ev-soon">Coming up</span>{% elseif is_today %}<span class="ev-soon">Today</span>{% endif %}
                     </a>
-                    <div class="post-body">
-                        <time datetime="{{ post.date|date('Y-m-d') }}">{{ post.date|date('j F Y') }}</time>
+                    <div class="ev-body">
+                        <p class="ev-tags">
+                            <span class="ev-tag">{{ k.emoji }} {{ k.label }}</span>
+                            <time datetime="{{ post.date|date('Y-m-d') }}">{{ post.date|date('j F Y') }}</time>
+                        </p>
                         <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
-                        <p>{{ post.header.summary ?: post.summary|striptags }}</p>
-                        <a class="link-arrow" href="{{ post.url }}">Read more {{ kk.icon('arrow', 18) }}</a>
+                        {% if post.header.when or post.header.where %}
+                            <ul class="ev-meta">
+                                {% if post.header.when %}<li>{{ kk.icon('clock', 18) }} {{ post.header.when }}</li>{% endif %}
+                                {% if post.header.where %}<li>{{ kk.icon('pin', 18) }} {{ post.header.where }}</li>{% endif %}
+                            </ul>
+                        {% endif %}
+                        <p class="ev-sum">{{ post.header.summary ?: post.summary|striptags }}</p>
+                        <a class="ev-more" href="{{ post.url }}">Read more {{ kk.icon('arrow', 18) }}</a>
                     </div>
                 </article>
             {% else %}
-                <p class="center">No posts yet. Check back soon.</p>
+                <div class="ev-none">
+                    <span aria-hidden="true">🗓️</span>
+                    <h3>Nothing on the calendar yet</h3>
+                    <p>We’re cooking up something good. Follow us on Instagram to be the first to know.</p>
+                </div>
             {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="ev-cta">
+    <div class="wrap">
+        <div class="ev-cta-card">
+            <span class="ev-cta-emoji" aria-hidden="true">🔔</span>
+            <h2>Don’t miss out</h2>
+            <p>New events and activities land here first, and on Instagram. Got an idea for something we should host? Tell us.</p>
+            <div class="ev-cta-actions">
+                {% if social.instagram %}<a class="ev-btn" href="{{ social.instagram }}" target="_blank" rel="noopener">{{ kk.icon('instagram', 20) }} Follow on Instagram</a>{% endif %}
+                <a class="ev-btn ev-btn-alt" href="{{ url('/contact') }}">💬 Get in touch</a>
+            </div>
         </div>
     </div>
 </section>

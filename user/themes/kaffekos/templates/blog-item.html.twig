@@ -1,22 +1,41 @@
 {% extends 'partials/base.html.twig' %}
 {% import 'macros/kk.html.twig' as kk %}
 {% set cover = header.cover ? page.media[header.cover] : null %}
+{% set kinds = {
+    event:    {label: 'Event',    emoji: '🎉'},
+    activity: {label: 'Activity', emoji: '🎲'},
+    news:     {label: 'News',     emoji: '📣'}
+} %}
+{% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%'} %}
+{% set kind = header.kind ?: 'news' %}
+{% set k = kinds[kind]|default(kinds.news) %}
+{% block body_class %}page-events{% endblock %}
 {% block og_image %}{% if cover %}<meta property="og:image" content="{{ url(kk.imgurl(cover, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
 {% block hero %}
-<section class="page-banner post-banner">
+<section class="ev-hero ev-hero-post">
+    <span class="ev-shape ev-star s1" aria-hidden="true"></span>
+    <span class="ev-shape ev-ring s2" aria-hidden="true"></span>
+    <span class="ev-shape ev-blob s4" aria-hidden="true"></span>
     <div class="wrap wrap-narrow">
-        <p class="eyebrow"><a href="{{ page.parent.url }}">{{ page.parent.title }}</a> &middot; {{ page.date|date('j F Y') }}</p>
-        <h1>{{ page.title }}</h1>
+        <p class="ev-eyebrow">{{ k.emoji }} {{ k.label }} &middot; {{ page.date|date('j F Y') }}</p>
+        <h1 class="ev-title">{{ page.title }}</h1>
     </div>
-    <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
 </section>
 {% endblock %}
 {% block content %}
-<article class="section">
+<article class="ev-stage ev-post">
     <div class="wrap wrap-narrow">
-        {% if cover %}<div class="post-hero">{{ kk.img(cover, 1100, 620, page.title, null, false) }}</div>{% endif %}
-        <div class="prose">{{ page.content|raw }}</div>
-        <p class="center"><a class="btn btn-outline" href="{{ page.parent.url }}">&larr; All news</a></p>
+        <div class="ev-post-card">
+            {% if cover %}<div class="ev-post-hero"{% if header.cover_focus and focus[header.cover_focus] %} style="--focus: {{ focus[header.cover_focus] }}"{% endif %}>{{ kk.imgfit(cover, 1100, 1100, page.title) }}</div>{% endif %}
+            {% if header.when or header.where %}
+                <ul class="ev-meta ev-meta-lg">
+                    {% if header.when %}<li>{{ kk.icon('clock', 20) }} {{ header.when }}</li>{% endif %}
+                    {% if header.where %}<li>{{ kk.icon('pin', 20) }} {{ header.where }}</li>{% endif %}
+                </ul>
+            {% endif %}
+            <div class="prose">{{ page.content|raw }}</div>
+        </div>
+        <p class="center"><a class="ev-btn ev-btn-alt" href="{{ page.parent.url }}">&larr; All events</a></p>
     </div>
 </article>
 {% endblock %}

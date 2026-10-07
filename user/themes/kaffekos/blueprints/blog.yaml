@@ -1,4 +1,4 @@
-title: Journal Page
+title: Events Page
 extends@: default
 
 form:
@@ -11,8 +11,8 @@ form:
               label: Introduction (optional)
             blog_help:
               type: spacer
-              title: Posting news
-              text: 'Click the + next to Journal in the page list, choose "Journal Post" as the page type, write your news and set a Date on its Options tab.'
+              title: Adding an event
+              text: 'Click the + next to Events in the page list, choose "Event Post" as the page type, write it up and set its Date on the Options tab (use the event date for events). Newest and upcoming ones show first.'
         banner:
           type: tab
           title: Page Banner

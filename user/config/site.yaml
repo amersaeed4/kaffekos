@@ -6,3 +6,6 @@ author:
 metadata:
     description: 'Kaffekos is a Norwegian-inspired coffee house in Lahore, Pakistan. Premium coffee, warm bakes and a cosy Scandinavian atmosphere.'
     keywords: 'Kaffekos, coffee, cafe, Lahore, Norwegian, Scandinavian, Nordic, bakery, kanelbolle'
+redirects:
+    '/journal': '/events'
+    '/journal/(.*)': '/events/$1'

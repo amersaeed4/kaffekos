@@ -23,7 +23,7 @@ Log in with your admin account. After every change, click **Save**. The change i
 | Our Story page | **Pages → Our Story** |
 | Menu items, prices, categories | **Pages → Menu** (see below) |
 | Photos | **Pages → Gallery** |
-| News / events | **Pages → Journal** |
+| Events, activities & news | **Pages → Events** |
 | Contact page texts | **Pages → Contact** |
 | Where contact messages are emailed | **Plugins → Email → "To" address** |
 
@@ -68,8 +68,9 @@ Open the section's tab (e.g. **8 · Guest Reviews**) and switch **Show this sect
 **Pages → Gallery →** drag photos into **Page Media** → **Save**. They appear automatically.
 For captions or a specific order use the **Photos & Captions** tab.
 
-### Post news or an event
-**Pages →** **+ Add** next to **Journal** → page type **Journal Post**. Write the title and text, add a cover photo and short summary, **Save**. Newest posts show first.
+### Add an event, activity or news post
+**Pages →** **+ Add** next to **Events** → page type **Event Post**. Write the title and text, choose the **Type** (Event / Activity / News), optionally fill **When** and **Where**, add a cover photo and short summary, **Save**.
+Set the post's **Date** (Options tab) to the event date. Posts with a future date get a green "Coming up" badge; the newest/upcoming one is shown big at the top.
 
 ### Add a completely new page (e.g. "Catering")
 **Pages → + Add** → page type **Standard Page**. It appears in the top menu automatically (the page list order = menu order).

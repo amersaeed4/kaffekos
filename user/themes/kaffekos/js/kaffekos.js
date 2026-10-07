@@ -346,4 +346,22 @@
             }, { passive: true });
         }
     }
+    /* ---------- events: filter by type ---------- */
+    var evGrid = $('[data-events]');
+    if (evGrid) {
+        var evBtns = $$('[data-ev-filter]');
+        evBtns.forEach(function (b) {
+            b.addEventListener('click', function () {
+                var f = b.getAttribute('data-ev-filter');
+                evBtns.forEach(function (o) { var on = o === b; o.classList.toggle('is-on', on); o.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+                var first = true;
+                $$('.ev-card', evGrid).forEach(function (c) {
+                    var hit = f === 'all' || c.getAttribute('data-kind') === f;
+                    c.hidden = !hit;
+                    c.classList.toggle('is-feature', hit && first && f === 'all');
+                    if (hit) first = false;
+                });
+            });
+        });
+    }
 })();
