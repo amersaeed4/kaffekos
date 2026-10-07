@@ -7,6 +7,8 @@ cover: friday-live-1.jpg
 cover_focus: full
 kind: event
 when: 'Fri 9 Oct, 8:00 PM onwards'
+event_start: '2026-10-09 20:00'
+event_end: '2026-10-10 00:00'
 where: 'Grand Park, Shouq Chowk, Johar Town, Lahore'
 summary: 'Live music in the open air with munis.mujahid, board games on the table and 15% off all drinks and savoury items. Free entry, no ticket needed.'
 gallery:

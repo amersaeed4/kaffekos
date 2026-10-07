@@ -26,6 +26,34 @@
         {% if hero.show_open_badge is null or hero.show_open_badge %}
             <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>Opening hours below</span></p>
         {% endif %}
+
+        {# Upcoming-event banner: shown while an event is still to come or on right now; links to the soonest one.
+           Optional "Starts" / "Ends" on the event post (entered as Lahore time, UTC+5) give "Happening now" and hide it once over. #}
+        {% set ev_page = page.find('/events') %}
+        {% set ev_today = 'today'|date('U') %}
+        {% set ev_now = 'now'|date('U') %}
+        {% set ev_soon = ev_page ? ev_page.children.published|filter(p => p.date >= ev_today and not (p.header.event_end and ((p.header.event_end ~ ' +05:00')|date('U')) <= ev_now))|sort((a, b) => a.date <=> b.date) : [] %}
+        {% if ev_soon|length %}
+            {% set ev = ev_soon|first %}
+            {% set ev_start = ev.header.event_start ? ((ev.header.event_start ~ ' +05:00')|date('U')) : null %}
+            {% set ev_end = ev.header.event_end ? ((ev.header.event_end ~ ' +05:00')|date('U')) : (ev_start ? (((((ev_start + 18000) / 86400)|round(0, 'floor')) + 1) * 86400 - 18000) : null) %}
+            {% set ev_live = ev_start and ev_start <= ev_now and ev_now < ev_end %}
+            {% if ev_start %}
+                {% set ev_days = (((ev_start + 18000) / 86400)|round(0, 'floor')) - (((ev_now + 18000) / 86400)|round(0, 'floor')) %}
+            {% else %}
+                {% set ev_days = (((ev.date|date('Y-m-d')|date('U')) - ev_today) / 86400)|round %}
+            {% endif %}
+            {% set ev_when = ev_live ? 'Happening now' : (ev_days <= 0 ? 'Today' : (ev_days == 1 ? 'Tomorrow' : 'In ' ~ ev_days ~ ' days')) %}
+            {% set ev_more = ev_soon|length - 1 %}
+            <a class="hm-event{{ ev_live ? ' is-live' : '' }}" href="{{ ev_more ? ev_page.url : ev.url }}"{% if ev_start %} data-start="{{ ev_start }}" data-end="{{ ev_end }}"{% endif %}>
+                <span class="hm-event-tag"><span class="hm-event-dot" aria-hidden="true"></span><span data-ev-label>{{ ev_when }}</span></span>
+                <span class="hm-event-main">
+                    <strong>{{ ev.title }}</strong>
+                    {% if ev.header.when %}<small>{{ ev.header.when }}{% if ev_more %} &middot; +{{ ev_more }} more {{ ev_more == 1 ? 'event' : 'events' }}{% endif %}</small>{% elseif ev_more %}<small>+{{ ev_more }} more {{ ev_more == 1 ? 'event' : 'events' }}</small>{% endif %}
+                </span>
+                <span class="hm-event-go" aria-hidden="true">{{ kk.icon('arrow', 20) }}</span>
+            </a>
+        {% endif %}
     </div>
 </section>
 <div class="hm-ticker" aria-hidden="true">

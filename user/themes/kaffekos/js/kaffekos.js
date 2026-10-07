@@ -101,6 +101,22 @@
         }
     }
 
+    /* ---------- home: event banner flips to "Happening now" / hides itself when over (no reload needed) ---------- */
+    var evBanner = $('.hm-event[data-start]');
+    if (evBanner) {
+        var evStart = +evBanner.getAttribute('data-start'), evEnd = +evBanner.getAttribute('data-end'), evLabel = $('[data-ev-label]', evBanner);
+        var evTick = function () {
+            var now = Date.now() / 1000;
+            if (now >= evEnd) { evBanner.hidden = true; return; }
+            if (now >= evStart && !evBanner.classList.contains('is-live')) {
+                evBanner.classList.add('is-live');
+                if (evLabel) evLabel.textContent = 'Happening now';
+            }
+        };
+        evTick();
+        setInterval(evTick, 30000);
+    }
+
     /* ---------- scroll reveal (only below-the-fold items) ---------- */
     if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         var io = new IntersectionObserver(function (entries) {

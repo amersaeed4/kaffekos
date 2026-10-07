@@ -27,6 +27,14 @@ form:
               label: When (optional)
               placeholder: 'Fri 17 Oct, 7 PM'
               help: 'Shown on the card, e.g. the day and time of the event.'
+            header.event_start:
+              type: datetime
+              label: Starts (optional, Lahore time)
+              help: 'Exact start. With this, the homepage banner can say "Happening now" while the event is on.'
+            header.event_end:
+              type: datetime
+              label: Ends (optional, Lahore time)
+              help: 'Exact end. After this the homepage banner disappears. If empty, it stays until the end of the start day.'
             header.where:
               type: text
               label: Where (optional)
