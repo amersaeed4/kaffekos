@@ -70,7 +70,14 @@ For captions or a specific order use the **Photos & Captions** tab.
 
 ### Add an event, activity or news post
 **Pages →** **+ Add** next to **Events** → page type **Event Post**. Write the title and text, choose the **Type** (Event / Activity / News), optionally fill **When** and **Where**, add a cover photo and short summary, **Save**.
-Set the post's **Date** (Options tab) to the event date. Posts with a future date get a green "Coming up" badge; the newest/upcoming one is shown big at the top.
+Set the post's **Date** (Options tab) to the event date. Posts dated today or later appear first under **Coming up** with a green badge; older ones go under **Happened**.
+
+**Upcoming event posters:** for a poster with text on it, set *Which part of the cover photo stays visible* to **Show the whole picture** so nothing is cut off. Extra posters/photos go in **More photos** (with captions).
+
+**Remove an upcoming event automatically after it happens:** on the post's **Options** tab, switch on **Unpublish Date** and set it to the day after the event (e.g. event on 9 Oct → 10 Oct 00:00). The post disappears from the Events page (and its link stops working) by itself. Later, add a new post with the real photos from the event.
+
+### "Coming up" on the Home page
+Nothing to do: any **Event** or **Activity** post with today's date or a later date shows up on the Home page (below Welcome), soonest first, with a "In 2 days" label. When the event is over, or its **Unpublish Date** passes, it disappears by itself; if nothing is coming up, the section is hidden. To change its heading or how many events show: **Pages → Home → 2b · Coming Up**.
 
 ### Add a completely new page (e.g. "Catering")
 **Pages → + Add** → page type **Standard Page**. It appears in the top menu automatically (the page list order = menu order).

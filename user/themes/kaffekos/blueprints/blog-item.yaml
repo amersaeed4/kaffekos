@@ -50,4 +50,18 @@ form:
                 upper: 'Upper part'
                 middle: 'Middle'
                 bottom: 'Bottom'
-              help: 'The photo is cropped to fit the card. For tall phone photos with people in them, "Top" or "Upper part" keeps faces in view.'
+                full: 'Show the whole picture (for posters)'
+              help: 'The photo is cropped to fit the card. For tall phone photos with people in them, "Top" or "Upper part" keeps faces in view. Choose "Show the whole picture" for a poster with text, so nothing gets cut off.'
+            header.gallery:
+              type: list
+              style: vertical
+              label: More photos (optional)
+              help: 'Extra pictures shown under the post text, with an optional caption. Upload them to Page Media first.'
+              fields:
+                .image:
+                  type: filepicker
+                  label: Photo
+                  preview_images: true
+                .caption:
+                  type: text
+                  label: Caption

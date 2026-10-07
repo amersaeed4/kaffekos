@@ -129,6 +129,44 @@ form:
                   type: text
                   label: Small text
 
+        upcoming:
+          type: tab
+          title: 2b · Coming Up
+          fields:
+            upcoming_help:
+              type: spacer
+              title: This section fills itself
+              text: 'Events and Activities you add under Pages → Events with today''s date or a future date show up here automatically, soonest first. Once an event is over (or its Unpublish Date passes) it disappears. If there is nothing coming up, the whole section is hidden.'
+            header.upcoming.enabled:
+              type: toggle
+              label: Show this section
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.upcoming.eyebrow:
+              type: text
+              label: Small label
+              placeholder: 'Coming up'
+            header.upcoming.title:
+              type: text
+              label: Heading
+              placeholder: 'Save the date'
+            header.upcoming.subtitle:
+              type: text
+              label: Line under the heading (optional)
+            header.upcoming.count:
+              type: number
+              label: How many events to show
+              default: 3
+              size: x-small
+              validate:
+                min: 1
+                max: 6
+
         coffee:
           type: tab
           title: 3 · Our Coffee

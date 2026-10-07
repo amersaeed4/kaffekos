@@ -73,6 +73,87 @@
     </section>
 {% endif %}
 
+{# ----------------------------------------------- COMING UP (automatic) #}
+{% set up = header.upcoming ?? {} %}
+{% if up.enabled is null or up.enabled %}
+    {% set events_page = page.find('/events') %}
+    {% set today = 'today'|date('U') %}
+    {# events and activities dated today or later (news is left out); soonest first. Unpublished posts never show. #}
+    {% set soon = events_page ? events_page.children.published|filter(p => p.date >= today and (p.header.kind ?: 'news') != 'news')|sort((a, b) => a.date <=> b.date) : [] %}
+    {% set soon = soon|slice(0, up.count ?: 3) %}
+    {% if soon|length %}
+        {% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%', full: '50% 50%'} %}
+        {% set kinds = {event: {label: 'Event', emoji: '🎉'}, activity: {label: 'Activity', emoji: '🎲'}, news: {label: 'News', emoji: '📣'}} %}
+        <section class="hm-soon" aria-labelledby="hm-soon-title">
+            <span class="hm-soon-shape hm-soon-star s1" aria-hidden="true"></span>
+            <span class="hm-soon-shape hm-soon-ring s2" aria-hidden="true"></span>
+            <span class="hm-soon-shape hm-soon-star s3" aria-hidden="true"></span>
+            <span class="hm-soon-shape hm-soon-blob s4" aria-hidden="true"></span>
+            <div class="wrap">
+                <header class="hm-soon-head">
+                    <p class="hm-soon-pill"><span class="hm-soon-dot" aria-hidden="true"></span> {{ up.eyebrow ?: 'Coming up' }}</p>
+                    <h2 id="hm-soon-title">{{ up.title ?: 'Save the date' }}</h2>
+                    {% if up.subtitle %}<p class="lead">{{ up.subtitle }}</p>{% endif %}
+                </header>
+
+                {% for ev in soon %}
+                    {% set k = kinds[ev.header.kind ?: 'event']|default(kinds.event) %}
+                    {% set cover = ev.header.cover ? ev.media[ev.header.cover] : null %}
+                    {% set poster = ev.header.cover_focus == 'full' %}
+                    {% set days = ((ev.date|date('Y-m-d')|date('U')) - today) // 86400 %}
+                    {% set when_label = days <= 0 ? 'Today!' : (days == 1 ? 'Tomorrow' : 'In ' ~ days ~ ' days') %}
+                    {% if loop.first %}
+                        <article class="hm-soon-card">
+                            <a class="hm-soon-media{{ poster ? ' is-poster' : '' }}" href="{{ ev.url }}" aria-label="{{ ev.title|e('html_attr') }}"{% if ev.header.cover_focus and focus[ev.header.cover_focus] %} style="--focus: {{ focus[ev.header.cover_focus] }}"{% endif %}>
+                                {% if cover %}{{ kk.imgfit(cover, 900, 1125, ev.title) }}{% else %}<span class="hm-soon-empty">{{ k.emoji }}</span>{% endif %}
+                                <span class="hm-soon-date"><b>{{ ev.date|date('d') }}</b><i>{{ ev.date|date('M') }}</i></span>
+                            </a>
+                            <div class="hm-soon-body">
+                                <p class="hm-soon-tags">
+                                    <span class="hm-soon-countdown">⏳ {{ when_label }}</span>
+                                    <span class="hm-soon-kind">{{ k.emoji }} {{ k.label }}</span>
+                                </p>
+                                <h3><a href="{{ ev.url }}">{{ ev.title }}</a></h3>
+                                {% if ev.header.when or ev.header.where %}
+                                    <ul class="hm-soon-meta">
+                                        {% if ev.header.when %}<li>{{ kk.icon('clock', 20) }} <span>{{ ev.header.when }}</span></li>{% endif %}
+                                        {% if ev.header.where %}<li>{{ kk.icon('pin', 20) }} <span>{{ ev.header.where }}</span></li>{% endif %}
+                                    </ul>
+                                {% endif %}
+                                <p class="hm-soon-sum">{{ ev.header.summary ?: ev.summary|striptags }}</p>
+                                <div class="hm-soon-actions">
+                                    <a class="hm-soon-btn" href="{{ ev.url }}">See the details {{ kk.icon('arrow', 18) }}</a>
+                                    {% if soon|length > 1 %}<a class="hm-soon-btn hm-soon-btn-ghost" href="{{ events_page.url }}">All events</a>{% endif %}
+                                </div>
+                            </div>
+                        </article>
+                    {% endif %}
+                {% endfor %}
+
+                {% if soon|length > 1 %}
+                    <div class="hm-soon-more">
+                        {% for ev in soon|slice(1) %}
+                            {% set k = kinds[ev.header.kind ?: 'event']|default(kinds.event) %}
+                            {% set cover = ev.header.cover ? ev.media[ev.header.cover] : null %}
+                            {% set poster = ev.header.cover_focus == 'full' %}
+                            <a class="hm-soon-mini" href="{{ ev.url }}"{% if ev.header.cover_focus and focus[ev.header.cover_focus] %} style="--focus: {{ focus[ev.header.cover_focus] }}"{% endif %}>
+                                <span class="hm-soon-mini-media{{ poster ? ' is-poster' : '' }}">{% if cover %}{{ kk.imgfit(cover, 400, 500, ev.title) }}{% else %}<span class="hm-soon-empty">{{ k.emoji }}</span>{% endif %}</span>
+                                <span class="hm-soon-mini-body">
+                                    <span class="hm-soon-kind">{{ k.emoji }} {{ ev.date|date('j M') }}</span>
+                                    <strong>{{ ev.title }}</strong>
+                                    {% if ev.header.when %}<em>{{ ev.header.when }}</em>{% endif %}
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% elseif events_page %}
+                    <p class="hm-soon-foot"><a href="{{ events_page.url }}">See all events {{ kk.icon('arrow', 18) }}</a></p>
+                {% endif %}
+            </div>
+        </section>
+    {% endif %}
+{% endif %}
+
 {# ---------------------------------------------------------- OUR COFFEE #}
 {% set cf = header.coffee ?? {} %}
 {% if (cf.enabled is null or cf.enabled) and (cf.title or cf.text) %}

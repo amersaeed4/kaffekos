@@ -11,13 +11,14 @@
 
 {% block hero %}
 {% set total = page.children.published|length %}
+{% set soon_count = page.children.published|filter(p => p.date >= ('today'|date('U')))|length %}
 <section class="ev-hero">
     <span class="ev-shape ev-star s1" aria-hidden="true"></span>
     <span class="ev-shape ev-ring s2" aria-hidden="true"></span>
     <span class="ev-shape ev-star s3" aria-hidden="true"></span>
     <span class="ev-shape ev-blob s4" aria-hidden="true"></span>
 
-    <span class="ev-chip ev-chip-1" aria-hidden="true">📅 <b>{{ total }}</b> {{ total == 1 ? 'post' : 'posts' }}</span>
+    {% if soon_count %}<span class="ev-chip ev-chip-1" aria-hidden="true">🔥 <b>{{ soon_count }}</b> coming up</span>{% else %}<span class="ev-chip ev-chip-1" aria-hidden="true">📅 <b>{{ total }}</b> {{ total == 1 ? 'post' : 'posts' }}</span>{% endif %}
     <span class="ev-chip ev-chip-2" aria-hidden="true">☕ <b>100%</b> kos</span>
 
     <div class="wrap">
@@ -37,10 +38,14 @@
 {% endblock %}
 
 {% block content %}
-{% set posts = page.children.published.order('date', 'desc') %}
 {% set today = 'today'|date('U') %}
+{% set all_posts = page.children.published %}
+{# upcoming (today and later) first, soonest on top; then past posts, newest first #}
+{% set soon = all_posts|filter(p => p.date >= today)|sort((a, b) => a.date <=> b.date) %}
+{% set past = all_posts|filter(p => p.date < today)|sort((a, b) => b.date <=> a.date) %}
+{% set posts = soon|merge(past) %}
 {% set social = theme_var('social') %}
-{% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%'} %}
+{% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%', full: '50% 50%'} %}
 {% set used = posts|map(p => p.header.kind ?: 'news') %}
 
 <section class="ev-stage">
@@ -65,13 +70,16 @@
 
         <div class="ev-grid" data-events>
             {% for post in posts %}
+                {% if loop.first and soon|length %}<h3 class="ev-group-title ev-group-soon" data-ev-group><span>🔥 Coming up</span></h3>{% endif %}
+                {% if post.date < today and loop.index0 == soon|length %}<h3 class="ev-group-title" data-ev-group><span>📸 {{ soon|length ? 'Happened' : 'Looking back' }}</span></h3>{% endif %}
                 {% set kind = post.header.kind ?: 'news' %}
                 {% set k = kinds[kind]|default(kinds.news) %}
                 {% set cover = post.header.cover ? post.media[post.header.cover] : null %}
-                {% set upcoming = post.date > today %}
-                {% set is_today = post.date == today %}
+                {% set upcoming = post.date >= today + 86400 %}
+                {% set is_today = post.date >= today and not upcoming %}
+                {% set poster = post.header.cover_focus == 'full' %}
                 {% set feature = loop.first and posts|length > 1 %}
-                <article class="ev-card{{ feature ? ' is-feature' : '' }}" data-kind="{{ kind }}"{% if post.header.cover_focus and focus[post.header.cover_focus] %} style="--focus: {{ focus[post.header.cover_focus] }}"{% endif %}>
+                <article class="ev-card{{ feature ? ' is-feature' : '' }}{{ poster ? ' is-poster' : '' }}{{ post.date >= today ? ' is-soon' : '' }}" data-kind="{{ kind }}"{% if post.header.cover_focus and focus[post.header.cover_focus] %} style="--focus: {{ focus[post.header.cover_focus] }}"{% endif %}>
                     <a class="ev-cover" href="{{ post.url }}" tabindex="-1" aria-hidden="true">
                         {% if cover %}{{ kk.imgfit(cover, 1000, 1000, post.title) }}{% else %}<span class="ev-cover-empty">{{ k.emoji }}</span>{% endif %}
                         <span class="ev-date"><b>{{ post.date|date('d') }}</b><i>{{ post.date|date('M') }}</i></span>

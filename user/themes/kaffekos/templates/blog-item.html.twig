@@ -6,7 +6,7 @@
     activity: {label: 'Activity', emoji: '🎲'},
     news:     {label: 'News',     emoji: '📣'}
 } %}
-{% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%'} %}
+{% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%', full: '50% 50%'} %}
 {% set kind = header.kind ?: 'news' %}
 {% set k = kinds[kind]|default(kinds.news) %}
 {% block body_class %}page-events{% endblock %}
@@ -26,7 +26,7 @@
 <article class="ev-stage ev-post">
     <div class="wrap wrap-narrow">
         <div class="ev-post-card">
-            {% if cover %}<div class="ev-post-hero"{% if header.cover_focus and focus[header.cover_focus] %} style="--focus: {{ focus[header.cover_focus] }}"{% endif %}>{{ kk.imgfit(cover, 1100, 1100, page.title) }}</div>{% endif %}
+            {% if cover %}<div class="ev-post-hero{{ header.cover_focus == 'full' ? ' is-poster' : '' }}"{% if header.cover_focus and focus[header.cover_focus] %} style="--focus: {{ focus[header.cover_focus] }}"{% endif %}>{{ kk.imgfit(cover, 1100, 1100, page.title) }}</div>{% endif %}
             {% if header.when or header.where %}
                 <ul class="ev-meta ev-meta-lg">
                     {% if header.when %}<li>{{ kk.icon('clock', 20) }} {{ header.when }}</li>{% endif %}
@@ -34,6 +34,17 @@
                 </ul>
             {% endif %}
             <div class="prose">{{ page.content|raw }}</div>
+            {% if header.gallery %}
+                <div class="ev-gallery">
+                    {% for item in header.gallery %}{% if item.image and page.media[item.image] %}
+                        {% set m = page.media[item.image] %}
+                        <figure>
+                            <a href="{{ m.cropResize(1800, 1800).quality(84).url }}" target="_blank" rel="noopener">{{ kk.imgfit(m, 800, 1000, item.caption ?: page.title) }}</a>
+                            {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
+                        </figure>
+                    {% endif %}{% endfor %}
+                </div>
+            {% endif %}
         </div>
         <p class="center"><a class="ev-btn ev-btn-alt" href="{{ page.parent.url }}">&larr; All events</a></p>
     </div>
