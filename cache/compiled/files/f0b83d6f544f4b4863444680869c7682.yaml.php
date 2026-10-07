@@ -2,7 +2,7 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/plugins/flex-objects/blueprints/flex-objects/pages.yaml',
-    'modified' => 1790904721,
+    'modified' => 1791376799,
     'size' => 523,
     'data' => [
         'title' => 'Pages (Admin)',

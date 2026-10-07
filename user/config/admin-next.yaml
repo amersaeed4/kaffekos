@@ -23,14 +23,14 @@ ui:
     editorFixedHeight: 0
     adminLanguage: en-US
     pagesPerPage: 20
-    pagesViewMode: miller
+    pagesViewMode: tree
     usersViewMode: cards
     groupsViewMode: cards
     pluginsViewMode: cards
     themesViewMode: cards
     flexAfterSave: ''
   settings:
-    autoSaveEnabled: true
+    autoSaveEnabled: false
     autoSaveToolbarUndo: true
     autoSaveBatchWindowMs: 0
     collabEnabled: true

@@ -2,13 +2,13 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/plugins/api/blueprints.yaml',
-    'modified' => 1790904721,
+    'modified' => 1791376789,
     'size' => 24845,
     'data' => [
         'name' => 'API',
         'slug' => 'api',
         'type' => 'plugin',
-        'version' => '1.0.44',
+        'version' => '1.0.45',
         'description' => 'RESTful API for Grav CMS. Provides headless access to pages, media, configuration, users, and system management.',
         'icon' => 'plug',
         'author' => [

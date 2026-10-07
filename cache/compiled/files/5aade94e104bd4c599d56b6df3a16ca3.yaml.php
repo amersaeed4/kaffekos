@@ -2,7 +2,7 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => 'plugin://api/permissions.yaml',
-    'modified' => 1790904721,
+    'modified' => 1791376789,
     'size' => 1845,
     'data' => [
         'actions' => [

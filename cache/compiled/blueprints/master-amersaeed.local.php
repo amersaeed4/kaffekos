@@ -1,37 +1,37 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledBlueprints',
-    'timestamp' => 1791177194,
-    'checksum' => 'fc04321beea3d0676668390041a4cda6',
+    'timestamp' => 1791376804,
+    'checksum' => '40e3684902e2beb931ee4e6d394bba2f',
     'files' => [
         'system/blueprints/config' => [
             'backups' => [
                 'file' => 'system/blueprints/config/backups.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'media' => [
                 'file' => 'system/blueprints/config/media.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'scheduler' => [
                 'file' => 'system/blueprints/config/scheduler.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'security' => [
                 'file' => 'system/blueprints/config/security.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'site' => [
                 'file' => 'system/blueprints/config/site.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'streams' => [
                 'file' => 'system/blueprints/config/streams.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'system' => [
                 'file' => 'system/blueprints/config/system.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ]
         ],
         'user/plugins' => [
@@ -41,7 +41,7 @@ return [
             ],
             'plugins/flex-objects' => [
                 'file' => 'user/plugins/flex-objects/blueprints.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376799
             ],
             'plugins/problems' => [
                 'file' => 'user/plugins/problems/blueprints.yaml',
@@ -49,7 +49,7 @@ return [
             ],
             'plugins/api' => [
                 'file' => 'user/plugins/api/blueprints.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376789
             ],
             'plugins/shortcode-core' => [
                 'file' => 'user/plugins/shortcode-core/blueprints.yaml',
@@ -61,7 +61,7 @@ return [
             ],
             'plugins/admin2' => [
                 'file' => 'user/plugins/admin2/blueprints.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376795
             ],
             'plugins/error' => [
                 'file' => 'user/plugins/error/blueprints.yaml',
@@ -69,7 +69,7 @@ return [
             ],
             'plugins/login' => [
                 'file' => 'user/plugins/login/blueprints.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376804
             ],
             'plugins/email' => [
                 'file' => 'user/plugins/email/blueprints.yaml',

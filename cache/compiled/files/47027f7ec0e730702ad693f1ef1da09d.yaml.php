@@ -2,13 +2,13 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/plugins/admin2/blueprints.yaml',
-    'modified' => 1790904721,
+    'modified' => 1791376795,
     'size' => 963,
     'data' => [
         'name' => 'Admin2',
         'slug' => 'admin2',
         'type' => 'plugin',
-        'version' => '2.1.27',
+        'version' => '2.1.28',
         'description' => 'Modern administration panel for Grav CMS. A redesigned admin experience.',
         'icon' => 'black-tie',
         'author' => [
@@ -29,7 +29,7 @@ return [
         'dependencies' => [
             0 => [
                 'name' => 'api',
-                'version' => '>=1.0.44'
+                'version' => '>=1.0.45'
             ]
         ],
         'form' => [

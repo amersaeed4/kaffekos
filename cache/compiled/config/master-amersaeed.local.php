@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791177194,
-    'checksum' => '9b1edb918a5c051afd426e6129368d00',
+    'timestamp' => 1791384273,
+    'checksum' => '83f7f10994a7d743322f33ecae99b0e2',
     'files' => [
         'user/env/amersaeed.local/config' => [
             'system' => [
@@ -13,7 +13,7 @@ return [
         'user/config' => [
             'admin-next' => [
                 'file' => 'user/config/admin-next.yaml',
-                'modified' => 1791146640
+                'modified' => 1791384266
             ],
             'media' => [
                 'file' => 'user/config/media.yaml',
@@ -25,11 +25,11 @@ return [
             ],
             'site' => [
                 'file' => 'user/config/site.yaml',
-                'modified' => 1791100445
+                'modified' => 1791383055
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791177194
+                'modified' => 1791376804
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
@@ -41,41 +41,41 @@ return [
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',
-                'modified' => 1791099069
+                'modified' => 1791376770
             ]
         ],
         'system/config' => [
             'backups' => [
                 'file' => 'system/config/backups.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'media' => [
                 'file' => 'system/config/media.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'mime' => [
                 'file' => 'system/config/mime.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'permissions' => [
                 'file' => 'system/config/permissions.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'scheduler' => [
                 'file' => 'system/config/scheduler.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'security' => [
                 'file' => 'system/config/security.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'site' => [
                 'file' => 'system/config/site.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'system' => [
                 'file' => 'system/config/system.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ]
         ],
         'user/plugins' => [
@@ -85,7 +85,7 @@ return [
             ],
             'plugins/flex-objects' => [
                 'file' => 'user/plugins/flex-objects/flex-objects.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376799
             ],
             'plugins/problems' => [
                 'file' => 'user/plugins/problems/problems.yaml',
@@ -93,7 +93,7 @@ return [
             ],
             'plugins/api' => [
                 'file' => 'user/plugins/api/api.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376789
             ],
             'plugins/shortcode-core' => [
                 'file' => 'user/plugins/shortcode-core/shortcode-core.yaml',
@@ -105,7 +105,7 @@ return [
             ],
             'plugins/admin2' => [
                 'file' => 'user/plugins/admin2/admin2.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376795
             ],
             'plugins/error' => [
                 'file' => 'user/plugins/error/error.yaml',
@@ -113,7 +113,7 @@ return [
             ],
             'plugins/login' => [
                 'file' => 'user/plugins/login/login.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376804
             ],
             'plugins/email' => [
                 'file' => 'user/plugins/email/email.yaml',
@@ -4248,7 +4248,10 @@ node_modules'
                 'size' => 300,
                 'delimiter' => '==='
             ],
-            'redirects' => NULL,
+            'redirects' => [
+                '/journal' => '/events',
+                '/journal/(.*)' => '/events/$1'
+            ],
             'routes' => NULL,
             'blog' => [
                 'route' => '/blog'
@@ -4615,7 +4618,7 @@ node_modules'
                     'editorFixedHeight' => 0,
                     'adminLanguage' => 'en-US',
                     'pagesPerPage' => 20,
-                    'pagesViewMode' => 'miller',
+                    'pagesViewMode' => 'tree',
                     'usersViewMode' => 'cards',
                     'groupsViewMode' => 'cards',
                     'pluginsViewMode' => 'cards',
@@ -4623,7 +4626,7 @@ node_modules'
                     'flexAfterSave' => ''
                 ],
                 'settings' => [
-                    'autoSaveEnabled' => true,
+                    'autoSaveEnabled' => false,
                     'autoSaveToolbarUndo' => true,
                     'autoSaveBatchWindowMs' => 0,
                     'collabEnabled' => true,
@@ -4636,8 +4639,14 @@ node_modules'
         'versions' => [
             'core' => [
                 'grav' => [
-                    'version' => '2.2.4',
-                    'schema' => '2.2.4_2026-09-30_0'
+                    'version' => '2.2.5',
+                    'schema' => '2.2.4_2026-09-30_0',
+                    'history' => [
+                        0 => [
+                            'version' => '2.2.5',
+                            'date' => '2026-10-07 12:39:30'
+                        ]
+                    ]
                 ]
             ]
         ]

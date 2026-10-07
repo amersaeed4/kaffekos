@@ -2,7 +2,7 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/system/config/permissions.yaml',
-    'modified' => 1790904721,
+    'modified' => 1791376770,
     'size' => 890,
     'data' => [
         'actions' => [

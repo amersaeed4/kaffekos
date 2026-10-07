@@ -3,25 +3,25 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'config',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791177194,
+    'timestamp' => 1791384273,
     'check_interval' => 2,
     'directories' => [
         '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config' => 1791147713,
         '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config/plugins' => 1791147713,
-        '/Users/amer/Sites/kaffekos1/user/config' => 1791146640,
+        '/Users/amer/Sites/kaffekos1/user/config' => 1791384266,
         '/Users/amer/Sites/kaffekos1/user/config/plugins' => 1791100445,
         '/Users/amer/Sites/kaffekos1/user/config/themes' => 1791145992,
-        '/Users/amer/Sites/kaffekos1/system/config' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/system/config' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/user/plugins' => 1791376804,
         '/Users/amer/Sites/kaffekos1/user/plugins/form' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/flex-objects' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/flex-objects' => 1791376799,
         '/Users/amer/Sites/kaffekos1/user/plugins/problems' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/api' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/api' => 1791376789,
         '/Users/amer/Sites/kaffekos1/user/plugins/shortcode-core' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/plugins/github-markdown-alerts' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/admin2' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/admin2' => 1791376795,
         '/Users/amer/Sites/kaffekos1/user/plugins/error' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/login' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/login' => 1791376804,
         '/Users/amer/Sites/kaffekos1/user/plugins/email' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/themes' => 1791127317,
         '/Users/amer/Sites/kaffekos1/user/themes/quark2' => 1790904721,
@@ -29,31 +29,31 @@ return [
     ],
     'file_mtimes' => [
         '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config/system.yaml' => 1791147647,
-        '/Users/amer/Sites/kaffekos1/user/config/admin-next.yaml' => 1791146640,
+        '/Users/amer/Sites/kaffekos1/user/config/admin-next.yaml' => 1791384266,
         '/Users/amer/Sites/kaffekos1/user/config/media.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/config/plugins/email.yaml' => 1791147078,
-        '/Users/amer/Sites/kaffekos1/user/config/site.yaml' => 1791100445,
-        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791177194,
+        '/Users/amer/Sites/kaffekos1/user/config/site.yaml' => 1791383055,
+        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791376804,
         '/Users/amer/Sites/kaffekos1/user/config/themes/kaffekos.yaml' => 1791177194,
         '/Users/amer/Sites/kaffekos1/user/config/themes/quark2.yaml' => 1791145992,
-        '/Users/amer/Sites/kaffekos1/user/config/versions.yaml' => 1791099069,
-        '/Users/amer/Sites/kaffekos1/system/config/backups.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/system/config/media.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/system/config/mime.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/system/config/permissions.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/system/config/scheduler.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/system/config/security.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/system/config/site.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/system/config/system.yaml' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/config/versions.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/backups.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/media.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/mime.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/permissions.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/scheduler.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/security.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/site.yaml' => 1791376770,
+        '/Users/amer/Sites/kaffekos1/system/config/system.yaml' => 1791376770,
         '/Users/amer/Sites/kaffekos1/user/plugins/form/form.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/flex-objects/flex-objects.yaml' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/flex-objects/flex-objects.yaml' => 1791376799,
         '/Users/amer/Sites/kaffekos1/user/plugins/problems/problems.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/api/api.yaml' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/api/api.yaml' => 1791376789,
         '/Users/amer/Sites/kaffekos1/user/plugins/shortcode-core/shortcode-core.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/plugins/github-markdown-alerts/github-markdown-alerts.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/admin2/admin2.yaml' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/admin2/admin2.yaml' => 1791376795,
         '/Users/amer/Sites/kaffekos1/user/plugins/error/error.yaml' => 1790904721,
-        '/Users/amer/Sites/kaffekos1/user/plugins/login/login.yaml' => 1790904721,
+        '/Users/amer/Sites/kaffekos1/user/plugins/login/login.yaml' => 1791376804,
         '/Users/amer/Sites/kaffekos1/user/plugins/email/email.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/themes/quark2/quark2.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/themes/kaffekos/kaffekos.yaml' => 1791129081
@@ -68,7 +68,7 @@ return [
         'user/config' => [
             'admin-next' => [
                 'file' => 'user/config/admin-next.yaml',
-                'modified' => 1791146640
+                'modified' => 1791384266
             ],
             'media' => [
                 'file' => 'user/config/media.yaml',
@@ -80,11 +80,11 @@ return [
             ],
             'site' => [
                 'file' => 'user/config/site.yaml',
-                'modified' => 1791100445
+                'modified' => 1791383055
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791177194
+                'modified' => 1791376804
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
@@ -96,41 +96,41 @@ return [
             ],
             'versions' => [
                 'file' => 'user/config/versions.yaml',
-                'modified' => 1791099069
+                'modified' => 1791376770
             ]
         ],
         'system/config' => [
             'backups' => [
                 'file' => 'system/config/backups.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'media' => [
                 'file' => 'system/config/media.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'mime' => [
                 'file' => 'system/config/mime.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'permissions' => [
                 'file' => 'system/config/permissions.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'scheduler' => [
                 'file' => 'system/config/scheduler.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'security' => [
                 'file' => 'system/config/security.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'site' => [
                 'file' => 'system/config/site.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ],
             'system' => [
                 'file' => 'system/config/system.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376770
             ]
         ],
         'user/plugins' => [
@@ -140,7 +140,7 @@ return [
             ],
             'plugins/flex-objects' => [
                 'file' => 'user/plugins/flex-objects/flex-objects.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376799
             ],
             'plugins/problems' => [
                 'file' => 'user/plugins/problems/problems.yaml',
@@ -148,7 +148,7 @@ return [
             ],
             'plugins/api' => [
                 'file' => 'user/plugins/api/api.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376789
             ],
             'plugins/shortcode-core' => [
                 'file' => 'user/plugins/shortcode-core/shortcode-core.yaml',
@@ -160,7 +160,7 @@ return [
             ],
             'plugins/admin2' => [
                 'file' => 'user/plugins/admin2/admin2.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376795
             ],
             'plugins/error' => [
                 'file' => 'user/plugins/error/error.yaml',
@@ -168,7 +168,7 @@ return [
             ],
             'plugins/login' => [
                 'file' => 'user/plugins/login/login.yaml',
-                'modified' => 1790904721
+                'modified' => 1791376804
             ],
             'plugins/email' => [
                 'file' => 'user/plugins/email/email.yaml',

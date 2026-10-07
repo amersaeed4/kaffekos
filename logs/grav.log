@@ -43,3 +43,4 @@
 [2026-10-05T05:12:09.150451+00:00] grav.DEBUG: API client error: No changelog found for 'kaffekos'. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/gpm/themes/kaffekos/changelog"} []
 [2026-10-05T05:13:14.564124+00:00] grav.DEBUG: API client error: Thumbnail not found. {"status":404,"method":"GET","path":"/kaffekos1/api/v1/thumbnails/c7a31da017ada0f422474e8475db4e36.jpg"} []
 [2026-10-05T05:13:15.523694+00:00] grav.DEBUG: Flex: User index updated, 1 objects (0 added, 1 updated, 0 removed). [] []
+[2026-10-07T14:33:46.289236+00:00] grav.DEBUG: API client error: Page not found at route: /journal/welcome-to-kaffekos {"status":404,"method":"GET","path":"/kaffekos1/api/v1/pages/journal/welcome-to-kaffekos"} []

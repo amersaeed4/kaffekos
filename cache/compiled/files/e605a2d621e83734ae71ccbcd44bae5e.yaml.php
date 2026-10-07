@@ -2,7 +2,7 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledYamlFile',
     'filename' => '/Users/amer/Sites/kaffekos1/system/blueprints/config/scheduler.yaml',
-    'modified' => 1790904721,
+    'modified' => 1791376770,
     'size' => 39009,
     'data' => [
         'title' => 'PLUGIN_ADMIN.SCHEDULER',
