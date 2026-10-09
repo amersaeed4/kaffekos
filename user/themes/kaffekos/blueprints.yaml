@@ -195,6 +195,38 @@ form:
               label: Price range (for Google)
               default: 'Rs. 300 - 1500'
 
+        # ------------------------------------------------------ GOOGLE RATING
+        google:
+          type: tab
+          title: Google Rating
+          fields:
+            google_intro:
+              type: spacer
+              title: Live Google rating on the Home page
+              text: 'The rating and review count come from Google automatically. The API key and Place ID are kept out of the admin on purpose, in the file user/config/google-places.yaml on the server. If Google can''t be reached, the last good number (or the numbers typed on the Home page) are shown.'
+
+            google.refresh_hours:
+              type: number
+              label: Refresh every (hours)
+              default: 6
+              size: x-small
+              validate:
+                type: int
+                min: 1
+                max: 168
+              help: 'How often the site asks Google for fresh numbers. 6 = 4 times a day.'
+
+            google.max_calls_per_day:
+              type: number
+              label: Maximum calls to Google per day
+              default: 6
+              size: x-small
+              validate:
+                type: int
+                min: 1
+                max: 100
+              help: 'Hard safety limit, counted per day (Lahore time), including retries after a failed call. Keep it above 24 / refresh hours, otherwise the last refresh of the day is skipped. Google''s free allowance is about 1,000 calls a month.'
+
         # ----------------------------------------------------------- HOURS
         hours:
           type: tab

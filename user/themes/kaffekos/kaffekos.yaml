@@ -31,6 +31,10 @@ business:
   lng: '74.3024827'
   price_range: 'Rs. 300 - 1500'
 
+google:
+  refresh_hours: 6
+  max_calls_per_day: 6
+
 hours:
   - { day: Monday, open: '07:00', close: '23:00', closed: false }
   - { day: Tuesday, open: '07:00', close: '23:00', closed: false }

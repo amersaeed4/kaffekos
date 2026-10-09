@@ -148,7 +148,7 @@ class Kaffekos extends Theme
      * Live Google rating + review count for the café (Places API "Place Details").
      * Needs user/config/google-places.yaml (git-ignored): api_key + place_id. Without it, or if Google can't be reached,
      * returns the last good value, or null so templates fall back to the text typed in the admin.
-     * Refreshes at most every 12 hours (retries after 15 minutes if a call fails), so it stays far inside Google's free quota.
+     * Refresh interval and the daily call limit are theme settings (defaults: every 6 hours, max 6 calls a day); a failed call is retried after 15 minutes. That keeps it far inside Google's free quota.
      *
      * @return array{rating: float, count: int}|null
      */
@@ -161,19 +161,33 @@ class Kaffekos extends Theme
             return null;
         }
 
+        // Both limits come from Admin -> Themes -> Kaffekos -> Google Rating
+        $refreshHours = max(1, min(168, (int)$cfg->get('themes.kaffekos.google.refresh_hours', 6)));
+        $maxCalls     = max(1, min(100, (int)$cfg->get('themes.kaffekos.google.max_calls_per_day', 6)));
+
         $cache = $this->grav['cache'];
-        $id    = 'kk-google-rating-' . md5($place);
+        $id    = 'kk-google-rating-' . md5($place . $key);
         $data  = $cache->fetch($id);
         $data  = is_array($data) ? $data : [];
 
         if (empty($data['next']) || $data['next'] <= time()) {
-            $fresh = $this->fetchGooglePlace($key, $place, (string)$cfg->get('google-places.endpoint'));
-            if ($fresh) {
-                $data = $fresh + ['next' => time() + 12 * 3600];
-            } else {
-                $data['next'] = time() + 15 * 60;
+            // Hard self-imposed limit: never more than $maxCalls calls to Google per Lahore day
+            // (set in the theme settings), whatever else happens.
+            $today = gmdate('Y-m-d', time() + 5 * 3600);
+            if (($data['day'] ?? '') !== $today) {
+                $data['day']   = $today;
+                $data['calls'] = 0;
             }
-            $cache->save($id, $data, 30 * 86400);
+            if ($data['calls'] < $maxCalls) {
+                $data['calls']++;
+                $fresh = $this->fetchGooglePlace($key, $place, (string)$cfg->get('google-places.endpoint'));
+                if ($fresh) {
+                    $data = $fresh + ['next' => time() + $refreshHours * 3600, 'day' => $data['day'], 'calls' => $data['calls']];
+                } else {
+                    $data['next'] = time() + 15 * 60;
+                }
+                $cache->save($id, $data, 30 * 86400);
+            }
         }
 
         return isset($data['rating'], $data['count']) ? ['rating' => (float)$data['rating'], 'count' => (int)$data['count']] : null;
