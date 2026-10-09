@@ -1,8 +1,8 @@
 <?php
 return [
     '@class' => 'Grav\\Common\\Config\\CompiledConfig',
-    'timestamp' => 1791384273,
-    'checksum' => '83f7f10994a7d743322f33ecae99b0e2',
+    'timestamp' => 1791583456,
+    'checksum' => '1ff3626cf374c8e37ffa729af1f66631',
     'files' => [
         'user/env/amersaeed.local/config' => [
             'system' => [
@@ -14,6 +14,10 @@ return [
             'admin-next' => [
                 'file' => 'user/config/admin-next.yaml',
                 'modified' => 1791384266
+            ],
+            'google-places' => [
+                'file' => 'user/config/google-places.yaml',
+                'modified' => 1791583453
             ],
             'media' => [
                 'file' => 'user/config/media.yaml',
@@ -29,7 +33,7 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791376804
+                'modified' => 1791581930
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',
@@ -4259,7 +4263,7 @@ node_modules'
         ],
         'system' => [
             'absolute_urls' => false,
-            'timezone' => NULL,
+            'timezone' => 'Asia/Karachi',
             'default_locale' => NULL,
             'param_sep' => ':',
             'wrapped_site' => false,
@@ -4635,6 +4639,10 @@ node_modules'
                     ]
                 ]
             ]
+        ],
+        'google-places' => [
+            'api_key' => 'AIzaSyD-WdNzRUtcux5Zz-LqGAKI5O89l7nVuCQ',
+            'place_id' => 'ChIJkWK1VgADGTkRqyanwC9Wyjs'
         ],
         'versions' => [
             'core' => [

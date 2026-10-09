@@ -9,6 +9,7 @@ class Kaffekos extends Theme
     {
         return [
             'onTwigInitialized' => ['onTwigInitialized', 0],
+            'onPageInitialized' => ['onPageInitialized', 0],
         ];
     }
 
@@ -31,6 +32,59 @@ class Kaffekos extends Theme
 
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_featured_items', [$this, 'featuredItems']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_gallery_photos', [$this, 'galleryPhotos']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_google_rating', [$this, 'googleRating']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_event_posts', [$this, 'eventPosts']));
+    }
+
+    /**
+     * An "Upcoming event" post is only an announcement: once the event is over it disappears from the site
+     * by itself. "Over" means the optional Ends time (Lahore time) has passed, or, without one, the day of the
+     * event has ended (midnight, site timezone). Recaps (type Event / Activity / News) always stay.
+     */
+    public static function isExpiredAnnouncement($post): bool
+    {
+        $header = $post->header();
+        if (($header->kind ?? '') !== 'upcoming') {
+            return false;
+        }
+        $end = trim((string)($header->event_end ?? ''));
+        if ($end !== '') {
+            try {
+                return (new \DateTime($end, new \DateTimeZone('Asia/Karachi')))->getTimestamp() <= time();
+            } catch (\Exception $e) {
+                // unreadable date: fall back to the event day below
+            }
+        }
+        return (int)$post->date() < strtotime('today');
+    }
+
+    /**
+     * Published posts under the Events page, minus announcements whose day has passed.
+     *
+     * @return array<int, object>
+     */
+    public function eventPosts($eventsPage): array
+    {
+        $out = [];
+        if (!$eventsPage) {
+            return $out;
+        }
+        foreach ($eventsPage->children()->published() as $post) {
+            if (!self::isExpiredAnnouncement($post)) {
+                $out[] = $post;
+            }
+        }
+        return $out;
+    }
+
+    /** Someone opens the direct link of a finished announcement: send them to the Events list. */
+    public function onPageInitialized()
+    {
+        $page = $this->grav['page'] ?? null;
+        if ($page && $page->template() === 'blog-item' && self::isExpiredAnnouncement($page)) {
+            $parent = $page->parent();
+            $this->grav->redirect($parent ? $parent->route() : '/');
+        }
     }
 
     /**
@@ -88,5 +142,67 @@ class Kaffekos extends Theme
             }
         }
         return $limit > 0 ? array_slice($out, 0, (int)$limit) : $out;
+    }
+
+    /**
+     * Live Google rating + review count for the café (Places API "Place Details").
+     * Needs user/config/google-places.yaml (git-ignored): api_key + place_id. Without it, or if Google can't be reached,
+     * returns the last good value, or null so templates fall back to the text typed in the admin.
+     * Refreshes at most every 12 hours (retries after 15 minutes if a call fails), so it stays far inside Google's free quota.
+     *
+     * @return array{rating: float, count: int}|null
+     */
+    public function googleRating(): ?array
+    {
+        $cfg   = $this->grav['config'];
+        $key   = trim((string)$cfg->get('google-places.api_key'));
+        $place = trim((string)$cfg->get('google-places.place_id'));
+        if ($key === '' || $place === '') {
+            return null;
+        }
+
+        $cache = $this->grav['cache'];
+        $id    = 'kk-google-rating-' . md5($place);
+        $data  = $cache->fetch($id);
+        $data  = is_array($data) ? $data : [];
+
+        if (empty($data['next']) || $data['next'] <= time()) {
+            $fresh = $this->fetchGooglePlace($key, $place, (string)$cfg->get('google-places.endpoint'));
+            if ($fresh) {
+                $data = $fresh + ['next' => time() + 12 * 3600];
+            } else {
+                $data['next'] = time() + 15 * 60;
+            }
+            $cache->save($id, $data, 30 * 86400);
+        }
+
+        return isset($data['rating'], $data['count']) ? ['rating' => (float)$data['rating'], 'count' => (int)$data['count']] : null;
+    }
+
+    private function fetchGooglePlace(string $key, string $place, string $endpoint = ''): ?array
+    {
+        $base = rtrim($endpoint !== '' ? $endpoint : 'https://places.googleapis.com/v1/places', '/');
+        $ch   = curl_init($base . '/' . rawurlencode($place));
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 2,
+            CURLOPT_TIMEOUT        => 4,
+            CURLOPT_HTTPHEADER     => ['X-Goog-Api-Key: ' . $key, 'X-Goog-FieldMask: rating,userRatingCount'],
+        ]);
+        $body = curl_exec($ch);
+        $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err  = curl_error($ch);
+        curl_close($ch);
+
+        $json   = is_string($body) ? json_decode($body, true) : null;
+        $rating = is_array($json) ? ($json['rating'] ?? null) : null;
+        $count  = is_array($json) ? ($json['userRatingCount'] ?? null) : null;
+        if ($code === 200 && is_numeric($rating) && is_numeric($count) && $rating >= 1 && $rating <= 5 && $count > 0) {
+            return ['rating' => round((float)$rating, 1), 'count' => (int)$count];
+        }
+
+        $why = $err ?: (is_array($json) ? ($json['error']['message'] ?? 'unexpected response') : 'no response');
+        $this->grav['log']->warning('Kaffekos Google rating: HTTP ' . $code . ' ' . $why);
+        return null;
     }
 }

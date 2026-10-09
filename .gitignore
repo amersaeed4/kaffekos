@@ -13,3 +13,6 @@
 /vendor/
 .DS_Store
 Thumbs.db
+
+# Secrets (API keys)
+/user/config/google-places.yaml

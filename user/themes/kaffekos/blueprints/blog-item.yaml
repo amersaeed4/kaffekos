@@ -16,12 +16,13 @@ form:
             header.kind:
               type: select
               label: Type
-              default: event
+              default: upcoming
               options:
-                event: 'Event'
+                upcoming: 'Upcoming event (removed automatically after its date)'
+                event: 'Event (stays on the page, e.g. photos after the event)'
                 activity: 'Activity'
                 news: 'News'
-              help: 'Sets the coloured label on the card.'
+              help: 'Choose "Upcoming event" for an announcement or poster: it shows under "Coming up" on the Events page and the Home page and disappears by itself once the event day is over. Use "Event" for a write-up of something that already happened.'
             header.when:
               type: text
               label: When (optional)
@@ -34,7 +35,7 @@ form:
             header.event_end:
               type: datetime
               label: Ends (optional, Lahore time)
-              help: 'Exact end. After this the homepage banner disappears. If empty, it stays until the end of the start day.'
+              help: 'Exact end. For an "Upcoming event" post, it disappears from the site after this time. If empty, it stays until the end of the event day (midnight).'
             header.where:
               type: text
               label: Where (optional)

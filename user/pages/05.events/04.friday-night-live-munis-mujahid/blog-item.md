@@ -1,11 +1,10 @@
 ---
 title: 'Friday Night, Live with munis.mujahid'
-date: '2026-10-09 15:00'
-unpublish_date: '2026-10-10 00:00'
+date: '2026-10-09 20:00'
 media_order: 'friday-live-1.jpg, friday-live-2.jpg, friday-live-3.jpg, friday-live-4.jpg, friday-live-5.jpg'
 cover: friday-live-1.jpg
 cover_focus: full
-kind: event
+kind: upcoming
 when: 'Fri 9 Oct, 8:00 PM onwards'
 event_start: '2026-10-09 20:00'
 event_end: '2026-10-10 00:00'

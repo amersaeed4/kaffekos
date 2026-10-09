@@ -2,8 +2,8 @@
 return [
     '@class' => 'Grav\\Common\\File\\CompiledMarkdownFile',
     'filename' => '/Users/amer/Sites/kaffekos1/user/pages/01.home/home.md',
-    'modified' => 1791544263,
-    'size' => 3898,
+    'modified' => 1791582233,
+    'size' => 3923,
     'data' => [
         'header' => [
             'title' => 'Home',
@@ -41,7 +41,8 @@ Kaffekos brings that feeling to Lahore: carefully crafted coffee with rich aroma
                     ],
                     2 => [
                         'value' => '4.8★',
-                        'label' => 'on Google (88 reviews)'
+                        'label' => 'on Google (88 reviews)',
+                        'google' => true
                     ]
                 ]
             ],
@@ -165,6 +166,7 @@ intro:
         -
             value: 4.8★
             label: \'on Google (88 reviews)\'
+            google: true
 coffee:
     enabled: true
     eyebrow: \'Our coffee\'

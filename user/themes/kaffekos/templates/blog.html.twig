@@ -3,6 +3,7 @@
 {% block body_class %}page-events{% endblock %}
 
 {% set kinds = {
+    upcoming: {label: 'Upcoming', emoji: '🔥'},
     event:    {label: 'Event',    emoji: '🎉'},
     activity: {label: 'Activity', emoji: '🎲'},
     news:     {label: 'News',     emoji: '📣'}
@@ -10,8 +11,9 @@
 {% set ribbon = ['events', 'activities', 'good company', 'coffee o’clock', 'bring a friend', 'pure kos', 'good vibes only'] %}
 
 {% block hero %}
-{% set total = page.children.published|length %}
-{% set soon_count = page.children.published|filter(p => p.date >= ('today'|date('U')))|length %}
+{% set live_posts = kk_event_posts(page) %}
+{% set total = live_posts|length %}
+{% set soon_count = live_posts|filter(p => p.date >= ('today'|date('U')))|length %}
 <section class="ev-hero">
     <span class="ev-shape ev-star s1" aria-hidden="true"></span>
     <span class="ev-shape ev-ring s2" aria-hidden="true"></span>
@@ -39,7 +41,8 @@
 
 {% block content %}
 {% set today = 'today'|date('U') %}
-{% set all_posts = page.children.published %}
+{# announcements whose day is over are already left out #}
+{% set all_posts = kk_event_posts(page) %}
 {# upcoming (today and later) first, soonest on top; then past posts, newest first #}
 {% set soon = all_posts|filter(p => p.date >= today)|sort((a, b) => a.date <=> b.date) %}
 {% set past = all_posts|filter(p => p.date < today)|sort((a, b) => b.date <=> a.date) %}
@@ -63,7 +66,7 @@
         <div class="ev-filters" role="toolbar" aria-label="Filter posts">
             <button type="button" class="ev-fchip is-on" data-ev-filter="all" style="--c: var(--ev-saffron)" aria-pressed="true">🌈 All</button>
             {% for key, k in kinds %}{% if key in used %}
-                <button type="button" class="ev-fchip" data-ev-filter="{{ key }}" style="--c: var(--ev-{{ {event: 'coral', activity: 'lagoon', news: 'plum'}[key] }})" aria-pressed="false">{{ k.emoji }} {{ k.label }}</button>
+                <button type="button" class="ev-fchip" data-ev-filter="{{ key }}" style="--c: var(--ev-{{ {upcoming: 'leaf', event: 'coral', activity: 'lagoon', news: 'plum'}[key] }})" aria-pressed="false">{{ k.emoji }} {{ k.label }}</button>
             {% endif %}{% endfor %}
         </div>
         {% endif %}

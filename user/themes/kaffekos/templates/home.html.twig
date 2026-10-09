@@ -32,7 +32,7 @@
         {% set ev_page = page.find('/events') %}
         {% set ev_today = 'today'|date('U') %}
         {% set ev_now = 'now'|date('U') %}
-        {% set ev_soon = ev_page ? ev_page.children.published|filter(p => p.date >= ev_today and not (p.header.event_end and ((p.header.event_end ~ ' +05:00')|date('U')) <= ev_now))|sort((a, b) => a.date <=> b.date) : [] %}
+        {% set ev_soon = ev_page ? kk_event_posts(ev_page)|filter(p => p.date >= ev_today and not (p.header.event_end and ((p.header.event_end ~ ' +05:00')|date('U')) <= ev_now))|sort((a, b) => a.date <=> b.date) : [] %}
         {% if ev_soon|length %}
             {% set ev = ev_soon|first %}
             {% set ev_start = ev.header.event_start ? ((ev.header.event_start ~ ' +05:00')|date('U')) : null %}
@@ -90,9 +90,14 @@
                     <a class="link-arrow" href="{{ kk.href(intro.link_url ?: '/about') }}">{{ intro.link_label }} {{ kk.icon('arrow', 18) }}</a>
                 {% endif %}
                 {% if intro.stats %}
+                    {% set g = kk_google_rating() %}
                     <ul class="stats hm-stats">
                         {% for s in intro.stats %}
-                            <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
+                            {% if s.google and g %}
+                                <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ g.rating|number_format(1) }}★</strong><span>on Google ({{ g.count }} {{ g.count == 1 ? 'review' : 'reviews' }})</span></li>
+                            {% else %}
+                                <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
+                            {% endif %}
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -107,11 +112,11 @@
     {% set events_page = page.find('/events') %}
     {% set today = 'today'|date('U') %}
     {# events and activities dated today or later (news is left out); soonest first. Unpublished posts never show. #}
-    {% set soon = events_page ? events_page.children.published|filter(p => p.date >= today and (p.header.kind ?: 'news') != 'news')|sort((a, b) => a.date <=> b.date) : [] %}
+    {% set soon = events_page ? kk_event_posts(events_page)|filter(p => p.date >= today and (p.header.kind ?: 'news') != 'news')|sort((a, b) => a.date <=> b.date) : [] %}
     {% set soon = soon|slice(0, up.count ?: 3) %}
     {% if soon|length %}
         {% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%', full: '50% 50%'} %}
-        {% set kinds = {event: {label: 'Event', emoji: '🎉'}, activity: {label: 'Activity', emoji: '🎲'}, news: {label: 'News', emoji: '📣'}} %}
+        {% set kinds = {upcoming: {label: 'Upcoming', emoji: '🔥'}, event: {label: 'Event', emoji: '🎉'}, activity: {label: 'Activity', emoji: '🎲'}, news: {label: 'News', emoji: '📣'}} %}
         <section class="hm-soon" aria-labelledby="hm-soon-title">
             <span class="hm-soon-shape hm-soon-star s1" aria-hidden="true"></span>
             <span class="hm-soon-shape hm-soon-ring s2" aria-hidden="true"></span>

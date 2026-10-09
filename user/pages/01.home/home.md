@@ -30,6 +30,7 @@ intro:
         -
             value: 4.8★
             label: 'on Google (88 reviews)'
+            google: true
 coffee:
     enabled: true
     eyebrow: 'Our coffee'

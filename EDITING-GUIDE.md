@@ -74,10 +74,10 @@ Set the post's **Date** (Options tab) to the event date. Posts dated today or la
 
 **Upcoming event posters:** for a poster with text on it, set *Which part of the cover photo stays visible* to **Show the whole picture** so nothing is cut off. Extra posters/photos go in **More photos** (with captions).
 
-**Remove an upcoming event automatically after it happens:** on the post's **Options** tab, switch on **Unpublish Date** and set it to the day after the event (e.g. event on 9 Oct → 10 Oct 00:00). The post disappears from the Events page (and its link stops working) by itself. Later, add a new post with the real photos from the event.
+**Upcoming events remove themselves:** set the post's **Type** to **Upcoming event** (the default for new posts). It shows under *Coming up* on the Events page and on the Home page, and disappears completely once the event is over: after its optional **Ends** time, or at midnight of the event day if there is none. Its link then goes to the Events list. When you have photos from the night, add a new post with Type **Event** (it stays on the page) and use **More photos** for the extra pictures.
 
 ### "Coming up" on the Home page
-Nothing to do: any **Event** or **Activity** post with today's date or a later date shows up on the Home page (below Welcome), soonest first, with a "In 2 days" label. When the event is over, or its **Unpublish Date** passes, it disappears by itself; if nothing is coming up, the section is hidden. To change its heading or how many events show: **Pages → Home → 2b · Coming Up**.
+Nothing to do: any **Upcoming event**, **Event** or **Activity** post dated today or later shows up on the Home page (below Welcome), soonest first, with a "In 2 days" label. When the event is over it disappears by itself; if nothing is coming up, the section is hidden. To change its heading or how many events show: **Pages → Home → 2b · Coming Up**.
 
 ### Add a completely new page (e.g. "Catering")
 **Pages → + Add** → page type **Standard Page**. It appears in the top menu automatically (the page list order = menu order).

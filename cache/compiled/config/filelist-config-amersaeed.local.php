@@ -3,12 +3,12 @@ return [
     '@class' => 'Grav\\Common\\Service\\ConfigServiceProvider',
     'type' => 'config',
     'environment' => 'amersaeed.local',
-    'timestamp' => 1791384273,
+    'timestamp' => 1791583456,
     'check_interval' => 2,
     'directories' => [
         '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config' => 1791147713,
         '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config/plugins' => 1791147713,
-        '/Users/amer/Sites/kaffekos1/user/config' => 1791384266,
+        '/Users/amer/Sites/kaffekos1/user/config' => 1791583413,
         '/Users/amer/Sites/kaffekos1/user/config/plugins' => 1791100445,
         '/Users/amer/Sites/kaffekos1/user/config/themes' => 1791145992,
         '/Users/amer/Sites/kaffekos1/system/config' => 1791376770,
@@ -30,10 +30,11 @@ return [
     'file_mtimes' => [
         '/Users/amer/Sites/kaffekos1/user/env/amersaeed.local/config/system.yaml' => 1791147647,
         '/Users/amer/Sites/kaffekos1/user/config/admin-next.yaml' => 1791384266,
+        '/Users/amer/Sites/kaffekos1/user/config/google-places.yaml' => 1791583453,
         '/Users/amer/Sites/kaffekos1/user/config/media.yaml' => 1790904721,
         '/Users/amer/Sites/kaffekos1/user/config/plugins/email.yaml' => 1791147078,
         '/Users/amer/Sites/kaffekos1/user/config/site.yaml' => 1791383055,
-        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791376804,
+        '/Users/amer/Sites/kaffekos1/user/config/system.yaml' => 1791581930,
         '/Users/amer/Sites/kaffekos1/user/config/themes/kaffekos.yaml' => 1791177194,
         '/Users/amer/Sites/kaffekos1/user/config/themes/quark2.yaml' => 1791145992,
         '/Users/amer/Sites/kaffekos1/user/config/versions.yaml' => 1791376770,
@@ -70,6 +71,10 @@ return [
                 'file' => 'user/config/admin-next.yaml',
                 'modified' => 1791384266
             ],
+            'google-places' => [
+                'file' => 'user/config/google-places.yaml',
+                'modified' => 1791583453
+            ],
             'media' => [
                 'file' => 'user/config/media.yaml',
                 'modified' => 1790904721
@@ -84,7 +89,7 @@ return [
             ],
             'system' => [
                 'file' => 'user/config/system.yaml',
-                'modified' => 1791376804
+                'modified' => 1791581930
             ],
             'themes/kaffekos' => [
                 'file' => 'user/config/themes/kaffekos.yaml',

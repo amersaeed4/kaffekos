@@ -883,7 +883,7 @@ address { font-style: normal; }
 .ev-fchip:hover { transform: translate(-2px, -3px) rotate(-2deg); box-shadow: 5px 6px 0 var(--ev-ink); background: var(--c); color: var(--ev-ink); }
 .ev-fchip:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ev-ink); }
 .ev-fchip.is-on { background: var(--c); transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ev-ink); }
-.ev-fchip.is-on[data-ev-filter="event"], .ev-fchip.is-on[data-ev-filter="activity"], .ev-fchip.is-on[data-ev-filter="news"] { color: #fff; }
+.ev-fchip.is-on[data-ev-filter="upcoming"], .ev-fchip.is-on[data-ev-filter="event"], .ev-fchip.is-on[data-ev-filter="activity"], .ev-fchip.is-on[data-ev-filter="news"] { color: #fff; }
 
 /* cards */
 .ev-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 2.4rem 2rem; padding: .4rem .5rem .8rem 0; }

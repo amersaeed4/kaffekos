@@ -128,6 +128,17 @@ form:
                 .label:
                   type: text
                   label: Small text
+                .google:
+                  type: toggle
+                  label: Fill from Google automatically
+                  help: 'Turn on for the Google rating box. It then shows the live rating and review count from Google Maps. The text above is only used if Google can''t be reached.'
+                  highlight: 1
+                  default: 0
+                  options:
+                    1: 'Yes'
+                    0: 'No'
+                  validate:
+                    type: bool
 
         upcoming:
           type: tab

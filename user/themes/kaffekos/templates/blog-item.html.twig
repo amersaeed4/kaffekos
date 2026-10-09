@@ -2,6 +2,7 @@
 {% import 'macros/kk.html.twig' as kk %}
 {% set cover = header.cover ? page.media[header.cover] : null %}
 {% set kinds = {
+    upcoming: {label: 'Upcoming', emoji: '🔥'},
     event:    {label: 'Event',    emoji: '🎉'},
     activity: {label: 'Activity', emoji: '🎲'},
     news:     {label: 'News',     emoji: '📣'}
