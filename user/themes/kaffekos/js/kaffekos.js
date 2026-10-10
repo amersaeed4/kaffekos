@@ -173,25 +173,95 @@
         $$('.menu-section').forEach(function (s) { spy.observe(s); });
     }
 
-    /* ---------- menu: live search ---------- */
-    var q = $('#menu-search');
-    if (q) {
-        var blocks = $$('[data-menu-block]'), none = $('#menu-empty');
-        q.addEventListener('input', function () {
-            var term = q.value.trim().toLowerCase(), any = false;
-            blocks.forEach(function (b) {
-                var titleHit = term && b.querySelector('h2').textContent.toLowerCase().indexOf(term) > -1, shown = 0;
-                $$('.menu-item', b).forEach(function (it) {
-                    var hit = !term || titleHit || it.textContent.toLowerCase().indexOf(term) > -1;
-                    it.hidden = !hit; if (hit) shown++;
+    /* ---------- menu: section switch, live search, favourites, surprise ---------- */
+    var menuBlocks = $$('[data-menu-block]');
+    if (menuBlocks.length) {
+        var q = $('#menu-search'), none = $('#menu-empty'), ctl = $('#menu-controls');
+        var groups = $$('.menu-group'), tabsAll = $$('.menu-tabs a');
+        var state = { term: '', group: '', favs: false };
+        var FAV_KEY = 'kk-menu-favs', favs = {};
+        try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || '{}') || {}; } catch (err) { favs = {}; }
+        var saveFavs = function () { try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (err) { /* private mode */ } };
+        var keyOf = function (it) { return it.closest('[data-menu-block]').id + '|' + it.querySelector('h3').textContent.trim(); };
+        var heart = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.8 5 6.2 5c2.1 0 3.7 1.2 4.6 2.7h.4C12.1 6.2 13.7 5 15.8 5c3.4 0 5.3 3.4 3.8 6.8C19.5 16.4 12 21 12 21z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+        /* a heart on every item */
+        var allItems = [];
+        menuBlocks.forEach(function (b) {
+            $$('.menu-item', b).forEach(function (it) {
+                allItems.push(it);
+                var btn = document.createElement('button');
+                btn.type = 'button'; btn.className = 'menu-fav'; btn.innerHTML = heart;
+                btn.setAttribute('aria-label', 'Add ' + it.querySelector('h3').textContent.trim() + ' to my picks');
+                var k = keyOf(it);
+                var paint = function () { var on = !!favs[k]; btn.classList.toggle('is-on', on); btn.setAttribute('aria-pressed', on); it.classList.toggle('is-fav', on); };
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (favs[k]) delete favs[k]; else favs[k] = 1;
+                    saveFavs(); paint(); update();
                 });
-                b.hidden = !shown; if (shown) any = true;
-                b.classList.add('is-visible');
+                paint();
+                it.appendChild(btn);
             });
-            $$('.menu-filler').forEach(function (f) { f.hidden = !!term; });
-            $$('.menu-tabs a').forEach(function (a) { var t = $(a.getAttribute('href')); a.hidden = !!t && t.hidden; });
-            if (none) none.hidden = any || !term;
         });
+
+        /* controls: section switch + my picks + surprise me */
+        var mk = function (cls, html, onclick) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.className = 'menu-chip ' + cls; b.innerHTML = html; b.addEventListener('click', onclick);
+            ctl.appendChild(b); return b;
+        };
+        var chips = [];
+        if (groups.length > 1) {
+            var all = mk('', 'All', function () { state.group = ''; update(); });
+            all.dataset.group = ''; chips.push(all);
+            groups.forEach(function (g) {
+                var c = mk('', g.getAttribute('data-group-label'), function () { state.group = g.getAttribute('data-group'); update(); });
+                c.dataset.group = g.getAttribute('data-group'); chips.push(c);
+            });
+        }
+        var favChip = mk('chip-fav', heart + ' <span>My picks</span> <b class="chip-count">0</b>', function () { state.favs = !state.favs; update(); });
+        mk('chip-surprise', '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg> Surprise me', function () {
+            var pool = allItems.filter(function (it) { return !it.hidden && !it.closest('[hidden]'); });
+            if (!pool.length) return;
+            var it = pool[Math.floor(Math.random() * pool.length)];
+            $$('.is-picked').forEach(function (x) { x.classList.remove('is-picked'); });
+            it.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            void it.offsetWidth; it.classList.add('is-picked');
+            setTimeout(function () { it.classList.remove('is-picked'); }, 3200);
+        });
+
+        /* apply the search, section and favourites filters together */
+        var update = function () {
+            var term = state.term.toLowerCase(), any = false, filtering = !!(term || state.group || state.favs);
+            groups.forEach(function (g) {
+                var gHidden = !!state.group && g.getAttribute('data-group') !== state.group, gAny = false;
+                $$('[data-menu-block]', g).forEach(function (b) {
+                    var titleHit = term && b.querySelector('h2').textContent.toLowerCase().indexOf(term) > -1, shown = 0;
+                    $$('.menu-item', b).forEach(function (it) {
+                        var hit = (!term || titleHit || it.textContent.toLowerCase().indexOf(term) > -1) && (!state.favs || favs[keyOf(it)]);
+                        it.hidden = !hit; if (hit) shown++;
+                    });
+                    b.hidden = gHidden || !shown;
+                    if (!b.hidden) { gAny = true; b.classList.add('is-visible'); }
+                });
+                $$('.menu-filler', g).forEach(function (f) { f.hidden = filtering; });
+                g.hidden = gHidden || !gAny;
+                if (!g.hidden) any = true;
+            });
+            tabsAll.forEach(function (a) { var t = $(a.getAttribute('href')); a.hidden = !t || t.hidden; });
+            chips.forEach(function (c) { var on = c.dataset.group === state.group; c.classList.toggle('is-active', on); c.setAttribute('aria-pressed', on); });
+            var n = Object.keys(favs).length;
+            favChip.classList.toggle('is-active', state.favs); favChip.setAttribute('aria-pressed', state.favs);
+            favChip.classList.toggle('has-favs', n > 0);
+            favChip.querySelector('.chip-count').textContent = n;
+            if (none) {
+                none.hidden = any || !filtering;
+                none.textContent = state.favs && !term ? 'No picks yet. Tap the heart on any item to save it here.' : 'Nothing matches your search. Try another word.';
+            }
+        };
+        if (q) q.addEventListener('input', function () { state.term = q.value.trim(); update(); });
+        update();
     }
 
     /* ---------- gallery: filters, shuffle, saved hearts, tilt, lightbox ---------- */

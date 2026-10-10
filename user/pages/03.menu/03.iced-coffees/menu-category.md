@@ -1,5 +1,6 @@
 ---
 title: 'Iced Coffees'
+group: Drinks
 tone: red
 items:
     - { name: 'Milan Mocha' }

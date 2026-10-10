@@ -17,6 +17,6 @@
         {% endfor %}
     </div>
     {% if decor %}
-        <div class="menu-decor" aria-hidden="true"><img src="{{ url('theme://images/menu/' ~ decor ~ '.png') }}" alt="" loading="lazy"></div>
+        <div class="menu-decor decor-{{ decor }}" aria-hidden="true"><img src="{{ url('theme://images/menu/' ~ decor ~ '.png') }}" alt="" loading="lazy"></div>
     {% endif %}
 </section>

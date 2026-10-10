@@ -20,6 +20,11 @@ form:
               type: textarea
               rows: 2
               label: Short description (optional)
+            header.group:
+              type: text
+              label: Menu section
+              help: 'Categories with the same section are grouped under one heading, with a switch at the top of the Menu page. For example Drinks or Sandwiches. Leave empty for no grouping.'
+              placeholder: Drinks
             header.tone:
               type: select
               label: Colour style
@@ -41,6 +46,8 @@ form:
                 cup-hug: 'Hugging a cup'
                 chef: 'Chef on a croissant'
                 norway: 'Norway stamp'
+                sandwich-boy: 'Boy on a sandwich'
+                sandwich-duo: 'Chef and walking sandwich'
         items:
           type: tab
           title: Menu Items

@@ -1,5 +1,6 @@
 ---
 title: 'Shakes'
+group: Drinks
 tone: blue
 items:
     - { name: 'Strawberry & Cream' }

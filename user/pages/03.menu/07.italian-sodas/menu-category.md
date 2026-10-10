@@ -1,5 +1,6 @@
 ---
 title: 'Italian Sodas'
+group: Drinks
 tone: blue-solid
 items:
     - { name: 'Pineapple Soda' }

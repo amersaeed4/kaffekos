@@ -1,5 +1,6 @@
 ---
 title: Frappes
+group: Drinks
 tone: red-light
 items:
     -

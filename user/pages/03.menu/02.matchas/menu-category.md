@@ -1,5 +1,6 @@
 ---
 title: 'Matchas'
+group: Drinks
 tone: red
 decor: matcha-oslo
 items:

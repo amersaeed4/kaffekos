@@ -13,7 +13,7 @@ form:
             menu_help:
               type: spacer
               title: How the menu works
-              text: 'Each menu category (Coffee, Bakes, ...) is a sub-page of this page. In the page list, click the + next to Menu to add a category, and drag categories to reorder them. Items are added inside each category.'
+              text: 'Each menu category (Hot Drinks, Shakes, Sandwiches, ...) is a sub-page of this page. Every item in it can be renamed, described, hidden or given a photo. In the page list, click the + next to Menu to add a category, and drag categories to reorder them. Items are added inside each category.'
         banner:
           type: tab
           title: Page Banner

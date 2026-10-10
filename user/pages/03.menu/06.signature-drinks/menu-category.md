@@ -1,5 +1,6 @@
 ---
 title: 'Signature Drinks'
+group: Drinks
 tone: red-light
 items:
     - { name: 'Citrus Blast Frappe' }

@@ -1,5 +1,6 @@
 ---
 title: 'Iced Tea'
+group: Drinks
 tone: blue
 decor: cup-hug
 items:

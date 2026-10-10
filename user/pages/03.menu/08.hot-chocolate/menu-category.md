@@ -1,5 +1,6 @@
 ---
 title: 'Hot Chocolate'
+group: Drinks
 tone: red
 items:
     -

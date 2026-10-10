@@ -1,5 +1,6 @@
 ---
 title: 'Hot Drinks'
+group: Drinks
 tone: blue
 items:
     -

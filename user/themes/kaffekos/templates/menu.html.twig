@@ -10,6 +10,7 @@
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
             <input type="search" id="menu-search" placeholder="Search the menu: latte, matcha, mocha…" autocomplete="off" aria-label="Search the menu">
         </label>
+        <div class="menu-controls" id="menu-controls" role="group" aria-label="Menu filters"></div>
     </div>
     <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
 </section>
@@ -23,28 +24,41 @@
         <div class="wrap wrap-narrow prose center">{{ page.content|raw }}</div>
     {% endif %}
 
+    {# group the categories by their "Menu section" (Drinks, Sandwiches, ...) in page order #}
+    {% set groups = {} %}
+    {% for cat in cats %}
+        {% set g = cat.header.group ?: 'Menu' %}
+        {% set groups = groups|merge({(g): (groups[g] ?? [])|merge([cat])}) %}
+    {% endfor %}
+
     {% if cats|length > 1 %}
         <nav class="menu-tabs" aria-label="Menu categories">
             <div class="wrap">
-                {% for cat in cats %}<a href="#{{ cat.slug }}" class="tab-{{ cat.header.tone ?: 'blue' }}">{{ cat.title }}</a>{% endfor %}
+                {% for g, list in groups %}{% for cat in list %}<a href="#{{ cat.slug }}" class="tab-{{ cat.header.tone ?: 'blue' }}" data-group="{{ g|lower|replace({' ': '-'}) }}">{{ cat.title }}</a>{% endfor %}{% endfor %}
             </div>
         </nav>
     {% endif %}
 
     <div class="wrap wrap-menu-poster">
-        <div class="menu-blocks">
-            {% for cat in cats %}
-                {% include 'partials/menu-section.html.twig' with {cat: cat, currency: theme_var('menu.currency'), show_images: show_images, show_prices: show_prices} %}
-            {% else %}
-                <p class="center">The menu is being prepared. Please check back soon.</p>
-            {% endfor %}
-            {% if cats|length is odd and cats|length > 1 %}
-                <aside class="menu-block menu-filler" aria-hidden="true">
-                    <img src="{{ url('theme://images/menu/chef.png') }}" alt="" loading="lazy">
-                    <p>Coffee. Comfort. Connection.</p>
-                </aside>
-            {% endif %}
-        </div>
+        {% for g, list in groups %}
+            {% set gslug = g|lower|replace({' ': '-'}) %}
+            <div class="menu-group" data-group="{{ gslug }}" data-group-label="{{ g }}">
+                {% if groups|length > 1 %}<h2 class="menu-group-title"><span>{{ g }} Menu</span></h2>{% endif %}
+                <div class="menu-blocks">
+                    {% for cat in list %}
+                        {% include 'partials/menu-section.html.twig' with {cat: cat, currency: theme_var('menu.currency'), show_images: show_images, show_prices: show_prices} %}
+                    {% endfor %}
+                    {% if list|length is odd and list|length > 1 %}
+                        <aside class="menu-block menu-filler" aria-hidden="true">
+                            <img src="{{ url('theme://images/menu/chef.png') }}" alt="" loading="lazy">
+                            <p>Coffee. Comfort. Connection.</p>
+                        </aside>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p class="center">The menu is being prepared. Please check back soon.</p>
+        {% endfor %}
         <p class="menu-empty" id="menu-empty" hidden>Nothing matches your search. Try another word.</p>
 
         <div class="menu-closing">
