@@ -7,4 +7,8 @@ items:
     - { name: 'Cold Brew', price: '700', description: 'Steeped slowly for a smooth, naturally sweet cup.', badge: New }
     - { name: 'Iced Mocha', price: '700', description: 'Chocolate, espresso and milk, served over ice.' }
     - { name: 'Fresh Lemonade', price: '400', description: 'Lemon, mint and a touch of sugar.' }
+seo:
+    title: 'Cold Drinks | Iced Latte & Cold Coffee | Kaffekos Lahore'
+    description: 'Chilled cold drinks and cold coffees at Kaffekos in Johar Town, Lahore, made with Hausbrandt Italian coffee for hot Lahore days.'
+    keywords: 'cold drinks Lahore, cold coffee Lahore, iced latte, summer drinks Lahore, best cold coffee in Lahore'
 ---

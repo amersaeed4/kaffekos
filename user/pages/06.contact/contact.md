@@ -61,4 +61,8 @@ form:
             message: 'Tusen takk! Thank you, your message has been sent. We will get back to you soon.'
         -
             reset: true
+seo:
+    title: 'Contact & Location | Kaffekos Coffee Shop, Johar Town Lahore'
+    description: 'Find Kaffekos at Grand Park, Block A, Phase 1, Johar Town, Lahore. Opening hours, directions, phone, WhatsApp and a form to send us a message.'
+    keywords: 'Kaffekos location, Kaffekos address, coffee shop Johar Town, cafe near me, cafe in Johar Town Lahore, Grand Park Johar Town, coffee shop opening hours Lahore, book a table cafe Lahore, Norwegian coffee shop Lahore'
 ---

@@ -8,6 +8,10 @@ kind: event
 when: 'Friday 11 September 2026'
 where: 'Kaffekos, Lahore'
 summary: 'Today was our very first day: a relaxed soft launch with good coffee, board games and plenty of kos.'
+seo:
+    title: 'Our First Day: Kaffekos Soft Launch in Lahore'
+    description: 'Kaffekos, a new Norwegian coffee shop in Johar Town, Lahore, opened its doors with a relaxed soft launch, Hausbrandt coffee, chess and plenty of kos.'
+    keywords: 'new coffee shop in Lahore, new cafe Johar Town, Kaffekos opening, Kaffekos soft launch, Norwegian coffee shop opening Lahore, best coffee shop in Lahore'
 ---
 
 Today was the day: **Kaffekos opened its doors for the very first time.**

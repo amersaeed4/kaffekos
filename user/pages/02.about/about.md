@@ -17,6 +17,10 @@ team:
     title: 'The people behind the counter'
     subtitle: ''
     members: []
+seo:
+    title: 'Our Story | Norwegian Coffee Shop in Lahore | Kaffekos'
+    description: 'Kaffe is coffee, kos is cosiness. Learn how Kaffekos brought a Norwegian-inspired coffee house and Hausbrandt Italian coffee to Johar Town, Lahore.'
+    keywords: 'about Kaffekos, Norwegian coffee culture, what is kos, kaffe kos meaning, Norwegian coffee shop Lahore, Scandinavian coffee house, hygge cafe Lahore, Nordic cafe, Hausbrandt coffee story, best coffee shop in Lahore'
 ---
 
 ## A little piece of Norway in Lahore

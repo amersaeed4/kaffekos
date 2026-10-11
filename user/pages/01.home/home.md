@@ -100,5 +100,9 @@ visit:
     text: 'The kettle is on. Find us in Lahore and stay a while.'
 metadata:
     description: 'Kaffekos is a Norwegian-inspired coffee house in Johar Town, Lahore. Coffee, Comfort, Connection: premium Hausbrandt coffee, warm bakes and a cosy Scandinavian atmosphere.'
+seo:
+    title: 'Kaffekos | Best Norwegian Coffee Shop in Lahore'
+    description: 'Kaffekos is a Norwegian coffee shop in Johar Town, Lahore, brewing every cup with Hausbrandt, premium Italian coffee beans from Trieste. Visit us for kos.'
+    keywords: 'best coffee shop in Lahore, best cafe in Lahore, Norwegian coffee shop in Lahore, Norwegian cafe, best coffee beans from Hausbrandt Italy, Hausbrandt coffee Lahore, Hausbrandt Pakistan, Italian coffee beans, coffee shop Johar Town, Scandinavian cafe Lahore, cafe near me'
 ---
 

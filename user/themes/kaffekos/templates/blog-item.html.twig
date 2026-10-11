@@ -11,7 +11,23 @@
 {% set kind = header.kind ?: 'news' %}
 {% set k = kinds[kind]|default(kinds.news) %}
 {% block body_class %}page-events{% endblock %}
-{% block og_image %}{% if cover %}<meta property="og:image" content="{{ url(kk.imgurl(cover, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
+{% block og_image %}{% if cover %}<meta property="og:image" content="{{ url(kk.imgurl(cover, 1200, 630), true) }}">
+<meta name="twitter:image" content="{{ url(kk.imgurl(cover, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
+{% block head_extra %}
+<script type="application/ld+json">{{ {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    'headline': page.title,
+    'description': page_desc|striptags,
+    'keywords': kw_all|slice(0, 30)|join(', '),
+    'datePublished': page.date|date('c'),
+    'dateModified': page.modified|date('c'),
+    'mainEntityOfPage': page.url(true, true),
+    'image': cover ? url(kk.imgurl(cover, 1200, 630), true) : url('theme://images/kk-logo.png', true),
+    'author': {'@type': 'Organization', 'name': site.title},
+    'publisher': {'@type': 'Organization', 'name': site.title, 'logo': {'@type': 'ImageObject', 'url': url('theme://images/kk-logo.png', true)}}
+}|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+{% endblock %}
 {% block hero %}
 <section class="ev-hero ev-hero-post">
     <span class="ev-shape ev-star s1" aria-hidden="true"></span>

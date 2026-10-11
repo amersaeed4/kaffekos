@@ -21,3 +21,37 @@ form:
               type: textarea
               rows: 2
               label: Line under the title
+
+        seo:
+          type: tab
+          title: SEO
+          fields:
+            seo_help:
+              type: spacer
+              title: Search engine settings for this page
+              text: 'All optional. Anything left empty is filled in automatically from the page title, the banner line and the site-wide keywords (Theme settings > SEO & Keywords). Page keywords come first, then the site-wide ones.'
+            header.seo.title:
+              type: text
+              label: Search title
+              help: 'The blue link in Google. Aim for 50-60 characters and put the main phrase first.'
+              placeholder: 'Norwegian Coffee Shop in Lahore | Kaffekos'
+            header.seo.description:
+              type: textarea
+              rows: 3
+              label: Search description
+              help: 'The grey text under the link in Google. Aim for 140-160 characters. Write it as a sentence people would want to click.'
+            header.seo.keywords:
+              type: textarea
+              rows: 3
+              label: Page keywords
+              help: 'Comma separated. Phrases people type into Google, for example: best coffee shop in Lahore, Hausbrandt coffee beans'
+            header.seo.noindex:
+              type: toggle
+              label: Hide this page from Google
+              highlight: 0
+              default: 0
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool

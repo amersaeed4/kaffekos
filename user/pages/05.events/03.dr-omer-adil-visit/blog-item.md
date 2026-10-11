@@ -8,6 +8,10 @@ kind: event
 when: 'Saturday 26 September 2026'
 where: 'Kaffekos, Lahore'
 summary: 'We were honoured to welcome Dr. Omer Adil, the well-known orthopedic surgeon, professor and media personality, to Kaffekos.'
+seo:
+    title: 'Dr. Omer Adil Visits Kaffekos Coffee Shop, Lahore'
+    description: 'Kaffekos was honoured to welcome Dr. Omer Adil, orthopedic surgeon, professor and media personality, to our Norwegian coffee shop in Johar Town, Lahore.'
+    keywords: 'Dr Omer Adil, Dr Omer Adil Lahore, Kaffekos visit, celebrity visit cafe Lahore, Norwegian coffee shop Lahore, best coffee shop in Lahore'
 ---
 
 We were honoured to welcome **Dr. Omer Adil** to Kaffekos on 26 September 2026.

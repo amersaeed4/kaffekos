@@ -4,4 +4,8 @@ media_order: 'exterior-night.jpg, pastry-display.jpg, cappuccino-and-cake.jpg, i
 banner:
     eyebrow: 'Galleri'
     subtitle: 'A look at life at Kaffekos.'
+seo:
+    title: 'Gallery | Inside Kaffekos Coffee Shop, Lahore'
+    description: 'Photos of Kaffekos, the Norwegian-inspired coffee shop in Johar Town, Lahore: cosy interiors, Hausbrandt coffee, fresh bakes and good company.'
+    keywords: 'Kaffekos photos, cafe interior Lahore, cosy cafe Lahore, aesthetic cafe Lahore, Instagram worthy cafe Lahore, Norwegian coffee shop, coffee and cake, best coffee shop in Lahore'
 ---

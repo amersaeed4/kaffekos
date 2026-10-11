@@ -11,4 +11,8 @@ items:
     - { name: 'Jalapeno Chicken', description: 'Tender seasoned chicken combined with spicy jalapeños and creamy, flavorful dressing. Served on toasted sourdough for a bold, zesty and satisfying experience.' }
     - { name: 'Vegetable Surprise', description: 'A delicious mix of fresh vegetables, creamy spread, and flavorful seasonings. Soft white bread brings everything together in a light yet satisfying bite.' }
     - { name: 'Tartar Chicken', description: 'Juicy chicken tossed in creamy tartar sauce, served in fresh sourdough bread.' }
+seo:
+    title: 'Signature Sandwiches | Cafe Lunch in Lahore | Kaffekos'
+    description: 'Freshly made signature sandwiches at Kaffekos, Johar Town, Lahore. A hearty cafe lunch or snack to enjoy with your Hausbrandt coffee.'
+    keywords: 'sandwiches Lahore, best sandwich in Lahore, cafe lunch Lahore, club sandwich Lahore, cafe food Johar Town'
 ---

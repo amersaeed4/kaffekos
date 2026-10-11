@@ -305,6 +305,40 @@ form:
               type: text
               label: X (Twitter) link
 
+        # ------------------------------------------------------------- SEO
+        seo:
+          type: tab
+          title: SEO & Keywords
+          fields:
+            seo_intro:
+              type: spacer
+              title: Site-wide search engine settings
+              text: 'Used on every page. Each page can add its own title, description and keywords on its SEO tab; the page ones come first and these are added after them.'
+
+            seo.keywords:
+              type: textarea
+              rows: 12
+              label: Site-wide keywords
+              help: 'Comma or new line separated. Added to every page as search keywords. Add new phrases at the end, for example a new product or a nearby area.'
+
+            seo.title_suffix:
+              type: text
+              label: Title ending
+              help: 'Added after the page name in the browser tab and Google, for pages without their own search title.'
+              default: 'Norwegian Coffee Shop in Lahore'
+
+            seo.description:
+              type: textarea
+              rows: 3
+              label: Fallback description
+              help: 'Used for any page that has no description of its own.'
+
+            seo.area:
+              type: text
+              label: Area served
+              help: 'Shown to Google as the neighbourhood and city of the shop.'
+              default: 'Johar Town, Lahore'
+
         # --------------------------------------------------------- FOOTER
         footer:
           type: tab

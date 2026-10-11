@@ -8,4 +8,8 @@ items:
     - { name: 'Cheesecake Slice', price: '650', description: 'Creamy cheesecake on a buttery biscuit base.' }
     - { name: 'Fresh Pastries', price: '350', description: 'Baked goods from our counter, ask what is fresh today.', image: pastry-display.jpg, featured: true }
     - { name: Croissant, price: '350', description: 'Flaky, buttery and best with a latte.' }
+seo:
+    title: 'Bakes | Fresh Pastries & Cinnamon Buns | Kaffekos Lahore'
+    description: 'Warm pastries, cakes and Norwegian-style bakes like the kanelbolle cinnamon bun, baked for Kaffekos, a Norwegian coffee shop in Lahore.'
+    keywords: 'bakery Lahore, fresh pastries Lahore, cinnamon bun Lahore, kanelbolle, Norwegian bakery, cake and coffee Lahore, dessert cafe Johar Town'
 ---

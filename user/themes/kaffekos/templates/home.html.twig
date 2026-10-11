@@ -6,7 +6,8 @@
 
 {% block body_class %}is-home page-home{% endblock %}
 
-{% block og_image %}{% if hero_img %}<meta property="og:image" content="{{ url(kk.imgurl(hero_img, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
+{% block og_image %}{% if hero_img %}<meta property="og:image" content="{{ url(kk.imgurl(hero_img, 1200, 630), true) }}">
+<meta name="twitter:image" content="{{ url(kk.imgurl(hero_img, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
 
 {% block hero %}
 <section class="hero hero-fun"{% if hero_img %} style="--hero: url('{{ kk.imgurlfit(hero_img, 2400, 3200) }}'); --hero-y: {{ hero.focus ?: '40%' }}"{% endif %}>

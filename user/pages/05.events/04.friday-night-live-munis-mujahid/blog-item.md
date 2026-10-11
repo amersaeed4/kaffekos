@@ -23,6 +23,10 @@ gallery:
     -
         image: friday-live-5.jpg
         caption: 'Our location: Grand Park, Johar Town.'
+seo:
+    title: 'Friday Night Live with munis.mujahid | Kaffekos Lahore'
+    description: 'Live music with munis.mujahid, board games and 15% off drinks and savoury items at Kaffekos, a Norwegian coffee shop in Johar Town, Lahore. Free entry.'
+    keywords: 'live music Lahore, Friday night live Lahore, munis mujahid, open air live music cafe Lahore, things to do in Lahore tonight, board games cafe Lahore, cafe deals Lahore'
 ---
 
 ## Friday night, live.

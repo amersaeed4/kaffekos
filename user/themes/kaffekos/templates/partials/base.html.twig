@@ -9,8 +9,18 @@
 {% set favicon = theme_var('custom_favicon') %}
 {% set favicon_first = (favicon is iterable and favicon|length > 0) ? favicon|first : null %}
 {% set favicon_url = favicon_first.name|default(null) ? url('theme://images/favicon/' ~ favicon_first.name) : url('theme://images/kk-logo.png') %}
-{% set page_title = page.title and page.route != '/' and page.route != '/home' ? page.title ~ ' | ' ~ site.title : site.title ~ ' | ' ~ (theme_var('brand.tagline') ?: 'Coffee House') %}
-{% set page_desc = page.metadata.description.content|default(header.hero.subtitle|default(header.banner.subtitle|default(header.summary|default(site.metadata.description)))) %}
+{# ---- SEO: page values (page > SEO tab) first, site-wide values (Theme settings > SEO & Keywords) after ---- #}
+{% set seo = header.seo ?? {} %}
+{% set seo_site = theme_var('seo') ?? {} %}
+{% set is_home = page.route == '/' or page.route == '/home' %}
+{% set page_title = seo.title ?: (page.title and not is_home ? page.title ~ ' | ' ~ site.title ~ (seo_site.title_suffix ? ' - ' ~ seo_site.title_suffix : '') : site.title ~ ' | ' ~ (seo_site.title_suffix ?: (theme_var('brand.tagline') ?: 'Coffee House'))) %}
+{% set page_desc = (seo.description ?: page.metadata.description.content|default(header.hero.subtitle|default(header.banner.subtitle|default(header.summary|default(null))))) ?: (page.title and not is_home ? page.title ~ ' at ' ~ site.title ~ '. ' : '') ~ (seo_site.description ?: site.metadata.description) %}
+{% set kw_page = ((seo.keywords ?: '') ~ ',' ~ (page.metadata.keywords.content ?? ''))|replace({"\n": ',', "\r": ''})|split(',') %}
+{% set kw_site = (seo_site.keywords ?: site.metadata.keywords ?: '')|replace({"\n": ',', "\r": ''})|split(',') %}
+{% set kw_all = [] %}
+{% for kw in kw_page|merge(kw_site) %}{% set kw = kw|trim %}{% if kw and (kw|lower) not in kw_all|map(x => x|lower) %}{% set kw_all = kw_all|merge([kw]) %}{% endif %}{% endfor %}
+{% set seo_noindex = seo.noindex or page.template == 'error' or page.header.robots == 'noindex' %}
+{% set seo_type = page.template == 'blog-item' ? 'article' : 'website' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,17 +37,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ page_title|e('html') }}</title>
     <meta name="description" content="{{ page_desc|striptags|e('html_attr') }}">
+    <meta name="keywords" content="{{ kw_all|slice(0, 30)|join(', ')|e('html_attr') }}">
+    <meta name="author" content="{{ site.title|e('html_attr') }}">
+    <meta name="robots" content="{{ seo_noindex ? 'noindex,follow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' }}">
+    <meta name="geo.region" content="PK-PB">
+    <meta name="geo.placename" content="{{ (seo_site.area ?: 'Lahore')|e('html_attr') }}">
+    <meta name="geo.position" content="{{ biz.lat }};{{ biz.lng }}">
+    <meta name="ICBM" content="{{ biz.lat }}, {{ biz.lng }}">
     <meta name="theme-color" content="{{ colors.navy|default('#0f2747') }}">
     <link rel="canonical" href="{{ page.url(true, true) }}">
     <link rel="icon" href="{{ favicon_url }}">
     <link rel="apple-touch-icon" href="{{ favicon_url }}">
     <meta property="og:site_name" content="{{ site.title|e('html_attr') }}">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ seo_type }}">
     <meta property="og:title" content="{{ page_title|e('html_attr') }}">
     <meta property="og:description" content="{{ page_desc|striptags|e('html_attr') }}">
     <meta property="og:url" content="{{ page.url(true, true) }}">
-    {% block og_image %}<meta property="og:image" content="{{ url('theme://images/kk-logo.png', true) }}">{% endblock %}
+    {% block og_image %}<meta property="og:image" content="{{ url('theme://images/kk-logo.png', true) }}">
+    <meta name="twitter:image" content="{{ url('theme://images/kk-logo.png', true) }}">{% endblock %}
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ page_title|e('html_attr') }}">
+    <meta name="twitter:description" content="{{ page_desc|striptags|e('html_attr') }}">
 
     <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ url('theme://fonts/fraunces-normal.woff2') }}">
     <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ url('theme://fonts/dm-sans-normal.woff2') }}">
