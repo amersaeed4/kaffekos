@@ -15,6 +15,9 @@
             </span>
         </a>
 
+        {# phones: the switcher sits in the header bar itself, so it is visible without opening the menu #}
+        {% include 'partials/lang-switch.html.twig' with {variant: 'bar'} %}
+
         <nav class="main-nav" id="main-nav" aria-label="{{ 'KK.MAIN_NAV'|t }}">
             <ul>
                 {% for p in pages.children.visible %}

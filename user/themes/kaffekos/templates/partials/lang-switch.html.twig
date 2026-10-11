@@ -1,10 +1,16 @@
-{# Language switcher: one link per supported language, to the same page in that language #}
+{# Language switcher (variant: nav = inside the main menu, bar = always visible in the mobile header): one button per supported language (round flag + code), linking to the same page in that language #}
 {% set switch_urls = switch_urls ?? kk_lang_urls() %}
 {% set cur_lang = cur_lang ?? kk_lang() %}
+{% set flags = {
+    en: '<svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><rect width="60" height="40" fill="#012169"/><path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0L60 40M60 0L0 40" stroke="#c8102e" stroke-width="3"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="13"/><path d="M30 0V40M0 20H60" stroke="#c8102e" stroke-width="8"/></svg>',
+    no: '<svg viewBox="0 0 22 16" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><rect width="22" height="16" fill="#ba0c2f"/><path d="M8 0V16M0 8H22" stroke="#fff" stroke-width="4"/><path d="M8 0V16M0 8H22" stroke="#00205b" stroke-width="2"/></svg>'
+} %}
 {% if switch_urls|length > 1 %}
-<div class="lang-switch" role="group" aria-label="{{ 'KK.LANG.LABEL'|t }}">
+<div class="lang-switch lang-switch--{{ variant ?? 'nav' }}" role="group" aria-label="{{ 'KK.LANG.LABEL'|t }}">
     {% for code, href in switch_urls %}
-        <a href="{{ href }}" lang="{{ code }}" hreflang="{{ code }}" class="{{ code == cur_lang ? 'is-active' : '' }}" title="{{ ('KK.LANG.' ~ code|upper)|t }}"{% if code == cur_lang %} aria-current="true"{% endif %}>{{ code|upper }}</a>
+        <a href="{{ href }}" lang="{{ code }}" hreflang="{{ code }}" class="{{ code == cur_lang ? 'is-active' : '' }}" title="{{ ('KK.LANG.' ~ code|upper)|t }}"{% if code == cur_lang %} aria-current="true"{% endif %}>
+            <span class="lang-flag">{{ flags[code]|default('')|raw }}</span><span class="lang-code">{{ code|upper }}</span>
+        </a>
     {% endfor %}
 </div>
 {% endif %}
