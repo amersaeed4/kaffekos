@@ -26,9 +26,21 @@
             {% if hero.btn1_label %}<a class="btn btn-primary btn-lg" href="{{ kk.href(hero.btn1_url ?: '/menu') }}">{{ hero.btn1_label }}</a>{% endif %}
             {% if hero.btn2_label %}<a class="btn btn-ghost btn-lg" href="{{ kk.href(hero.btn2_url ?: '/contact') }}">{{ hero.btn2_label }}</a>{% endif %}
         </div>
-        {% if hero.show_open_badge is null or hero.show_open_badge %}
-            <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>{{ 'KK.HOME.HOURS_BELOW'|t }}</span></p>
-        {% endif %}
+        {% set show_partner = hero.show_partner is null or hero.show_partner %}
+        {% set partner_logo = hero.partner_logo ? page.media[hero.partner_logo] : null %}
+        <div class="hm-hero-meta">
+            {% if hero.show_open_badge is null or hero.show_open_badge %}
+                <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>{{ 'KK.HOME.HOURS_BELOW'|t }}</span></p>
+            {% endif %}
+            {% if show_partner %}
+                <a class="hm-brew" href="#coffee">
+                    <span class="hm-brew-cup" aria-hidden="true">{{ kk.icon('cup', 16) }}</span>
+                    <span class="hm-brew-label">{{ 'KK.HOME.BREWED_WITH'|t }}</span>
+                    {% if partner_logo %}<img class="hm-brew-logo" src="{{ partner_logo.url }}" alt="Hausbrandt" height="22">{% else %}<span class="hm-brew-mark">Hausbrandt</span>{% endif %}
+                    <span class="hm-brew-arrow" aria-hidden="true">{{ kk.icon('arrow', 15) }}</span>
+                </a>
+            {% endif %}
+        </div>
 
         {# Upcoming-event banner: shown while an event is still to come or on right now; links to the soonest one.
            Optional "Starts" / "Ends" on the event post (entered as Lahore time, UTC+5) give "Happening now" and hide it once over. #}
@@ -226,7 +238,7 @@
 {% if (cf.enabled is null or cf.enabled) and (cf.title or cf.text) %}
     {% set cf_img = cf.image ? page.media[cf.image] : null %}
     {% set cf_img2 = cf.image2 ? page.media[cf.image2] : null %}
-    <section class="section section-navy coffee hb">
+    <section id="coffee" class="section section-navy coffee hb">
         <div class="wrap coffee-grid">
             <div class="coffee-text">
                 {% if cf.eyebrow %}<p class="eyebrow eyebrow-light">{{ cf.eyebrow }}</p>{% endif %}

@@ -1701,6 +1701,23 @@ address { font-style: normal; }
 }
 @media (prefers-reduced-motion: reduce) { .hm-follow, .hm-follow-badge { animation: none; } .hm-follow::after { display: none; } }
 
+/* ---- Hero: "Brewed exclusively with Hausbrandt" pill (text, or the logo once uploaded) ---- */
+.hm-hero-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem; margin-top: 2rem; }
+.hm-hero-meta .open-badge { margin: 0; }
+.hm-brew { display: inline-flex; align-items: center; gap: .6rem; padding: .45rem 1rem .45rem .85rem; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(213, 194, 142, .5); color: #fff; font-size: .92rem; font-weight: 500; text-decoration: none; transition: transform .25s cubic-bezier(.3, 1.6, .5, 1), background .25s, border-color .25s; }
+.hm-brew:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .22); border-color: #d5c28e; }
+.hm-brew-cup { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #db030e; color: #fff; flex: none; }
+.hm-brew-label { opacity: .92; white-space: nowrap; }
+.hm-brew-mark { font-family: var(--font-head); font-weight: 800; font-size: 1.02rem; letter-spacing: .16em; text-transform: uppercase; color: #e6d6a2; }
+.hm-brew-logo { display: block; height: 22px; width: auto; }
+.hm-brew-arrow { display: grid; place-items: center; opacity: .8; transform: rotate(90deg); transition: transform .25s; }
+.hm-brew:hover .hm-brew-arrow { transform: rotate(90deg) translateX(4px); }
+@media (max-width: 600px) {
+    .hm-brew { gap: .45rem; padding: .4rem .8rem .4rem .55rem; font-size: .8rem; }
+    .hm-brew-cup { width: 22px; height: 22px; }
+    .hm-brew-mark { font-size: .86rem; letter-spacing: .08em; }
+}
+
 @media (max-width: 1100px) {
     .hm-chip { display: none; }
     .hm-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -75,6 +75,21 @@ form:
                 0: 'No'
               validate:
                 type: bool
+            header.hero.show_partner:
+              type: toggle
+              label: Show "Brewed exclusively with Hausbrandt"
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+            header.hero.partner_logo:
+              type: filepicker
+              label: Hausbrandt logo (optional)
+              preview_images: true
+              help: 'Upload the logo to Page Media first, then pick it here. Use a white or light version (transparent PNG or SVG), because it sits on the dark photo. Without a logo the word "Hausbrandt" is shown as text.'
 
         welcome:
           type: tab
