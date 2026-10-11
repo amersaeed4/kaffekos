@@ -345,6 +345,63 @@ form:
               help: 'Shown to Google as the neighbourhood and city of the shop.'
               default: 'Johar Town, Lahore'
 
+        # ------------------------------------------------------- NORWEGIAN
+        norwegian:
+          type: tab
+          title: Norwegian (Norsk)
+          fields:
+            norwegian_intro:
+              type: spacer
+              title: Norwegian version of the texts in the other tabs
+              text: 'Shown to visitors who switch the website to Norwegian (EN / NO switch in the menu). If a field is left empty, the English text is shown instead. The other texts of the website are edited in Pages: choose the language at the top of the page editor.'
+
+            brand.tagline_no:
+              type: text
+              label: Small line under the name (Norwegian)
+              default: 'Kaffe, komfort, samhold'
+
+            header.cta_label_no:
+              type: text
+              label: Header button text (Norwegian)
+              default: 'Besøk oss'
+
+            announcement.text_no:
+              type: text
+              label: Announcement text (Norwegian)
+
+            hours_note_no:
+              type: text
+              label: Note under the opening hours (Norwegian)
+
+            footer.about_no:
+              type: textarea
+              rows: 3
+              label: Short text in the footer (Norwegian)
+              default: 'Et lite stykke Norge i Lahore. Ærlig kaffe, varme bakverk og den typen koselige hjørner som får deg til å bli litt lenger.'
+
+            footer.copyright_no:
+              type: text
+              label: Copyright line (Norwegian)
+              default: 'Kaffekos. Alle rettigheter forbeholdt.'
+
+            seo.title_suffix_no:
+              type: text
+              label: Title ending (Norwegian)
+              default: 'Norsk kaffebar i Lahore'
+
+            seo.description_no:
+              type: textarea
+              rows: 3
+              label: Fallback description (Norwegian)
+              default: 'Kaffekos er den norske kaffebaren i Lahore, med førsteklasses italienske Hausbrandt-kaffebønner, varme bakverk og nordisk kos i Johar Town.'
+
+            seo.keywords_no:
+              type: textarea
+              rows: 6
+              label: Site-wide keywords (Norwegian)
+              help: 'Comma or new line separated.'
+              default: 'norsk kaffebar i Lahore, norsk kafé, skandinavisk kafé, nordisk kaffehus, kos, Hausbrandt kaffe, italienske kaffebønner, kanelbolle, bakeri og kafé, Norwegian coffee shop Lahore, Hausbrandt coffee Lahore, Johar Town, Kaffekos'
+
         # --------------------------------------------------------- FOOTER
         footer:
           type: tab

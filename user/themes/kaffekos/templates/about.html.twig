@@ -1,14 +1,15 @@
 {% extends 'partials/base.html.twig' %}
 {% import 'macros/kk.html.twig' as kk %}
 {% block body_class %}page-about{% endblock %}
+{% set gloss = 'KK.GLOSS'|t == 'show' %}
 
 {% block hero %}
 {% set bimg = header.banner.image ? page.media[header.banner.image] : null %}
 {% set words = page.title|split(' ') %}
 <section class="ab-hero{{ bimg ? ' has-photo' : '' }}"{% if bimg %} style="--banner: url('{{ kk.imgurlfit(bimg, 2000, 2000) }}')"{% endif %}>
-    <span class="ab-chip ab-chip-1" aria-hidden="true"><b>Kaffe</b> coffee</span>
-    <span class="ab-chip ab-chip-2" aria-hidden="true"><b>Kos</b> cosiness</span>
-    <span class="ab-chip ab-chip-3" aria-hidden="true"><b>Velkommen</b> welcome</span>
+    <span class="ab-chip ab-chip-1" aria-hidden="true"><b>Kaffe</b>{% if gloss %} coffee{% endif %}</span>
+    <span class="ab-chip ab-chip-2" aria-hidden="true"><b>Kos</b>{% if gloss %} cosiness{% endif %}</span>
+    <span class="ab-chip ab-chip-3" aria-hidden="true"><b>Velkommen</b>{% if gloss %} welcome{% endif %}</span>
     <div class="wrap">
         {% if header.banner.eyebrow %}<p class="eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
         <h1>{% if words|length > 1 %}{{ words|slice(0, -1)|join(' ') }} {% endif %}<em>{{ words|last }}</em></h1>
@@ -20,7 +21,7 @@
         <div class="ab-ticker-track">
             {% for g in 1..2 %}
                 <div class="ab-ticker-group">
-                    {% for w in ['Kaffe', 'Kos', 'Velkommen', 'Takk', 'Skål', 'Kos deg', 'Kaffe', 'Kos', 'Velkommen', 'Takk', 'Skål', 'Kos deg'] %}<span>{{ w }}</span>{% endfor %}
+                    {% for w in ('KK.ABOUT.TICKER'|t)|split(',') %}<span>{{ w|trim }}</span>{% endfor %}
                 </div>
             {% endfor %}
         </div>
@@ -33,11 +34,11 @@
 <section class="section ab-story">
     <div class="wrap">
         <div class="ab-eq">
-            <div class="ab-eq-term" style="--r:-3deg; background: var(--ab-green)"><b>Kaffe</b><small>coffee</small></div>
+            <div class="ab-eq-term" style="--r:-3deg; background: var(--ab-green)"><b>Kaffe</b>{% if gloss %}<small>coffee</small>{% endif %}</div>
             <span class="ab-eq-op" aria-hidden="true">+</span>
-            <div class="ab-eq-term" style="--r:2deg; background: var(--ab-coral)"><b>Kos</b><small>cosiness</small></div>
+            <div class="ab-eq-term" style="--r:2deg; background: var(--ab-coral)"><b>Kos</b>{% if gloss %}<small>cosiness</small>{% endif %}</div>
             <span class="ab-eq-op" aria-hidden="true">=</span>
-            <div class="ab-eq-term is-sum" style="--r:-2deg"><b>Kaffekos</b><small>our little corner of Norway</small></div>
+            <div class="ab-eq-term is-sum" style="--r:-2deg"><b>Kaffekos</b><small>{{ 'KK.ABOUT.CORNER'|t }}</small></div>
         </div>
     </div>
     <div class="wrap {{ story_img ? 'split' : 'wrap-narrow' }}">
@@ -61,7 +62,7 @@
 {% if vals.items %}
 <section class="section ab-values">
     <div class="wrap">
-        {% include 'partials/section-head.html.twig' with {eyebrow: 'Våre verdier · Our values', title: vals.title, subtitle: null} %}
+        {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.ABOUT.VALUES'|t, title: vals.title, subtitle: null} %}
         <div class="ab-cards">
             {% set tones = ['green', 'coral', 'plum', 'lagoon'] %}
             {% for f in vals.items %}
@@ -105,14 +106,14 @@
         </div>
         <div class="ab-hello-text">
             <h2>Velkommen.<br><em>Kos deg!</em></h2>
-            <p>Welcome. Make yourself at home, there is always a seat and a warm cup waiting.</p>
+            <p>{{ 'KK.ABOUT.WELCOME_TEXT'|t }}</p>
             <div class="hero-actions">
-                <a class="btn btn-primary btn-lg" href="{{ url('/menu') }}">Explore the menu</a>
-                <a class="btn btn-ghost btn-lg" href="{{ url('/contact') }}">Find us</a>
+                <a class="btn btn-primary btn-lg" href="{{ url('/menu') }}">{{ 'KK.ABOUT.EXPLORE'|t }}</a>
+                <a class="btn btn-ghost btn-lg" href="{{ url('/contact') }}">{{ 'KK.FIND_US'|t }}</a>
             </div>
         </div>
     </div>
 </section>
 
-{% include 'partials/visit.html.twig' with {eyebrow: 'Velkommen', title: 'Come say hello', text: ''} %}
+{% include 'partials/visit.html.twig' with {eyebrow: 'Velkommen', title: 'KK.ABOUT.HELLO'|t, text: ''} %}
 {% endblock %}

@@ -2,10 +2,10 @@
 {% import 'macros/kk.html.twig' as kk %}
 {% set cover = header.cover ? page.media[header.cover] : null %}
 {% set kinds = {
-    upcoming: {label: 'Upcoming', emoji: '🔥'},
-    event:    {label: 'Event',    emoji: '🎉'},
-    activity: {label: 'Activity', emoji: '🎲'},
-    news:     {label: 'News',     emoji: '📣'}
+    upcoming: {label: 'KK.EVENTS.KIND_UPCOMING'|t, emoji: '🔥'},
+    event:    {label: 'KK.EVENTS.KIND_EVENT'|t,    emoji: '🎉'},
+    activity: {label: 'KK.EVENTS.KIND_ACTIVITY'|t, emoji: '🎲'},
+    news:     {label: 'KK.EVENTS.KIND_NEWS'|t,     emoji: '📣'}
 } %}
 {% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%', full: '50% 50%'} %}
 {% set kind = header.kind ?: 'news' %}
@@ -34,7 +34,7 @@
     <span class="ev-shape ev-ring s2" aria-hidden="true"></span>
     <span class="ev-shape ev-blob s4" aria-hidden="true"></span>
     <div class="wrap wrap-narrow">
-        <p class="ev-eyebrow">{{ k.emoji }} {{ k.label }} &middot; {{ page.date|date('j F Y') }}</p>
+        <p class="ev-eyebrow">{{ k.emoji }} {{ k.label }} &middot; {{ kk_date(page.date, 'KK.DATE.LONG'|t) }}</p>
         <h1 class="ev-title">{{ page.title }}</h1>
     </div>
 </section>
@@ -63,7 +63,7 @@
                 </div>
             {% endif %}
         </div>
-        <p class="center"><a class="ev-btn ev-btn-alt" href="{{ page.parent.url }}">&larr; All events</a></p>
+        <p class="center"><a class="ev-btn ev-btn-alt" href="{{ page.parent.url }}">&larr; {{ 'KK.EVENTS.ALL'|t }}</a></p>
     </div>
 </article>
 {% endblock %}

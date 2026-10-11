@@ -11,10 +11,13 @@
 {% set favicon_url = favicon_first.name|default(null) ? url('theme://images/favicon/' ~ favicon_first.name) : url('theme://images/kk-logo.png') %}
 {# ---- SEO: page values (page > SEO tab) first, site-wide values (Theme settings > SEO & Keywords) after ---- #}
 {% set seo = header.seo ?? {} %}
-{% set seo_site = theme_var('seo') ?? {} %}
+{% set seo_site = {title_suffix: kk_l('seo.title_suffix'), area: kk_l('seo.area'), description: kk_l('seo.description'), keywords: kk_l('seo.keywords')} %}
+{% set lang = kk_lang() %}
+{% set lang_urls = kk_lang_urls(true) %}
+{% set tagline = kk_l('brand.tagline') %}
 {% set is_home = page.route == '/' or page.route == '/home' %}
-{% set page_title = seo.title ?: (page.title and not is_home ? page.title ~ ' | ' ~ site.title ~ (seo_site.title_suffix ? ' - ' ~ seo_site.title_suffix : '') : site.title ~ ' | ' ~ (seo_site.title_suffix ?: (theme_var('brand.tagline') ?: 'Coffee House'))) %}
-{% set page_desc = (seo.description ?: page.metadata.description.content|default(header.hero.subtitle|default(header.banner.subtitle|default(header.summary|default(null))))) ?: (page.title and not is_home ? page.title ~ ' at ' ~ site.title ~ '. ' : '') ~ (seo_site.description ?: site.metadata.description) %}
+{% set page_title = seo.title ?: (page.title and not is_home ? page.title ~ ' | ' ~ site.title ~ (seo_site.title_suffix ? ' - ' ~ seo_site.title_suffix : '') : site.title ~ ' | ' ~ (seo_site.title_suffix ?: (tagline ?: 'Coffee House'))) %}
+{% set page_desc = (seo.description ?: page.metadata.description.content|default(header.hero.subtitle|default(header.banner.subtitle|default(header.summary|default(null))))) ?: (page.title and not is_home ? 'KK.SEO.PAGE_AT'|t(page.title, site.title) : '') ~ (seo_site.description ?: site.metadata.description) %}
 {% set kw_page = ((seo.keywords ?: '') ~ ',' ~ (page.metadata.keywords.content ?? ''))|replace({"\n": ',', "\r": ''})|split(',') %}
 {% set kw_site = (seo_site.keywords ?: site.metadata.keywords ?: '')|replace({"\n": ',', "\r": ''})|split(',') %}
 {% set kw_all = [] %}
@@ -22,7 +25,7 @@
 {% set seo_noindex = seo.noindex or page.template == 'error' or page.header.robots == 'noindex' %}
 {% set seo_type = page.template == 'blog-item' ? 'article' : 'website' %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-V0LFTKE9PG"></script>
@@ -46,8 +49,12 @@
     <meta name="ICBM" content="{{ biz.lat }}, {{ biz.lng }}">
     <meta name="theme-color" content="{{ colors.navy|default('#0f2747') }}">
     <link rel="canonical" href="{{ page.url(true, true) }}">
+    {% for code, href in lang_urls %}<link rel="alternate" hreflang="{{ code }}" href="{{ href }}">
+    {% endfor %}<link rel="alternate" hreflang="x-default" href="{{ lang_urls[config.system.languages.default_lang ?: 'en'] }}">
     <link rel="icon" href="{{ favicon_url }}">
     <link rel="apple-touch-icon" href="{{ favicon_url }}">
+    <meta property="og:locale" content="{{ lang == 'no' ? 'nb_NO' : 'en_US' }}">
+    <meta property="og:locale:alternate" content="{{ lang == 'no' ? 'en_US' : 'nb_NO' }}">
     <meta property="og:site_name" content="{{ site.title|e('html_attr') }}">
     <meta property="og:type" content="{{ seo_type }}">
     <meta property="og:title" content="{{ page_title|e('html_attr') }}">
@@ -79,13 +86,14 @@
     {% block head_extra %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
-<a class="skip-link" href="#main">Skip to content</a>
+<a class="skip-link" href="#main">{{ 'KK.SKIP'|t }}</a>
 
-{% if theme_var('announcement.enabled') and theme_var('announcement.text') %}
+{% set ann_text = kk_l('announcement.text') %}
+{% if theme_var('announcement.enabled') and ann_text %}
     {% set ann_link = theme_var('announcement.link') %}
     <div class="announce">
-        {% if ann_link %}<a href="{{ kk.href(ann_link) }}">{{ theme_var('announcement.text') }} {{ kk.icon('arrow', 16) }}</a>
-        {% else %}<span>{{ theme_var('announcement.text') }}</span>{% endif %}
+        {% if ann_link %}<a href="{{ kk.href(ann_link) }}">{{ ann_text }} {{ kk.icon('arrow', 16) }}</a>
+        {% else %}<span>{{ ann_text }}</span>{% endif %}
     </div>
 {% endif %}
 
@@ -98,6 +106,28 @@
 
 {% include 'partials/footer.html.twig' %}
 
+<script type="application/json" id="kk-i18n">{{ {
+    lang: lang,
+    time24: 'KK.CLOCK'|t == '24h',
+    days: ('KK.DATE.DAYS'|t)|split(','),
+    openNow: 'KK.JS.OPEN_NOW'|t,
+    closedOpensToday: 'KK.JS.CLOSED_OPENS_TODAY'|t,
+    closedOpensTomorrow: 'KK.JS.CLOSED_OPENS_TOMORROW'|t,
+    closedOpensDay: 'KK.JS.CLOSED_OPENS_DAY'|t,
+    closed: 'KK.CLOSED'|t,
+    happeningNow: 'KK.EVENTS.HAPPENING_NOW'|t,
+    menuOpen: 'KK.JS.MENU_OPEN'|t,
+    menuClose: 'KK.JS.MENU_CLOSE'|t,
+    addPick: 'KK.JS.ADD_PICK'|t,
+    removePick: 'KK.JS.REMOVE_PICK'|t,
+    myPicks: 'KK.JS.MY_PICKS'|t,
+    surprise: 'KK.JS.SURPRISE'|t,
+    allMenu: 'KK.JS.ALL'|t,
+    noPicks: 'KK.JS.NO_PICKS'|t,
+    noMatch: 'KK.MENU.NO_MATCH'|t,
+    savePhoto: 'KK.GALLERY.SAVE'|t,
+    removePhoto: 'KK.GALLERY.UNSAVE'|t,
+}|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
 <script type="application/json" id="kk-hours">{{ hours|json_encode|raw }}</script>
 {% do assets.addJs('theme://js/kaffekos.js', {group: 'bottom', loading: 'defer'}) %}
 {{ assets.js('bottom')|raw }}

@@ -26,6 +26,8 @@ Log in with your admin account. After every change, click **Save**. The change i
 | Events, activities & news | **Pages → Events** |
 | Contact page texts | **Pages → Contact** |
 | Where contact messages are emailed | **Plugins → Email → "To" address** |
+| The Norwegian version of the tagline, footer text, header button, SEO text | **Themes → Kaffekos → Norwegian (Norsk)** |
+| Norwegian page texts, menu items, event posts | **Pages →** open the page → switch language to **Norwegian** (see section 3) |
 
 Tip: in **Pages**, the pencil/edit opens a page; the tabs across the top group the settings.
 
@@ -95,7 +97,32 @@ There are no reviews yet (nothing has been invented). When you have real ones: *
 
 ---
 
-## 3. Contact form & email
+## 3. English and Norwegian (the EN | NO switch)
+
+The website has two languages: **English** (the default, addresses like `kaffekos.pk/menu`) and **Norwegian** (`kaffekos.pk/no/menu`). Visitors switch with the **EN | NO** buttons in the top menu. The site does not guess the language; people choose it themselves, and the choice sticks while they click around.
+
+**How it is stored:** every page has two text files, `menu.md` (English) and `menu.no.md` (Norwegian). They are independent: a change in one does **not** change the other.
+
+### Edit the Norwegian text of a page
+1. **Pages →** open the page (e.g. *Home*).
+2. At the top of the page editor choose the language **Norwegian** (**no**).
+3. Edit the fields and **Save**.
+
+If a page has no Norwegian version yet, visitors on `/no/...` see the English text of that page, so nothing ever appears blank. Create the Norwegian version by switching the editor to Norwegian and saving.
+
+### Things to remember
+* **New page, menu item, event or photo caption?** Add it in English first, then switch the editor to Norwegian and translate. A **new menu category** must also get a Norwegian version, otherwise `/no/menu` shows it in English.
+* **Prices, photos, "Show on Home page" and "Sold out"** are stored per language, because each language has its own copy of the page. When you change one of these, change it in **both** languages.
+* **Texts from the Themes settings** (tagline, header button, footer text, announcement bar, note under the hours, SEO title ending/description/keywords) have a twin field under **Themes → Kaffekos → Norwegian (Norsk)**. If a Norwegian field is left empty, the English text is shown.
+* **Fixed texts** that are not typed into a page (button labels like "Read more", "Open now · until 11 PM", weekday names, the filters on the Gallery) live in one file: `user/themes/kaffekos/languages.yaml`. A developer (or you, carefully) can edit the Norwegian lines there.
+* **Contact form:** the Norwegian form is in the Norwegian version of the Contact page. Messages from it are saved and emailed the same way; the email subject says "(Norwegian page)".
+* **Photos** are shared by both languages (upload once). Only their captions are per language.
+* **Search engines:** both languages are listed in `sitemap.xml`, and every page tells Google which version is the Norwegian one. Nothing to do.
+* **Upcoming events** disappear after the event in both languages, automatically.
+
+---
+
+## 4. Contact form & email
 
 * Messages are always **saved on the server** in `user/data/contact/` (one text file each), even if email fails.
 * They are also emailed to the address in **Plugins → Email → To**. On most shared hosting the default mail works. If emails are not arriving, set **Plugins → Email → Mailer** to **SMTP** and enter your mailbox details (e.g. the `info@kaffekos.pk` mailbox: host, port 587/465, user, password).
@@ -103,23 +130,23 @@ There are no reviews yet (nothing has been invented). When you have real ones: *
 
 ---
 
-## 4. Going live (hosting)
+## 5. Going live (hosting)
 
 1. Hosting needs **PHP 8.3 or newer** with the usual extensions (gd, mbstring, curl, zip, xml, openssl). Any cPanel/Apache host works. No database needed.
 2. Upload the **whole project folder** to the web root (`public_html`), including the hidden `.htaccess`.
 3. Make sure `cache/`, `logs/`, `tmp/`, `backup/`, `user/data/`, `user/pages/` and `user/config/` are writable by the web server.
 4. Open `https://kaffekos.pk/admin` and confirm you can log in. **Change the admin password** to a strong one (Admin → your profile).
 5. Turn on **HTTPS** (free SSL in cPanel) and make sure `kaffekos.pk` redirects to it.
-6. Then fill in the items in section 6 below.
+6. Then fill in the items in section 7 below.
 
-## 5. Backups & safety
+## 6. Backups & safety
 
 * **The whole site is just files.** To back up, download the `user/` folder (all content, images, settings) regularly, or use **Tools → Backups** in the admin panel.
 * Before big edits you can make a backup first, so you can always go back.
 * Never share the admin password. Create a separate admin account for each person (Accounts → Add).
 * Keep Grav and plugins up to date from **Tools → Updates** in the admin panel.
 
-## 6. Before launch: please confirm these
+## 7. Before launch: please confirm these
 
 Taken from your Google Maps listing (please double-check them):
 
@@ -138,7 +165,7 @@ Still placeholders:
 - [ ] **TikTok / YouTube / LinkedIn**: icons already show in the footer (greyed out). Add the links under Social Media to activate them (Instagram and Facebook are already set).
 - [ ] **Reviews section** on Home is off. Add real guest reviews if you want it.
 
-## 7. Good to know
+## 8. Good to know
 
 * **Page Media** = the photos belonging to a page. Upload there first, then pick the photo in the fields.
 * Photos: JPG/PNG/WebP are best. The site automatically makes smaller, faster versions.

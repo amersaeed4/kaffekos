@@ -3,14 +3,17 @@ enabled: true
 brand:
   wordmark: Kaffekos
   tagline: 'Coffee, Comfort, Connection'
+  tagline_no: 'Kaffe, komfort, samhold'
 
 header:
   cta_label: Visit Us
+  cta_label_no: 'Besøk oss'
   cta_url: /contact
 
 announcement:
   enabled: false
   text: ''
+  text_no: ''
   link: ''
 
 colors:
@@ -23,7 +26,10 @@ colors:
 
 seo:
   title_suffix: 'Norwegian Coffee Shop in Lahore'
+  title_suffix_no: 'Norsk kaffebar i Lahore'
   area: 'Johar Town, Lahore'
+  description_no: 'Kaffekos er den norske kaffebaren i Lahore, med førsteklasses italienske Hausbrandt-kaffebønner, varme bakverk og nordisk kos i Johar Town.'
+  keywords_no: 'norsk kaffebar i Lahore, norsk kafé, skandinavisk kafé, nordisk kaffehus, kos, Hausbrandt kaffe, italienske kaffebønner, kanelbolle, bakeri og kafé, Norwegian coffee shop Lahore, Hausbrandt coffee Lahore, Johar Town, Kaffekos'
   description: 'Kaffekos is the Norwegian coffee shop in Lahore, serving premium Hausbrandt Italian coffee beans, warm bakes and Nordic cosiness in Johar Town.'
   keywords: 'best coffee shop in Lahore, best cafe in Lahore, best coffee in Lahore, coffee shop Johar Town, cafe in Johar Town Lahore, cafe near me, Norwegian coffee shop, Norwegian cafe in Lahore, Norwegian coffee house, Scandinavian cafe Lahore, Nordic coffee house, hygge cafe, kos, Hausbrandt coffee, Hausbrandt coffee beans, best coffee beans from Italy, Italian coffee beans, premium Italian coffee, Italian espresso Lahore, Hausbrandt Pakistan, Hausbrandt Trieste, Hausbrandt 1892, 100% Arabica coffee, specialty coffee Lahore, espresso, cappuccino, flat white, iced latte, matcha Lahore, cinnamon bun, kanelbolle, bakery and cafe Lahore, cozy cafe Lahore, family cafe Lahore, Kaffekos'
 
@@ -50,6 +56,7 @@ hours:
   - { day: Saturday, open: '07:00', close: '23:00', closed: false }
   - { day: Sunday, open: '07:00', close: '23:00', closed: false }
 hours_note: ''
+hours_note_no: ''
 
 social:
   instagram: 'https://www.instagram.com/kaffekospakistan/'
@@ -62,7 +69,9 @@ social:
 footer:
   about: 'A small piece of Norway in Lahore. Honest coffee, warm bakes and the kind of cosy corner that makes you stay a little longer.'
   copyright: 'Kaffekos. All rights reserved.'
+  copyright_no: 'Kaffekos. Alle rettigheter forbeholdt.'
   tagline: 'Laget med kos i Lahore'
+  about_no: 'Et lite stykke Norge i Lahore. Ærlig kaffe, varme bakverk og den typen koselige hjørner som får deg til å bli litt lenger.'
 
 menu:
   currency: 'Rs.'

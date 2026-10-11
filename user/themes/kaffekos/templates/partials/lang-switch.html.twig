@@ -1,0 +1,10 @@
+{# Language switcher: one link per supported language, to the same page in that language #}
+{% set switch_urls = switch_urls ?? kk_lang_urls() %}
+{% set cur_lang = cur_lang ?? kk_lang() %}
+{% if switch_urls|length > 1 %}
+<div class="lang-switch" role="group" aria-label="{{ 'KK.LANG.LABEL'|t }}">
+    {% for code, href in switch_urls %}
+        <a href="{{ href }}" lang="{{ code }}" hreflang="{{ code }}" class="{{ code == cur_lang ? 'is-active' : '' }}" title="{{ ('KK.LANG.' ~ code|upper)|t }}"{% if code == cur_lang %} aria-current="true"{% endif %}>{{ code|upper }}</a>
+    {% endfor %}
+</div>
+{% endif %}
