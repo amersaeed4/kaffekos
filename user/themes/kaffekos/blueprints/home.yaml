@@ -128,6 +128,15 @@ form:
                 .label:
                   type: text
                   label: Small text
+                .look:
+                  type: select
+                  label: Look of this box
+                  default: plain
+                  options:
+                    plain: 'Plain colour'
+                    norway: 'Norway (flag)'
+                    lahore: 'Lahore (mosque skyline)'
+                  help: 'The Google box is styled automatically when "Fill from Google" below is on.'
                 .google:
                   type: toggle
                   label: Fill from Google automatically

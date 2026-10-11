@@ -33,6 +33,7 @@ class Kaffekos extends Theme
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_featured_items', [$this, 'featuredItems']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_gallery_photos', [$this, 'galleryPhotos']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_google_rating', [$this, 'googleRating']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_google_review_url', [$this, 'googleReviewUrl']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_event_posts', [$this, 'eventPosts']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_is_expired', [self::class, 'isExpiredAnnouncement']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_lang', [$this, 'activeLang']));
@@ -287,6 +288,22 @@ class Kaffekos extends Theme
         }
 
         return isset($data['rating'], $data['count']) ? ['rating' => (float)$data['rating'], 'count' => (int)$data['count']] : null;
+    }
+
+    /**
+     * Link that opens Google's "write a review" form for the café (used for the QR code and button on the Home page).
+     * Uses the link typed in Themes -> Kaffekos -> Google Rating if there is one, otherwise builds Google's official
+     * link from the Place ID in user/config/google-places.yaml. Returns null when neither exists.
+     */
+    public function googleReviewUrl(): ?string
+    {
+        $cfg    = $this->grav['config'];
+        $manual = trim((string)$cfg->get('themes.kaffekos.google.review_url'));
+        if ($manual !== '' && preg_match('#^https://#i', $manual)) {
+            return $manual;
+        }
+        $place = trim((string)$cfg->get('google-places.place_id'));
+        return $place !== '' ? 'https://search.google.com/local/writereview?placeid=' . rawurlencode($place) : null;
     }
 
     private function fetchGooglePlace(string $key, string $place, string $endpoint = ''): ?array

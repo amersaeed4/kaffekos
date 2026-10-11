@@ -46,6 +46,7 @@ business:
 google:
   refresh_hours: 6
   max_calls_per_day: 6
+  review_url: ''
 
 hours:
   - { day: Monday, open: '07:00', close: '01:00', closed: false }

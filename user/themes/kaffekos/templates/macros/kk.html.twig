@@ -79,3 +79,74 @@
 {% macro time12(t) %}
 {%- if t -%}{{ ('2000-01-01 ' ~ t)|date('KK.CLOCK'|t == '24h' ? 'H:i' : 'g:i A') }}{%- endif -%}
 {% endmacro %}
+
+{# Illustrations for the Home "Welcome" tiles #}
+{% macro flag_no() %}
+<svg class="hm-flag" viewBox="0 0 22 16" aria-hidden="true" focusable="false"><rect width="22" height="16" fill="#ba0c2f"/><path d="M6 0h4v16H6zM0 6h22v4H0z" fill="#fff"/><path d="M7 0h2v16H7zM0 7h22v2H0z" fill="#00205b"/></svg>
+{% endmacro %}
+
+{# Badshahi Mosque skyline (Lahore), drawn in currentColor #}
+{% macro skyline_lahore() %}
+<svg class="hm-skyline" viewBox="0 0 260 90" aria-hidden="true" focusable="false">
+    <g fill="currentColor">
+        <rect x="0" y="78" width="260" height="12"/>
+        <rect x="70" y="58" width="120" height="20"/>
+        <path d="M100 58C100 34 114 26 130 8C146 26 160 34 160 58Z"/>
+        <rect x="129" y="0" width="2" height="12"/>
+        <path d="M66 58C66 44 74 38 82 28C90 38 100 44 100 58Z"/>
+        <path d="M160 58C160 44 170 38 178 28C186 38 194 44 194 58Z"/>
+        <rect x="24" y="30" width="9" height="48"/>
+        <path d="M22 30h13c0-7-3-9-6.5-15C25 21 22 23 22 30Z"/>
+        <rect x="227" y="30" width="9" height="48"/>
+        <path d="M225 30h13c0-7-3-9-6.5-15C228 21 225 23 225 30Z"/>
+        <rect x="48" y="44" width="7" height="34"/>
+        <path d="M46.5 44h10c0-6-2-8-5-12C48.5 36 46.5 38 46.5 44Z"/>
+        <rect x="205" y="44" width="7" height="34"/>
+        <path d="M203.5 44h10c0-6-2-8-5-12C205.5 36 203.5 38 203.5 44Z"/>
+    </g>
+    <path d="M118 78V66a12 12 0 0 1 24 0v12Z" fill="rgba(0,0,0,.25)"/>
+</svg>
+{% endmacro %}
+
+{# Google "G" logo #}
+{% macro google_g(size) %}
+<svg class="hm-g-logo" width="{{ size ?: 34 }}" height="{{ size ?: 34 }}" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+{% endmacro %}
+
+{# A cosy Scandinavian character (faces right, seated on a stool, holding a mug) for the Home "kos" scene.
+   c: sweater, hat, band, hair, skin, mug, pants, begin (SMIL delay), beard (bool), braids (bool) #}
+{% macro kos_person(c) %}
+<g class="nw-person">
+    <rect x="40" y="176" width="92" height="12" rx="6" fill="#9a6a47"/>
+    <path d="M56 188L48 240M116 188L124 240" stroke="#7a4f36" stroke-width="7" stroke-linecap="round"/>
+    <rect x="62" y="154" width="98" height="26" rx="13" fill="{{ c.pants }}"/>
+    <rect x="140" y="166" width="24" height="64" rx="11" fill="{{ c.pants }}"/>
+    <path d="M138 224H178a9 9 0 0 1 0 16H138Z" fill="#4a2f22"/>
+    <path d="M52 82Q50 66 72 64H108Q132 66 130 86L134 160H54Z" fill="{{ c.sweater }}"/>
+    <rect x="53" y="106" width="78" height="16" fill="#f6efe3"/>
+    {% for k in 0..4 %}<path d="M{{ 66 + k * 15 }} 114l6-5 6 5-6 5Z" fill="{{ c.sweater }}"/>{% endfor %}
+    <rect x="54" y="152" width="80" height="8" rx="3" fill="#f6efe3" opacity=".35"/>
+    {% if c.braids %}<path d="M68 52Q56 72 62 98" stroke="{{ c.hair }}" stroke-width="11" stroke-linecap="round" fill="none"/><circle cx="62" cy="99" r="4.5" fill="{{ c.mug }}"/>{% endif %}
+    <rect x="80" y="58" width="18" height="14" fill="{{ c.skin }}"/>
+    <circle cx="90" cy="44" r="26" fill="{{ c.skin }}"/>
+    <circle cx="68" cy="48" r="5" fill="{{ c.skin }}"/>
+    {% if c.beard %}<path d="M66 50C64 84 116 86 116 52C106 64 78 64 66 50Z" fill="{{ c.hair }}"/>{% endif %}
+    <path d="M99 48q5 5 10 0" stroke="#3a2418" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <circle cx="105" cy="57" r="4.5" fill="#f08a7e" opacity=".55"/>
+    <path d="M98 60q7 7 14 0" stroke="{{ c.beard ? '#f6efe3' : '#3a2418' }}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M62 38C58 4 122 2 118 38Z" fill="{{ c.hat }}"/>
+    <rect x="60" y="32" width="60" height="13" rx="6" fill="{{ c.band }}"/>
+    {% for k in 0..4 %}<circle cx="{{ 70 + k * 10 }}" cy="38.5" r="2.2" fill="{{ c.hat }}"/>{% endfor %}
+    <circle cx="90" cy="6" r="9" fill="#fff"/>
+    <g>
+        <animateTransform attributeName="transform" type="rotate" values="0 110 86;-7 110 86;0 110 86" dur="4.6s" begin="{{ c.begin }}" repeatCount="indefinite"/>
+        <path d="M108 86Q134 104 148 126" stroke="{{ c.sweater }}" stroke-width="22" stroke-linecap="round" fill="none"/>
+        <rect x="146" y="108" width="28" height="32" rx="6" fill="#f6efe3"/>
+        <rect x="146" y="118" width="28" height="7" fill="{{ c.mug }}"/>
+        <path d="M174 114a9 9 0 0 1 0 18" stroke="#f6efe3" stroke-width="5" fill="none"/>
+        <circle cx="148" cy="130" r="9" fill="{{ c.skin }}"/>
+        <path class="nw-steam" d="M156 102q-6-9 0-16t0-14" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path class="nw-steam nw-steam-2" d="M166 102q-6-9 0-16t0-14" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </g>
+</g>
+{% endmacro %}

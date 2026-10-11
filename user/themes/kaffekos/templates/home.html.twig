@@ -14,11 +14,12 @@
 {% block hero %}
 <section class="hero hero-fun"{% if hero_img %} style="--hero: url('{{ kk.imgurlfit(hero_img, 2400, 3200) }}'); --hero-y: {{ hero.focus ?: '40%' }}"{% endif %}>
     <div class="hero-shade"></div>
+    <div class="hm-hero-aurora" aria-hidden="true"><i></i><i></i></div>
     <span class="hm-chip hm-chip-1" aria-hidden="true"><b>Kaffe</b>{% if gloss %} coffee{% endif %}</span>
     <span class="hm-chip hm-chip-2" aria-hidden="true"><b>Kos</b>{% if gloss %} cosiness{% endif %}</span>
-    <span class="hm-chip hm-chip-3" aria-hidden="true"><b>Skål</b>{% if gloss %} cheers{% endif %}</span>
+    <span class="hm-chip hm-chip-3" aria-hidden="true">{{ kk.flag_no() }}<b>Skål</b>{% if gloss %} cheers{% endif %}</span>
     <div class="wrap hero-content">
-        {% if hero.eyebrow %}<p class="eyebrow eyebrow-light">{{ hero.eyebrow }}</p>{% endif %}
+        {% if hero.eyebrow %}<p class="eyebrow eyebrow-light hm-hero-eyebrow">{{ kk.flag_no() }}<span>{{ hero.eyebrow }}</span></p>{% endif %}
         {% set hw = (hero.title|default(page.title))|split(' ') %}
         <h1>{% if hw|length > 1 %}{{ hw|slice(0, -1)|join(' ') }} {% endif %}<em>{{ hw|last }}</em></h1>
         {% if hero.subtitle %}<p class="lead">{{ hero.subtitle }}</p>{% endif %}
@@ -97,13 +98,43 @@
                     {% set g = kk_google_rating() %}
                     <ul class="stats hm-stats">
                         {% for s in intro.stats %}
-                            {% if s.google and g %}
-                                <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ g.rating|number_format(1) }}★</strong><span>{{ (g.count == 1 ? 'KK.HOME.ON_GOOGLE_ONE' : 'KK.HOME.ON_GOOGLE')|t(g.count) }}</span></li>
+                            {% set look = s.google ? 'google' : (s.look ?: 'plain') %}
+                            {% if look == 'norway' %}
+                                <li class="hm-stat hm-stat-norway">{{ kk.flag_no() }}<span class="hm-stat-text"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></span></li>
+                            {% elseif look == 'lahore' %}
+                                <li class="hm-stat hm-stat-lahore"><span class="hm-stat-text"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></span>{{ kk.skyline_lahore() }}</li>
+                            {% elseif look == 'google' %}
+                                {% set raw = s.value|replace({'★': ''})|trim %}
+                                {% set rate = g ? g.rating : ((raw matches '/^[0-9]+([.][0-9]+)?$/') ? raw + 0 : 0) %}
+                                {% set glabel = g ? ((g.count == 1 ? 'KK.HOME.GOOGLE_REVIEWS_ONE' : 'KK.HOME.GOOGLE_REVIEWS')|t(g.count)) : s.label %}
+                                <li class="hm-stat hm-stat-google">
+                                    <a href="{{ theme_var('business.maps_url') ?: '#' }}" target="_blank" rel="noopener">
+                                        {{ kk.google_g(34) }}
+                                        <span class="hm-g-body">
+                                            <span class="hm-g-top"><strong>{{ rate ? rate|number_format(1) : raw }}</strong>{% if rate %}<span class="hm-g-stars" style="--pct: {{ (rate / 5 * 100)|round }}%" role="img" aria-label="{{ 'KK.HOME.GOOGLE_STARS_ARIA'|t(rate|number_format(1)) }}">★★★★★</span>{% endif %}</span>
+                                            <span class="hm-g-label">{{ glabel }}</span>
+                                        </span>
+                                        <span class="hm-g-cta">{{ 'KK.HOME.GOOGLE_SEE'|t }} {{ kk.icon('arrow', 16) }}</span>
+                                    </a>
+                                </li>
                             {% else %}
-                                <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
+                                <li class="hm-stat hm-stat-plain"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
                             {% endif %}
                         {% endfor %}
                     </ul>
+                    {% set review_url = kk_google_review_url() %}
+                    {% if review_url %}
+                        {% do assets.addJs('theme://js/qrcode.js', {group: 'bottom', loading: 'defer'}) %}
+                        <div class="hm-review">
+                            <div class="hm-qr" data-qr="{{ review_url }}" role="img" aria-label="{{ 'KK.HOME.REVIEW_ALT'|t }}"><span class="hm-qr-scan" aria-hidden="true"></span></div>
+                            <div class="hm-review-body">
+                                <p class="hm-review-title">{{ kk.google_g(22) }} {{ 'KK.HOME.REVIEW_TITLE'|t }}</p>
+                                <p class="hm-review-text hm-review-scan">{{ 'KK.HOME.REVIEW_SCAN'|t }}</p>
+                                <p class="hm-review-text hm-review-tap">{{ 'KK.HOME.REVIEW_TAP'|t }}</p>
+                                <a class="hm-review-btn" href="{{ review_url }}" target="_blank" rel="noopener"><span aria-hidden="true">★</span> {{ 'KK.HOME.REVIEW_BTN'|t }}</a>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -120,7 +151,7 @@
     {% set soon = soon|slice(0, up.count ?: 3) %}
     {% if soon|length %}
         {% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%', full: '50% 50%'} %}
-        {% set kinds = {upcoming: {label: 'KK.EVENTS.KIND_UPCOMING'|t, emoji: '🔥'}, event: {label: 'KK.EVENTS.KIND_EVENT'|t, emoji: '🎉'}, activity: {label: 'KK.EVENTS.KIND_ACTIVITY'|t, emoji: '🎲'}, news: {label: 'KK.EVENTS.KIND_NEWS'|t, emoji: '📣'}} %}
+        {% set kinds = {upcoming: {label: 'KK.EVENTS.KIND_UPCOMING'|t, emoji: '🔥'}, event: {label: 'KK.EVENTS.KIND_EVENT'|t, emoji: '🎉'}, activity: {label: 'KK.EVENTS.KIND_ACTIVITY'|t, emoji: '🎲'}, music: {label: 'KK.EVENTS.KIND_MUSIC'|t, emoji: '🎵'}, news: {label: 'KK.EVENTS.KIND_NEWS'|t, emoji: '📣'}} %}
         <section class="hm-soon" aria-labelledby="hm-soon-title">
             <span class="hm-soon-shape hm-soon-star s1" aria-hidden="true"></span>
             <span class="hm-soon-shape hm-soon-ring s2" aria-hidden="true"></span>
@@ -196,25 +227,39 @@
 {% if (cf.enabled is null or cf.enabled) and (cf.title or cf.text) %}
     {% set cf_img = cf.image ? page.media[cf.image] : null %}
     {% set cf_img2 = cf.image2 ? page.media[cf.image2] : null %}
-    <section class="section section-navy coffee">
+    <section class="section section-navy coffee hb">
         <div class="wrap coffee-grid">
             <div class="coffee-text">
                 {% if cf.eyebrow %}<p class="eyebrow eyebrow-light">{{ cf.eyebrow }}</p>{% endif %}
-                <h2>{{ cf.title }}</h2>
+                {% set cw = cf.title|split(' ') %}
+                <h2>{% if cw|length > 1 %}{{ cw|slice(0, -1)|join(' ') }} {% endif %}<em>{{ cw|last }}</em></h2>
                 <div class="prose">{{ cf.text|markdown(false)|raw }}</div>
                 {% if cf.facts %}
-                    <ul class="stats stats-light">
+                    <ul class="stats stats-light hb-facts">
                         {% for f in cf.facts %}<li><strong>{{ f.value }}</strong><span>{{ f.label }}</span></li>{% endfor %}
                     </ul>
                 {% endif %}
                 {% if cf.link_label %}
                     {% set cf_url = cf.link_url ?: '#' %}
-                    <a class="btn btn-ghost" href="{{ kk.href(cf_url) }}"{% if cf_url starts with 'http' %} target="_blank" rel="noopener"{% endif %}>{{ cf.link_label }} {{ kk.icon('arrow', 18) }}</a>
+                    <a class="btn btn-ghost hb-btn" href="{{ kk.href(cf_url) }}"{% if cf_url starts with 'http' %} target="_blank" rel="noopener"{% endif %}>{{ cf.link_label }} {{ kk.icon('arrow', 18) }}</a>
                 {% endif %}
             </div>
             {% if cf_img or cf_img2 %}
                 <div class="coffee-media">
-                    <div class="coffee-halo" aria-hidden="true"></div>
+                    <div class="coffee-halo" aria-hidden="true"><i></i></div>
+                    <svg class="hb-postmark" viewBox="0 0 250 160" aria-hidden="true" focusable="false">
+                        <defs><path id="hb-pm-path" d="M170,80 m-55,0 a55,55 0 1,1 110,0 a55,55 0 1,1 -110,0"/></defs>
+                        <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                            <circle cx="170" cy="80" r="66" stroke-width="3.5"/>
+                            <circle cx="170" cy="80" r="42" stroke-width="1.6"/>
+                            <path d="M6 52q10-9 20 0t20 0t20 0t20 0t20 0"/>
+                            <path d="M6 68q10-9 20 0t20 0t20 0t20 0t20 0"/>
+                            <path d="M6 84q10-9 20 0t20 0t20 0t20 0t20 0"/>
+                            <path d="M6 100q10-9 20 0t20 0t20 0t20 0t20 0"/>
+                        </g>
+                        <text fill="currentColor" font-family="'Courier New', Courier, monospace" font-weight="700" font-size="12.5"><textPath href="#hb-pm-path" textLength="338" lengthAdjust="spacing">TRIESTE · ITALIA · DAL 1892 · </textPath></text>
+                        <text x="170" y="87" text-anchor="middle" fill="currentColor" font-family="'Courier New', Courier, monospace" font-weight="700" font-size="21">1892</text>
+                    </svg>
                     <div class="coffee-products">
                         {{ kk.imgfit(cf_img, 640, 760, 'KK.HOME.ALT_GOURMET'|t, 'product product-main') }}
                         {{ kk.imgfit(cf_img2, 560, 760, 'KK.HOME.ALT_SUBLIME'|t, 'product product-second') }}
@@ -230,17 +275,29 @@
 {% set hl = header.highlights ?? {} %}
 {% if (hl.enabled is null or hl.enabled) and hl.items %}
     <section class="section hm-features">
+        <span class="hm-deco hm-deco-1" aria-hidden="true">{{ kk.icon('bean', 90) }}</span>
+        <span class="hm-deco hm-deco-2" aria-hidden="true">{{ kk.icon('cup', 96) }}</span>
+        <span class="hm-deco hm-deco-3" aria-hidden="true">{{ kk.icon('bun', 84) }}</span>
+        <span class="hm-deco hm-deco-4" aria-hidden="true">{{ kk.icon('heart', 72) }}</span>
         <div class="wrap">
-            {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.HOME.WHY'|t, title: hl.title, subtitle: hl.subtitle} %}
-            <div class="features hm-cards">
-                {% set tones = ['coral', 'lagoon', 'plum', 'navy'] %}
-                {% for f in hl.items %}
-                    <div class="feature hm-card hm-card--{{ tones[loop.index0 % 4] }}" data-n="{{ '%02d'|format(loop.index) }}">
-                        <div class="feature-icon">{{ kk.icon(f.icon ?: 'cup', 30) }}</div>
-                        <h3>{{ f.title }}</h3>
-                        <p>{{ f.text }}</p>
-                    </div>
-                {% endfor %}
+            {% set hw = (hl.title ?: '')|split(' ') %}
+            {% set hn = hw|length > 2 ? 2 : 1 %}
+            <div class="section-head">
+                <p class="eyebrow">{{ 'KK.HOME.WHY'|t }}</p>
+                {% if hl.title %}<h2>{% if hw|length > hn %}{{ hw|slice(0, -hn)|join(' ') }} {% endif %}<mark>{{ hw|slice(-hn)|join(' ') }}</mark></h2>{% endif %}
+                {% if hl.subtitle %}<p class="lead">{{ hl.subtitle }}</p>{% endif %}
+            </div>
+            <div class="hm-cards-wrap">
+                <div class="features hm-cards">
+                    {% set tones = ['coral', 'lagoon', 'plum', 'navy'] %}
+                    {% for f in hl.items %}
+                        <div class="feature hm-card hm-card--{{ tones[loop.index0 % 4] }}" data-n="{{ '%02d'|format(loop.index) }}" style="--i: {{ loop.index0 }}">
+                            <div class="feature-icon">{{ kk.icon(f.icon ?: 'cup', 30) }}</div>
+                            <h3>{{ f.title }}</h3>
+                            <p>{{ f.text }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </section>
@@ -253,14 +310,47 @@
     {% set picks = kk_featured_items(menu_page, ft.limit ?: 6) %}
     {% if picks %}
         <section class="section hm-favs">
+            {# Norwegian flavour: northern-lights glow, 17 May bunting, fjord with a red cabin (snow falls only in the "kos" scene below) #}
+            <div class="nw-aurora" aria-hidden="true"><i></i><i></i></div>
+            <div class="nw-bunting" aria-hidden="true">
+                <svg viewBox="0 0 1000 70" preserveAspectRatio="none" focusable="false"><path d="M0 2 Q166.67 54 333.33 2 Q500 54 666.67 2 Q833.33 54 1000 2" fill="none" vector-effect="non-scaling-stroke"/></svg>
+                {% for j in 0..20 %}
+                    {% set u = ((j % 7) + 0.5) / 7 %}
+                    <i class="nw-flag nw-flag-{{ j % 3 }}" style="left: {{ ((j + 0.5) / 21 * 100)|round(2) }}%; top: {{ (2 + 26 * 4 * u * (1 - u))|round(1) }}px; --d: {{ (j * -0.37)|round(2) }}s"></i>
+                {% endfor %}
+            </div>
+            <div class="nw-fjord" aria-hidden="true">
+                <svg viewBox="0 0 1440 160" preserveAspectRatio="none" focusable="false">
+                    <path class="far" d="M0 110L120 70L210 100L340 40L470 95L560 60L700 105L840 50L960 92L1100 58L1230 98L1340 66L1440 100V160H0Z"/>
+                    <path class="caps" d="M322 56L340 40L358 56L346 52L340 58L334 52ZM822 66L840 50L858 66L846 62L840 68L834 62ZM544 74L560 60L576 74L566 70L560 76L554 70ZM1082 72L1100 58L1118 72L1106 68L1100 74L1094 68Z"/>
+                    <path class="mid" d="M0 130L90 98L200 128L330 84L450 126L600 92L720 130L880 80L1010 126L1150 96L1290 132L1440 108V160H0Z"/>
+                    <path class="near" d="M0 150C200 120 380 150 560 138S980 118 1180 140S1380 140 1440 132V160H0Z"/>
+                </svg>
+                <svg class="nw-cabin" viewBox="0 0 120 72" focusable="false">
+                    <path d="M12 68L22 42H17L26 22H21L30 4L39 22H34L43 42H38L48 68Z" fill="#2f5d62"/>
+                    <path d="M0 68L8 50H4L11 34H8L14 20L20 34H17L24 50H20L28 68Z" fill="#3b7076" opacity=".85"/>
+                    <rect x="92" y="22" width="6" height="14" fill="#6b3b32"/>
+                    <rect x="58" y="42" width="46" height="26" fill="#ba0c2f"/>
+                    <path d="M53 43L81 23L109 43Z" fill="#3e2420"/>
+                    <rect x="65" y="52" width="8" height="16" fill="#f6efe3"/>
+                    <rect x="84" y="50" width="11" height="10" fill="#ffe9a8" stroke="#f6efe3" stroke-width="1.5"/>
+                    <circle class="smoke s1" cx="95" cy="18" r="3.4"/><circle class="smoke s2" cx="95" cy="18" r="3.4"/><circle class="smoke s3" cx="95" cy="18" r="3.4"/>
+                </svg>
+            </div>
             <div class="wrap">
-                {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.HOME.KITCHEN'|t, title: ft.title, subtitle: ft.subtitle} %}
+                {% set fw = (ft.title ?: '')|split(' ') %}
+                {% set fn = fw|length > 2 ? 2 : 1 %}
+                <div class="section-head">
+                    <p class="eyebrow nw-eyebrow">{{ kk.flag_no() }} {{ 'KK.HOME.KITCHEN'|t }}</p>
+                    {% if ft.title %}<h2>{% if fw|length > fn %}{{ fw|slice(0, -fn)|join(' ') }} {% endif %}<mark>{{ fw|slice(-fn)|join(' ') }}</mark></h2>{% endif %}
+                    {% if ft.subtitle %}<p class="lead">{{ ft.subtitle }}</p>{% endif %}
+                </div>
                 <div class="menu-grid hm-fav-grid">
                     {% for pick in picks %}
                         {% include 'partials/menu-item.html.twig' with {item: pick.item, image: pick.image, currency: theme_var('menu.currency'), show_image: true, card: true, show_price: (ft.show_prices ? true : false)} %}
                     {% endfor %}
                 </div>
-                <p class="center"><a class="btn btn-primary btn-lg" href="{{ menu_page.url }}">{{ ft.button_label ?: 'KK.HOME.FULL_MENU'|t }}</a></p>
+                <p class="center"><a class="btn btn-primary btn-lg" href="{{ menu_page.url }}">{{ ft.button_label ?: 'KK.HOME.FULL_MENU'|t }} {{ kk.icon('arrow', 20) }}</a></p>
             </div>
         </section>
     {% endif %}
@@ -272,10 +362,40 @@
     {% set q_img = q.image ? page.media[q.image] : null %}
     <section class="kos hm-kos"{% if q_img %} style="--kos-bg: url('{{ kk.imgurlfit(q_img, 2000, 2000) }}')"{% endif %}>
         <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
+        <div class="nw-snowfall kos-snow" aria-hidden="true">
+            {% for j in 0..17 %}<i class="nw-snow" style="left: {{ (j * 5.6 + 3)|round }}%; --s: {{ 10 + (j * 7) % 14 }}px; --t: {{ 14 + (j * 3) % 8 }}s; --d: {{ -((j * 5) % 13) }}s; --x: {{ ((j % 2) * 2 - 1) * (20 + (j * 7) % 30) }}px"></i>{% endfor %}
+        </div>
+        <div class="kos-lights" aria-hidden="true">
+            <svg viewBox="0 0 1000 60" preserveAspectRatio="none" focusable="false"><path d="M0 4 Q125 50 250 4 Q375 50 500 4 Q625 50 750 4 Q875 50 1000 4" fill="none" vector-effect="non-scaling-stroke"/></svg>
+            {% for j in 0..23 %}
+                {% set u = ((j % 6) + 0.5) / 6 %}
+                <i class="kos-bulb kos-bulb-{{ j % 4 }}" style="left: {{ ((j + 0.5) / 24 * 100)|round(2) }}%; top: {{ (4 + 23 * 4 * u * (1 - u))|round(1) }}px; --d: {{ (j * -0.53)|round(2) }}s"></i>
+            {% endfor %}
+        </div>
         <div class="wrap kos-inner">
             <p class="kos-word">{{ q.word }}</p>
             {% if q.pronunciation %}<p class="kos-pron">{{ q.pronunciation }}</p>{% endif %}
             <p class="kos-text">{{ q.text }}</p>
+            <div class="kos-scene" aria-hidden="true">
+                <div class="kos-hearth"></div>
+                <svg viewBox="0 0 640 250" focusable="false">
+                    <ellipse cx="320" cy="241" rx="300" ry="12" fill="#7a2b3a" opacity=".7"/>
+                    <ellipse cx="320" cy="241" rx="262" ry="8" fill="none" stroke="#f6efe3" stroke-width="2" stroke-dasharray="7 9" opacity=".55"/>
+                    <g transform="translate(60 0)">{{ kk.kos_person({sweater: '#ba0c2f', hat: '#00205b', band: '#f6efe3', hair: '#e6c46c', skin: '#f3cfae', mug: '#ba0c2f', pants: '#5b5f94', begin: '0s', braids: true, beard: false}) }}</g>
+                    <g transform="translate(640 0) scale(-1 1) translate(60 0)">{{ kk.kos_person({sweater: '#2f6aa8', hat: '#ba0c2f', band: '#f6efe3', hair: '#a8622e', skin: '#eec1a0', mug: '#00205b', pants: '#5b5f94', begin: '-2.3s', braids: false, beard: true}) }}</g>
+                    <rect x="316" y="186" width="8" height="48" fill="#7a4f36"/>
+                    <ellipse cx="320" cy="236" rx="30" ry="6" fill="#7a4f36"/>
+                    <ellipse cx="320" cy="182" rx="66" ry="12" fill="#6e4630"/>
+                    <ellipse cx="320" cy="177" rx="66" ry="12" fill="#a5714c"/>
+                    <ellipse cx="288" cy="173" rx="22" ry="5" fill="#f6efe3"/>
+                    <ellipse cx="288" cy="166" rx="15" ry="9" fill="#c98b54"/>
+                    <path d="M279 166a9 5 0 0 1 18 0M283 166a5 3 0 0 1 10 0" stroke="#8a5430" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <rect x="338" y="148" width="14" height="26" rx="2" fill="#f6efe3"/>
+                    <path class="nw-flame" d="M345 146c-6-6-3-14 0-19c3 5 6 13 0 19Z" fill="#ffcf5a"/>
+                    <path class="nw-flame nw-flame-in" d="M345 145c-3-3-1-8 0-10c1 2 3 7 0 10Z" fill="#fff4cf"/>
+                    <g class="nw-hearts" fill="#ff7b6b"><path class="nw-heart" d="M0 0c-4-6-12-2-8 5c3 5 8 8 8 8s5-3 8-8c4-7-4-11-8-5Z" transform="translate(312 120)"/><path class="nw-heart nw-heart-2" d="M0 0c-4-6-12-2-8 5c3 5 8 8 8 8s5-3 8-8c4-7-4-11-8-5Z" transform="translate(328 110)"/><path class="nw-heart nw-heart-3" d="M0 0c-4-6-12-2-8 5c3 5 8 8 8 8s5-3 8-8c4-7-4-11-8-5Z" transform="translate(320 100)"/></g>
+                </svg>
+            </div>
         </div>
         <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
     </section>
@@ -298,6 +418,22 @@
                     {% endfor %}
                 </div>
                 <p class="center"><a class="btn btn-primary btn-lg" href="{{ gpage.url }}">{{ 'KK.HOME.VIEW_GALLERY'|t }}</a></p>
+                {% set ig = theme_var('social.instagram') %}
+                {% if ig %}
+                    {% do assets.addJs('theme://js/qrcode.js', {group: 'bottom', loading: 'defer'}) %}
+                    <div class="hm-follow">
+                        <div class="hm-follow-qrwrap">
+                            <div class="hm-qr hm-follow-qr" data-qr="{{ ig }}" role="img" aria-label="{{ 'KK.HOME.IG_ALT'|t }}"><span class="hm-qr-scan" aria-hidden="true"></span></div>
+                            <span class="hm-follow-badge" aria-hidden="true">{{ kk.icon('instagram', 20) }}</span>
+                        </div>
+                        <div class="hm-follow-body">
+                            <p class="hm-follow-kicker"><span class="hm-follow-scan">{{ 'KK.HOME.IG_SCAN'|t }}</span><span class="hm-follow-tap">{{ 'KK.HOME.IG_TAP'|t }}</span></p>
+                            <p class="hm-follow-title">{{ 'KK.HOME.IG_TITLE'|t }} <b>@{{ ig|trim('/')|split('/')|last }}</b></p>
+                            <p class="hm-follow-text">{{ 'KK.HOME.IG_TEXT'|t }}</p>
+                            <a class="hm-follow-btn" href="{{ ig }}" target="_blank" rel="noopener">{{ kk.icon('instagram', 18) }} {{ 'KK.HOME.IG_BTN'|t }}</a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </section>
     {% endif %}

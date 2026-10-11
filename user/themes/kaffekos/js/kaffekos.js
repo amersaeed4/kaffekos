@@ -132,6 +132,24 @@
         setInterval(evTick, 30000);
     }
 
+    /* ---------- Home: QR code that opens Google's "write a review" form (drawn here from the link in data-qr) ---------- */
+    var qrBoxes = $$('[data-qr]');
+    if (qrBoxes.length && window.qrcode) {
+        qrBoxes.forEach(function (box) {
+            try {
+                var qr = window.qrcode(0, 'M');
+                qr.addData(box.getAttribute('data-qr'));
+                qr.make();
+                box.insertAdjacentHTML('afterbegin', qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true }));
+            } catch (e) { box.hidden = true; }
+        });
+    }
+
+    /* ---------- reduced motion: also stop the SVG (SMIL) animations in the "kos" scene ---------- */
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        $$('.kos-scene svg').forEach(function (svg) { if (svg.pauseAnimations) svg.pauseAnimations(); });
+    }
+
     /* ---------- scroll reveal (only below-the-fold items) ---------- */
     if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         var io = new IntersectionObserver(function (entries) {

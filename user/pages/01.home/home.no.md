@@ -23,9 +23,11 @@ intro:
     stats:
         -
             value: Norge
+            look: norway
             label: 'vår inspirasjon'
         -
             value: Lahore
+            look: lahore
             label: 'vårt hjem'
         -
             value: 4.8★

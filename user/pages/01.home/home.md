@@ -23,13 +23,15 @@ intro:
     stats:
         -
             value: Norway
+            look: norway
             label: 'our inspiration'
         -
             value: Lahore
+            look: lahore
             label: 'our home'
         -
             value: 4.8★
-            label: 'on Google (88 reviews)'
+            label: 'on Google (112 reviews)'
             google: true
 coffee:
     enabled: true

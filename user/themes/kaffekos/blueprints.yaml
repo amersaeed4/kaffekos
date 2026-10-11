@@ -211,6 +211,15 @@ form:
               title: Live Google rating on the Home page
               text: 'The rating and review count come from Google automatically. The API key and Place ID are kept out of the admin on purpose, in the file user/config/google-places.yaml on the server. If Google can''t be reached, the last good number (or the numbers typed on the Home page) are shown.'
 
+            google.review_url:
+              type: text
+              label: Review link (optional)
+              placeholder: 'https://search.google.com/local/writereview?placeid=...'
+              validate:
+                pattern: '^(https://.*)?$'
+                message: 'The link must start with https://'
+              help: 'Where the QR code and the "Write a review" button on the Home page lead. Leave empty to use Google''s official review link, built automatically from the Place ID.'
+
             google.refresh_hours:
               type: number
               label: Refresh every (hours)
