@@ -4,7 +4,7 @@
 <section class="section">
     <div class="wrap wrap-menu">
         {% include 'partials/menu-section.html.twig' with {cat: page, currency: theme_var('menu.currency'), show_images: true} %}
-        <p class="center"><a class="btn btn-outline" href="{{ page.parent.url }}">&larr; Back to the full menu</a></p>
+        <p class="center"><a class="btn btn-outline" href="{{ page.parent.url }}">&larr; {{ 'KK.MENU.BACK'|t }}</a></p>
     </div>
 </section>
 {% endblock %}

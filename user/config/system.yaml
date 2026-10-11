@@ -19,3 +19,12 @@ gpm:
 updates:
   safe_upgrade: true
   safe_upgrade_snapshot_limit: 5
+languages:
+  supported:
+    - en
+    - 'no'
+  default_lang: en
+  include_default_lang: false
+  include_default_lang_file_extension: false
+  http_accept_language: false
+  session_store_active: false

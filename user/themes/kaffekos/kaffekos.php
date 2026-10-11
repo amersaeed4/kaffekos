@@ -35,6 +35,101 @@ class Kaffekos extends Theme
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_google_rating', [$this, 'googleRating']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_event_posts', [$this, 'eventPosts']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_is_expired', [self::class, 'isExpiredAnnouncement']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_lang', [$this, 'activeLang']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_lang_urls', [$this, 'languageUrls']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_lang_prefix', [$this, 'langPrefix']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_date', [$this, 'localDate']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_l', [$this, 'localized']));
+    }
+
+    /** Language of the current request, e.g. "en" or "no". */
+    public function activeLang(): string
+    {
+        $language = $this->grav['language'];
+        return $language->getActive() ?: (string)$language->getDefault();
+    }
+
+    /** "" for the default language, "/no" for the others: put it in front of an internal route. */
+    public function langPrefix(): string
+    {
+        $lang = $this->activeLang();
+        return $lang === (string)$this->grav['language']->getDefault() ? '' : '/' . $lang;
+    }
+
+    /**
+     * Addresses of the current page in every supported language, for the language switcher and hreflang links.
+     *
+     * @return array<string, string> language code => path (with the site's base folder), or full address when $absolute
+     */
+    public function languageUrls(bool $absolute = false): array
+    {
+        $language = $this->grav['language'];
+        $default  = (string)$language->getDefault();
+        $root     = rtrim($this->grav['uri']->rootUrl($absolute), '/');
+        $path     = '/' . trim((string)$this->grav['uri']->path(), '/');
+        $path     = $path === '/' ? '' : $path;
+        $out      = [];
+        foreach ($language->getLanguages() as $code) {
+            $isDefault  = $code === $default;
+            $out[$code] = $root . ($isDefault ? '' : '/' . $code) . $path;
+            if ($isDefault && $path === '') {
+                $out[$code] .= '/'; // the default-language home page ends in a slash, like its canonical address
+            }
+        }
+        return $out;
+    }
+
+    /** Like Twig's date(), but month and day names come out in the active language (theme language file). */
+    public function localDate($timestamp, string $format): string
+    {
+        $timestamp = is_numeric($timestamp) ? (int)$timestamp : (int)strtotime((string)$timestamp);
+        if ($this->activeLang() === (string)$this->grav['language']->getDefault()) {
+            return date($format, $timestamp);
+        }
+        $lang  = $this->grav['language'];
+        $names = function (string $key) use ($lang): array {
+            return array_map('trim', explode(',', (string)$lang->translate($key)));
+        };
+        $months = $names('KK.DATE.MONTHS');
+        $mshort = $names('KK.DATE.MONTHS_SHORT');
+        $days   = $names('KK.DATE.DAYS');
+        $dshort = $names('KK.DATE.DAYS_SHORT');
+
+        $out = '';
+        for ($i = 0, $n = strlen($format); $i < $n; $i++) {
+            $c = $format[$i];
+            if ($c === '\\' && $i + 1 < $n) {
+                $out .= $format[++$i];
+            } elseif ($c === 'F' && count($months) === 12) {
+                $out .= $months[(int)date('n', $timestamp) - 1];
+            } elseif ($c === 'M' && count($mshort) === 12) {
+                $out .= $mshort[(int)date('n', $timestamp) - 1];
+            } elseif ($c === 'l' && count($days) === 7) {
+                $out .= $days[(int)date('N', $timestamp) - 1];
+            } elseif ($c === 'D' && count($dshort) === 7) {
+                $out .= $dshort[(int)date('N', $timestamp) - 1];
+            } else {
+                $out .= date($c, $timestamp);
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * A theme setting in the visitor's language. Each translatable setting has an optional twin with a
+     * language suffix (footer.about, footer.about_no). The twin wins when it is filled in, otherwise the main one is used.
+     */
+    public function localized(string $path)
+    {
+        $config = $this->grav['config'];
+        $lang   = $this->activeLang();
+        if ($lang !== (string)$this->grav['language']->getDefault()) {
+            $twin = $config->get('themes.kaffekos.' . $path . '_' . $lang);
+            if (is_string($twin) && trim($twin) !== '') {
+                return $twin;
+            }
+        }
+        return $config->get('themes.kaffekos.' . $path);
     }
 
     /**
@@ -84,7 +179,7 @@ class Kaffekos extends Theme
         $page = $this->grav['page'] ?? null;
         if ($page && $page->template() === 'blog-item' && self::isExpiredAnnouncement($page)) {
             $parent = $page->parent();
-            $this->grav->redirect($parent ? $parent->route() : '/');
+            $this->grav->redirectLangSafe($parent ? $parent->route() : '/');
         }
     }
 

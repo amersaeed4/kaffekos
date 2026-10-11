@@ -8,9 +8,9 @@
         {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
         <label class="menu-search">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            <input type="search" id="menu-search" placeholder="Search the menu: latte, matcha, mocha…" autocomplete="off" aria-label="Search the menu">
+            <input type="search" id="menu-search" placeholder="{{ 'KK.MENU.SEARCH_PH'|t }}" autocomplete="off" aria-label="{{ 'KK.MENU.SEARCH'|t }}">
         </label>
-        <div class="menu-controls" id="menu-controls" role="group" aria-label="Menu filters"></div>
+        <div class="menu-controls" id="menu-controls" role="group" aria-label="{{ 'KK.MENU.FILTERS'|t }}"></div>
     </div>
     <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
 </section>
@@ -27,12 +27,12 @@
     {# group the categories by their "Menu section" (Drinks, Sandwiches, ...) in page order #}
     {% set groups = {} %}
     {% for cat in cats %}
-        {% set g = cat.header.group ?: 'Menu' %}
+        {% set g = cat.header.group ?: 'KK.MENU.DEFAULT_GROUP'|t %}
         {% set groups = groups|merge({(g): (groups[g] ?? [])|merge([cat])}) %}
     {% endfor %}
 
     {% if cats|length > 1 %}
-        <nav class="menu-tabs" aria-label="Menu categories">
+        <nav class="menu-tabs" aria-label="{{ 'KK.MENU.CATEGORIES'|t }}">
             <div class="wrap">
                 {% for g, list in groups %}{% for cat in list %}<a href="#{{ cat.slug }}" class="tab-{{ cat.header.tone ?: 'blue' }}" data-group="{{ g|lower|replace({' ': '-'}) }}">{{ cat.title }}</a>{% endfor %}{% endfor %}
             </div>
@@ -43,7 +43,7 @@
         {% for g, list in groups %}
             {% set gslug = g|lower|replace({' ': '-'}) %}
             <div class="menu-group" data-group="{{ gslug }}" data-group-label="{{ g }}">
-                {% if groups|length > 1 %}<h2 class="menu-group-title"><span>{{ g }} Menu</span></h2>{% endif %}
+                {% if groups|length > 1 %}<h2 class="menu-group-title"><span>{{ 'KK.MENU.GROUP_TITLE'|t(g) }}</span></h2>{% endif %}
                 <div class="menu-blocks">
                     {% for cat in list %}
                         {% include 'partials/menu-section.html.twig' with {cat: cat, currency: theme_var('menu.currency'), show_images: show_images, show_prices: show_prices} %}
@@ -51,20 +51,20 @@
                     {% if list|length is odd and list|length > 1 %}
                         <aside class="menu-block menu-filler" aria-hidden="true">
                             <img src="{{ url('theme://images/menu/chef.png') }}" alt="" loading="lazy">
-                            <p>Coffee. Comfort. Connection.</p>
+                            <p>{{ 'KK.MENU.FILLER'|t }}</p>
                         </aside>
                     {% endif %}
                 </div>
             </div>
         {% else %}
-            <p class="center">The menu is being prepared. Please check back soon.</p>
+            <p class="center">{{ 'KK.MENU.PREPARING'|t }}</p>
         {% endfor %}
-        <p class="menu-empty" id="menu-empty" hidden>Nothing matches your search. Try another word.</p>
+        <p class="menu-empty" id="menu-empty" hidden>{{ 'KK.MENU.NO_MATCH'|t }}</p>
 
         <div class="menu-closing">
             <img src="{{ url('theme://images/menu/norway.png') }}" alt="" loading="lazy">
             <div>
-                <p class="menu-closing-title">Made with kos.</p>
+                <p class="menu-closing-title">{{ 'KK.MENU.MADE_WITH'|t }}</p>
                 {% if header.menu_options.note %}<p>{{ header.menu_options.note }}</p>{% endif %}
             </div>
         </div>

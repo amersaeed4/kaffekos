@@ -3,12 +3,12 @@
 {% block body_class %}page-events{% endblock %}
 
 {% set kinds = {
-    upcoming: {label: 'Upcoming', emoji: '🔥'},
-    event:    {label: 'Event',    emoji: '🎉'},
-    activity: {label: 'Activity', emoji: '🎲'},
-    news:     {label: 'News',     emoji: '📣'}
+    upcoming: {label: 'KK.EVENTS.KIND_UPCOMING'|t, emoji: '🔥'},
+    event:    {label: 'KK.EVENTS.KIND_EVENT'|t,    emoji: '🎉'},
+    activity: {label: 'KK.EVENTS.KIND_ACTIVITY'|t, emoji: '🎲'},
+    news:     {label: 'KK.EVENTS.KIND_NEWS'|t,     emoji: '📣'}
 } %}
-{% set ribbon = ['events', 'activities', 'good company', 'coffee o’clock', 'bring a friend', 'pure kos', 'good vibes only'] %}
+{% set ribbon = ('KK.EVENTS.RIBBON'|t)|split(',')|map(w => w|trim) %}
 
 {% block hero %}
 {% set live_posts = kk_event_posts(page) %}
@@ -20,7 +20,7 @@
     <span class="ev-shape ev-star s3" aria-hidden="true"></span>
     <span class="ev-shape ev-blob s4" aria-hidden="true"></span>
 
-    {% if soon_count %}<span class="ev-chip ev-chip-1" aria-hidden="true">🔥 <b>{{ soon_count }}</b> coming up</span>{% else %}<span class="ev-chip ev-chip-1" aria-hidden="true">📅 <b>{{ total }}</b> {{ total == 1 ? 'post' : 'posts' }}</span>{% endif %}
+    {% if soon_count %}<span class="ev-chip ev-chip-1" aria-hidden="true">🔥 <b>{{ soon_count }}</b> {{ 'KK.EVENTS.CHIP_SOON'|t }}</span>{% else %}<span class="ev-chip ev-chip-1" aria-hidden="true">📅 <b>{{ total }}</b> {{ (total == 1 ? 'KK.EVENTS.POST' : 'KK.EVENTS.POSTS')|t }}</span>{% endif %}
     <span class="ev-chip ev-chip-2" aria-hidden="true">☕ <b>100%</b> kos</span>
 
     <div class="wrap">
@@ -54,17 +54,17 @@
 <section class="ev-stage">
     <div class="wrap">
         <header class="ev-head">
-            <h2>What’s <mark>on</mark> 🎉</h2>
+            <h2>{{ 'KK.EVENTS.HEAD'|t|raw }}</h2>
             {% if page.content|striptags|trim %}
                 <div class="prose">{{ page.content|raw }}</div>
             {% else %}
-                <p>Events, activities and news from the café. New things get added all the time, so check back often.</p>
+                <p>{{ 'KK.EVENTS.INTRO'|t }}</p>
             {% endif %}
         </header>
 
         {% if posts|length > 2 and kinds|filter((v, key) => key in used)|length > 1 %}
-        <div class="ev-filters" role="toolbar" aria-label="Filter posts">
-            <button type="button" class="ev-fchip is-on" data-ev-filter="all" style="--c: var(--ev-saffron)" aria-pressed="true">🌈 All</button>
+        <div class="ev-filters" role="toolbar" aria-label="{{ 'KK.EVENTS.FILTER'|t }}">
+            <button type="button" class="ev-fchip is-on" data-ev-filter="all" style="--c: var(--ev-saffron)" aria-pressed="true">🌈 {{ 'KK.ALL'|t }}</button>
             {% for key, k in kinds %}{% if key in used %}
                 <button type="button" class="ev-fchip" data-ev-filter="{{ key }}" style="--c: var(--ev-{{ {upcoming: 'leaf', event: 'coral', activity: 'lagoon', news: 'plum'}[key] }})" aria-pressed="false">{{ k.emoji }} {{ k.label }}</button>
             {% endif %}{% endfor %}
@@ -73,8 +73,8 @@
 
         <div class="ev-grid" data-events>
             {% for post in posts %}
-                {% if loop.first and soon|length %}<h3 class="ev-group-title ev-group-soon" data-ev-group><span>🔥 Coming up</span></h3>{% endif %}
-                {% if post.date < today and loop.index0 == soon|length %}<h3 class="ev-group-title" data-ev-group><span>📸 {{ soon|length ? 'Happened' : 'Looking back' }}</span></h3>{% endif %}
+                {% if loop.first and soon|length %}<h3 class="ev-group-title ev-group-soon" data-ev-group><span>🔥 {{ 'KK.EVENTS.COMING_UP'|t }}</span></h3>{% endif %}
+                {% if post.date < today and loop.index0 == soon|length %}<h3 class="ev-group-title" data-ev-group><span>📸 {{ (soon|length ? 'KK.EVENTS.HAPPENED' : 'KK.EVENTS.LOOKING_BACK')|t }}</span></h3>{% endif %}
                 {% set kind = post.header.kind ?: 'news' %}
                 {% set k = kinds[kind]|default(kinds.news) %}
                 {% set cover = post.header.cover ? post.media[post.header.cover] : null %}
@@ -85,13 +85,13 @@
                 <article class="ev-card{{ feature ? ' is-feature' : '' }}{{ poster ? ' is-poster' : '' }}{{ post.date >= today ? ' is-soon' : '' }}" data-kind="{{ kind }}"{% if post.header.cover_focus and focus[post.header.cover_focus] %} style="--focus: {{ focus[post.header.cover_focus] }}"{% endif %}>
                     <a class="ev-cover" href="{{ post.url }}" tabindex="-1" aria-hidden="true">
                         {% if cover %}{{ kk.imgfit(cover, 1000, 1000, post.title) }}{% else %}<span class="ev-cover-empty">{{ k.emoji }}</span>{% endif %}
-                        <span class="ev-date"><b>{{ post.date|date('d') }}</b><i>{{ post.date|date('M') }}</i></span>
-                        {% if upcoming %}<span class="ev-soon">Coming up</span>{% elseif is_today %}<span class="ev-soon">Today</span>{% endif %}
+                        <span class="ev-date"><b>{{ post.date|date('d') }}</b><i>{{ kk_date(post.date, 'M') }}</i></span>
+                        {% if upcoming %}<span class="ev-soon">{{ 'KK.EVENTS.COMING_UP'|t }}</span>{% elseif is_today %}<span class="ev-soon">{{ 'KK.EVENTS.TODAY'|t }}</span>{% endif %}
                     </a>
                     <div class="ev-body">
                         <p class="ev-tags">
                             <span class="ev-tag">{{ k.emoji }} {{ k.label }}</span>
-                            <time datetime="{{ post.date|date('Y-m-d') }}">{{ post.date|date('j F Y') }}</time>
+                            <time datetime="{{ post.date|date('Y-m-d') }}">{{ kk_date(post.date, 'KK.DATE.LONG'|t) }}</time>
                         </p>
                         <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
                         {% if post.header.when or post.header.where %}
@@ -101,14 +101,14 @@
                             </ul>
                         {% endif %}
                         <p class="ev-sum">{{ post.header.summary ?: post.summary|striptags }}</p>
-                        <a class="ev-more" href="{{ post.url }}">Read more {{ kk.icon('arrow', 18) }}</a>
+                        <a class="ev-more" href="{{ post.url }}">{{ 'KK.EVENTS.READ_MORE'|t }} {{ kk.icon('arrow', 18) }}</a>
                     </div>
                 </article>
             {% else %}
                 <div class="ev-none">
                     <span aria-hidden="true">🗓️</span>
-                    <h3>Nothing on the calendar yet</h3>
-                    <p>We’re cooking up something good. Follow us on Instagram to be the first to know.</p>
+                    <h3>{{ 'KK.EVENTS.NONE_TITLE'|t }}</h3>
+                    <p>{{ 'KK.EVENTS.NONE_TEXT'|t }}</p>
                 </div>
             {% endfor %}
         </div>
@@ -119,11 +119,11 @@
     <div class="wrap">
         <div class="ev-cta-card">
             <span class="ev-cta-emoji" aria-hidden="true">🔔</span>
-            <h2>Don’t miss out</h2>
-            <p>New events and activities land here first, and on Instagram. Got an idea for something we should host? Tell us.</p>
+            <h2>{{ 'KK.EVENTS.CTA_TITLE'|t }}</h2>
+            <p>{{ 'KK.EVENTS.CTA_TEXT'|t }}</p>
             <div class="ev-cta-actions">
-                {% if social.instagram %}<a class="ev-btn" href="{{ social.instagram }}" target="_blank" rel="noopener">{{ kk.icon('instagram', 20) }} Follow on Instagram</a>{% endif %}
-                <a class="ev-btn ev-btn-alt" href="{{ url('/contact') }}">💬 Get in touch</a>
+                {% if social.instagram %}<a class="ev-btn" href="{{ social.instagram }}" target="_blank" rel="noopener">{{ kk.icon('instagram', 20) }} {{ 'KK.EVENTS.FOLLOW'|t }}</a>{% endif %}
+                <a class="ev-btn ev-btn-alt" href="{{ url('/contact') }}">💬 {{ 'KK.EVENTS.CONTACT'|t }}</a>
             </div>
         </div>
     </div>

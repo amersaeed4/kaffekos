@@ -5,6 +5,8 @@
 {% set hero_img = hero.image ? page.media[hero.image] : null %}
 
 {% block body_class %}is-home page-home{% endblock %}
+{# the little Norwegian word chips explain themselves in English; in Norwegian they stand alone #}
+{% set gloss = 'KK.GLOSS'|t == 'show' %}
 
 {% block og_image %}{% if hero_img %}<meta property="og:image" content="{{ url(kk.imgurl(hero_img, 1200, 630), true) }}">
 <meta name="twitter:image" content="{{ url(kk.imgurl(hero_img, 1200, 630), true) }}">{% else %}{{ parent() }}{% endif %}{% endblock %}
@@ -12,9 +14,9 @@
 {% block hero %}
 <section class="hero hero-fun"{% if hero_img %} style="--hero: url('{{ kk.imgurlfit(hero_img, 2400, 3200) }}'); --hero-y: {{ hero.focus ?: '40%' }}"{% endif %}>
     <div class="hero-shade"></div>
-    <span class="hm-chip hm-chip-1" aria-hidden="true"><b>Kaffe</b> coffee</span>
-    <span class="hm-chip hm-chip-2" aria-hidden="true"><b>Kos</b> cosiness</span>
-    <span class="hm-chip hm-chip-3" aria-hidden="true"><b>Skål</b> cheers</span>
+    <span class="hm-chip hm-chip-1" aria-hidden="true"><b>Kaffe</b>{% if gloss %} coffee{% endif %}</span>
+    <span class="hm-chip hm-chip-2" aria-hidden="true"><b>Kos</b>{% if gloss %} cosiness{% endif %}</span>
+    <span class="hm-chip hm-chip-3" aria-hidden="true"><b>Skål</b>{% if gloss %} cheers{% endif %}</span>
     <div class="wrap hero-content">
         {% if hero.eyebrow %}<p class="eyebrow eyebrow-light">{{ hero.eyebrow }}</p>{% endif %}
         {% set hw = (hero.title|default(page.title))|split(' ') %}
@@ -25,7 +27,7 @@
             {% if hero.btn2_label %}<a class="btn btn-ghost btn-lg" href="{{ kk.href(hero.btn2_url ?: '/contact') }}">{{ hero.btn2_label }}</a>{% endif %}
         </div>
         {% if hero.show_open_badge is null or hero.show_open_badge %}
-            <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>Opening hours below</span></p>
+            <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>{{ 'KK.HOME.HOURS_BELOW'|t }}</span></p>
         {% endif %}
 
         {# Upcoming-event banner: shown while an event is still to come or on right now; links to the soonest one.
@@ -44,13 +46,14 @@
             {% else %}
                 {% set ev_days = (((ev.date|date('Y-m-d')|date('U')) - ev_today) / 86400)|round %}
             {% endif %}
-            {% set ev_when = ev_live ? 'Happening now' : (ev_days <= 0 ? 'Today' : (ev_days == 1 ? 'Tomorrow' : 'In ' ~ ev_days ~ ' days')) %}
+            {% set ev_when = ev_live ? 'KK.EVENTS.HAPPENING_NOW'|t : (ev_days <= 0 ? 'KK.EVENTS.TODAY'|t : (ev_days == 1 ? 'KK.EVENTS.TOMORROW'|t : 'KK.EVENTS.IN_DAYS'|t(ev_days))) %}
+            {% set ev_more_text = ev_more ? (ev_more == 1 ? 'KK.EVENTS.MORE_ONE'|t(ev_more) : 'KK.EVENTS.MORE_MANY'|t(ev_more)) : '' %}
             {% set ev_more = ev_soon|length - 1 %}
             <a class="hm-event{{ ev_live ? ' is-live' : '' }}" href="{{ ev_more ? ev_page.url : ev.url }}"{% if ev_start %} data-start="{{ ev_start }}" data-end="{{ ev_end }}"{% endif %}>
                 <span class="hm-event-tag"><span class="hm-event-dot" aria-hidden="true"></span><span data-ev-label>{{ ev_when }}</span></span>
                 <span class="hm-event-main">
                     <strong>{{ ev.title }}</strong>
-                    {% if ev.header.when %}<small>{{ ev.header.when }}{% if ev_more %} &middot; +{{ ev_more }} more {{ ev_more == 1 ? 'event' : 'events' }}{% endif %}</small>{% elseif ev_more %}<small>+{{ ev_more }} more {{ ev_more == 1 ? 'event' : 'events' }}</small>{% endif %}
+                    {% if ev.header.when %}<small>{{ ev.header.when }}{% if ev_more %} &middot; {{ ev_more_text }}{% endif %}</small>{% elseif ev_more %}<small>{{ ev_more_text }}</small>{% endif %}
                 </span>
                 <span class="hm-event-go" aria-hidden="true">{{ kk.icon('arrow', 20) }}</span>
             </a>
@@ -62,7 +65,7 @@
         <div class="hm-ticker-track">
             {% for g in 1..2 %}
                 <div class="hm-ticker-group">
-                    {% for w in ['Hausbrandt', 'Kaffe', 'Kos', 'Cinnamon buns', 'Matcha', 'Velkommen', 'Frappes', 'Skål', 'Hausbrandt', 'Kaffe', 'Kos', 'Cinnamon buns', 'Matcha', 'Velkommen', 'Frappes', 'Skål'] %}<span>{{ w }}</span>{% endfor %}
+                    {% for w in ('KK.HOME.TICKER'|t)|split(',') %}<span>{{ w|trim }}</span>{% endfor %}
                 </div>
             {% endfor %}
         </div>
@@ -95,7 +98,7 @@
                     <ul class="stats hm-stats">
                         {% for s in intro.stats %}
                             {% if s.google and g %}
-                                <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ g.rating|number_format(1) }}★</strong><span>on Google ({{ g.count }} {{ g.count == 1 ? 'review' : 'reviews' }})</span></li>
+                                <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ g.rating|number_format(1) }}★</strong><span>{{ (g.count == 1 ? 'KK.HOME.ON_GOOGLE_ONE' : 'KK.HOME.ON_GOOGLE')|t(g.count) }}</span></li>
                             {% else %}
                                 <li class="hm-stat hm-stat-{{ loop.index }}"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>
                             {% endif %}
@@ -117,7 +120,7 @@
     {% set soon = soon|slice(0, up.count ?: 3) %}
     {% if soon|length %}
         {% set focus = {top: '50% 0%', upper: '50% 20%', middle: '50% 50%', bottom: '50% 100%', full: '50% 50%'} %}
-        {% set kinds = {upcoming: {label: 'Upcoming', emoji: '🔥'}, event: {label: 'Event', emoji: '🎉'}, activity: {label: 'Activity', emoji: '🎲'}, news: {label: 'News', emoji: '📣'}} %}
+        {% set kinds = {upcoming: {label: 'KK.EVENTS.KIND_UPCOMING'|t, emoji: '🔥'}, event: {label: 'KK.EVENTS.KIND_EVENT'|t, emoji: '🎉'}, activity: {label: 'KK.EVENTS.KIND_ACTIVITY'|t, emoji: '🎲'}, news: {label: 'KK.EVENTS.KIND_NEWS'|t, emoji: '📣'}} %}
         <section class="hm-soon" aria-labelledby="hm-soon-title">
             <span class="hm-soon-shape hm-soon-star s1" aria-hidden="true"></span>
             <span class="hm-soon-shape hm-soon-ring s2" aria-hidden="true"></span>
@@ -125,8 +128,8 @@
             <span class="hm-soon-shape hm-soon-blob s4" aria-hidden="true"></span>
             <div class="wrap">
                 <header class="hm-soon-head">
-                    <p class="hm-soon-pill"><span class="hm-soon-dot" aria-hidden="true"></span> {{ up.eyebrow ?: 'Coming up' }}</p>
-                    <h2 id="hm-soon-title">{{ up.title ?: 'Save the date' }}</h2>
+                    <p class="hm-soon-pill"><span class="hm-soon-dot" aria-hidden="true"></span> {{ up.eyebrow ?: 'KK.EVENTS.COMING_UP'|t }}</p>
+                    <h2 id="hm-soon-title">{{ up.title ?: 'KK.EVENTS.SAVE_DATE'|t }}</h2>
                     {% if up.subtitle %}<p class="lead">{{ up.subtitle }}</p>{% endif %}
                 </header>
 
@@ -135,12 +138,12 @@
                     {% set cover = ev.header.cover ? ev.media[ev.header.cover] : null %}
                     {% set poster = ev.header.cover_focus == 'full' %}
                     {% set days = ((ev.date|date('Y-m-d')|date('U')) - today) // 86400 %}
-                    {% set when_label = days <= 0 ? 'Today!' : (days == 1 ? 'Tomorrow' : 'In ' ~ days ~ ' days') %}
+                    {% set when_label = days <= 0 ? 'KK.EVENTS.TODAY_BANG'|t : (days == 1 ? 'KK.EVENTS.TOMORROW'|t : 'KK.EVENTS.IN_DAYS'|t(days)) %}
                     {% if loop.first %}
                         <article class="hm-soon-card">
                             <a class="hm-soon-media{{ poster ? ' is-poster' : '' }}" href="{{ ev.url }}" aria-label="{{ ev.title|e('html_attr') }}"{% if ev.header.cover_focus and focus[ev.header.cover_focus] %} style="--focus: {{ focus[ev.header.cover_focus] }}"{% endif %}>
                                 {% if cover %}{{ kk.imgfit(cover, 900, 1125, ev.title) }}{% else %}<span class="hm-soon-empty">{{ k.emoji }}</span>{% endif %}
-                                <span class="hm-soon-date"><b>{{ ev.date|date('d') }}</b><i>{{ ev.date|date('M') }}</i></span>
+                                <span class="hm-soon-date"><b>{{ ev.date|date('d') }}</b><i>{{ kk_date(ev.date, 'M') }}</i></span>
                             </a>
                             <div class="hm-soon-body">
                                 <p class="hm-soon-tags">
@@ -156,8 +159,8 @@
                                 {% endif %}
                                 <p class="hm-soon-sum">{{ ev.header.summary ?: ev.summary|striptags }}</p>
                                 <div class="hm-soon-actions">
-                                    <a class="hm-soon-btn" href="{{ ev.url }}">See the details {{ kk.icon('arrow', 18) }}</a>
-                                    {% if soon|length > 1 %}<a class="hm-soon-btn hm-soon-btn-ghost" href="{{ events_page.url }}">All events</a>{% endif %}
+                                    <a class="hm-soon-btn" href="{{ ev.url }}">{{ 'KK.EVENTS.SEE_DETAILS'|t }} {{ kk.icon('arrow', 18) }}</a>
+                                    {% if soon|length > 1 %}<a class="hm-soon-btn hm-soon-btn-ghost" href="{{ events_page.url }}">{{ 'KK.EVENTS.ALL'|t }}</a>{% endif %}
                                 </div>
                             </div>
                         </article>
@@ -173,7 +176,7 @@
                             <a class="hm-soon-mini" href="{{ ev.url }}"{% if ev.header.cover_focus and focus[ev.header.cover_focus] %} style="--focus: {{ focus[ev.header.cover_focus] }}"{% endif %}>
                                 <span class="hm-soon-mini-media{{ poster ? ' is-poster' : '' }}">{% if cover %}{{ kk.imgfit(cover, 400, 500, ev.title) }}{% else %}<span class="hm-soon-empty">{{ k.emoji }}</span>{% endif %}</span>
                                 <span class="hm-soon-mini-body">
-                                    <span class="hm-soon-kind">{{ k.emoji }} {{ ev.date|date('j M') }}</span>
+                                    <span class="hm-soon-kind">{{ k.emoji }} {{ kk_date(ev.date, 'KK.DATE.SHORT'|t) }}</span>
                                     <strong>{{ ev.title }}</strong>
                                     {% if ev.header.when %}<em>{{ ev.header.when }}</em>{% endif %}
                                 </span>
@@ -181,7 +184,7 @@
                         {% endfor %}
                     </div>
                 {% elseif events_page %}
-                    <p class="hm-soon-foot"><a href="{{ events_page.url }}">See all events {{ kk.icon('arrow', 18) }}</a></p>
+                    <p class="hm-soon-foot"><a href="{{ events_page.url }}">{{ 'KK.EVENTS.SEE_ALL'|t }} {{ kk.icon('arrow', 18) }}</a></p>
                 {% endif %}
             </div>
         </section>
@@ -213,8 +216,8 @@
                 <div class="coffee-media">
                     <div class="coffee-halo" aria-hidden="true"></div>
                     <div class="coffee-products">
-                        {{ kk.imgfit(cf_img, 640, 760, 'Hausbrandt Gourmet 100% Arabica coffee beans', 'product product-main') }}
-                        {{ kk.imgfit(cf_img2, 560, 760, 'Hausbrandt Sublime 100% Arabica coffee beans', 'product product-second') }}
+                        {{ kk.imgfit(cf_img, 640, 760, 'KK.HOME.ALT_GOURMET'|t, 'product product-main') }}
+                        {{ kk.imgfit(cf_img2, 560, 760, 'KK.HOME.ALT_SUBLIME'|t, 'product product-second') }}
                     </div>
                     {% if cf.caption %}<p class="coffee-caption">{{ cf.caption }}</p>{% endif %}
                 </div>
@@ -228,7 +231,7 @@
 {% if (hl.enabled is null or hl.enabled) and hl.items %}
     <section class="section hm-features">
         <div class="wrap">
-            {% include 'partials/section-head.html.twig' with {eyebrow: 'Why Kaffekos', title: hl.title, subtitle: hl.subtitle} %}
+            {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.HOME.WHY'|t, title: hl.title, subtitle: hl.subtitle} %}
             <div class="features hm-cards">
                 {% set tones = ['coral', 'lagoon', 'plum', 'navy'] %}
                 {% for f in hl.items %}
@@ -251,13 +254,13 @@
     {% if picks %}
         <section class="section hm-favs">
             <div class="wrap">
-                {% include 'partials/section-head.html.twig' with {eyebrow: 'From our kitchen', title: ft.title, subtitle: ft.subtitle} %}
+                {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.HOME.KITCHEN'|t, title: ft.title, subtitle: ft.subtitle} %}
                 <div class="menu-grid hm-fav-grid">
                     {% for pick in picks %}
                         {% include 'partials/menu-item.html.twig' with {item: pick.item, image: pick.image, currency: theme_var('menu.currency'), show_image: true, card: true, show_price: (ft.show_prices ? true : false)} %}
                     {% endfor %}
                 </div>
-                <p class="center"><a class="btn btn-primary btn-lg" href="{{ menu_page.url }}">{{ ft.button_label ?: 'See the full menu' }}</a></p>
+                <p class="center"><a class="btn btn-primary btn-lg" href="{{ menu_page.url }}">{{ ft.button_label ?: 'KK.HOME.FULL_MENU'|t }}</a></p>
             </div>
         </section>
     {% endif %}
@@ -286,15 +289,15 @@
     {% if strip %}
         <section class="section hm-strip">
             <div class="wrap">
-                {% include 'partials/section-head.html.twig' with {eyebrow: 'Gallery', title: ps.title, subtitle: ps.subtitle} %}
+                {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.NAV_GALLERY'|t, title: ps.title, subtitle: ps.subtitle} %}
             </div>
             <div class="wrap wrap-wide">
                 <div class="photo-strip hm-photos">
                     {% for ph in strip %}
-                        <a href="{{ gpage.url }}" class="photo">{{ kk.img(ph.media, 560, 560, ph.caption ?: 'Kaffekos') }}</a>
+                        <a href="{{ gpage.url }}" class="photo">{{ kk.img(ph.media, 560, 560, ph.caption ?: site.title) }}</a>
                     {% endfor %}
                 </div>
-                <p class="center"><a class="btn btn-primary btn-lg" href="{{ gpage.url }}">View the gallery</a></p>
+                <p class="center"><a class="btn btn-primary btn-lg" href="{{ gpage.url }}">{{ 'KK.HOME.VIEW_GALLERY'|t }}</a></p>
             </div>
         </section>
     {% endif %}
@@ -305,11 +308,11 @@
 {% if (rv.enabled is null or rv.enabled) and rv.items %}
     <section class="section">
         <div class="wrap">
-            {% include 'partials/section-head.html.twig' with {eyebrow: 'Kind words', title: rv.title, subtitle: rv.subtitle} %}
+            {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.HOME.KIND_WORDS'|t, title: rv.title, subtitle: rv.subtitle} %}
             <div class="reviews">
                 {% for r in rv.items %}
                     <figure class="review">
-                        <div class="stars" aria-label="{{ r.rating ?: 5 }} out of 5 stars">
+                        <div class="stars" aria-label="{{ 'KK.HOME.STARS'|t(r.rating ?: 5) }}">
                             {% for i in 1..5 %}<span class="{{ i <= (r.rating ?: 5) ? 'on' : '' }}">{{ kk.icon('star', 18) }}</span>{% endfor %}
                         </div>
                         <blockquote>{{ r.text }}</blockquote>

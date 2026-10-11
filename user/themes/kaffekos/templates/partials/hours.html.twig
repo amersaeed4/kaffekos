@@ -4,10 +4,11 @@
     <tbody>
     {% for h in theme_var('hours') %}
         <tr data-day="{{ h.day|lower }}">
-            <th scope="row">{{ compact ? h.day|slice(0, 3) : h.day }}</th>
-            <td>{% if h.closed %}Closed{% else %}{{ kk.time12(h.open) }} &ndash; {{ kk.time12(h.close) }}{% endif %}</td>
+            {% set day_name = ('KK.DAYS.' ~ h.day|upper)|t %}
+            <th scope="row">{{ compact ? day_name|slice(0, 3) : day_name }}</th>
+            <td>{% if h.closed %}{{ 'KK.CLOSED'|t }}{% else %}{{ kk.time12(h.open) }} &ndash; {{ kk.time12(h.close) }}{% endif %}</td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
-{% if theme_var('hours_note') %}<p class="hours-note">{{ theme_var('hours_note') }}</p>{% endif %}
+{% if kk_l('hours_note') %}<p class="hours-note">{{ kk_l('hours_note') }}</p>{% endif %}

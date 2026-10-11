@@ -13,6 +13,6 @@
             {% endif %}
         </div>
         {% if item.description %}<p>{{ item.description }}</p>{% endif %}
-        {% if item.badge %}<span class="badge badge-{{ item.badge|lower }}">{{ item.badge }}</span>{% endif %}
+        {% if item.badge %}{% set badge_key = 'KK.BADGE.' ~ item.badge|upper %}<span class="badge badge-{{ item.badge|lower }}">{{ badge_key|t != badge_key ? badge_key|t : item.badge }}</span>{% endif %}
     </div>
 </article>

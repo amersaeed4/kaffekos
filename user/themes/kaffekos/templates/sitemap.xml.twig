@@ -1,19 +1,29 @@
 {#- Sitemap for search engines, built from the live page tree. New pages appear here automatically.
+    Every page is listed in each language, each entry pointing to its translations (hreflang).
     Left out: unpublished, hidden-from-Google (SEO tab), error pages, finished announcements. -#}
 {%- set seen = [] -%}
+{%- set root = uri.rootUrl(true)|trim('/', 'right') -%}
+{%- set langs = config.system.languages.supported -%}
+{%- set default_lang = config.system.languages.default_lang ?: langs|first -%}
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 {% for p in page.evaluate({'@root.descendants': true}) if p.published and p.routable and p.template != 'error' and p.template != 'sitemap' and not p.header.seo.noindex and not (p.template == 'blog-item' and kk_is_expired(p)) %}
-{%- set loc = p.url(true, true) -%}
-{%- if loc not in seen -%}
-{%- set seen = seen|merge([loc]) -%}
+{%- set route = p.home ? '' : p.route -%}
+{%- if route not in seen -%}
+{%- set seen = seen|merge([route]) -%}
 {%- set top = (p.route|trim('/')|split('/')|length) == 1 -%}
+{% for code in langs %}
     <url>
-        <loc>{{ loc|e('html') }}</loc>
+        <loc>{{ (root ~ (code == default_lang ? '' : '/' ~ code) ~ route)|e('html') }}</loc>
+{% for alt in langs %}
+        <xhtml:link rel="alternate" hreflang="{{ alt }}" href="{{ (root ~ (alt == default_lang ? '' : '/' ~ alt) ~ route)|e('html') }}"/>
+{% endfor %}
+        <xhtml:link rel="alternate" hreflang="x-default" href="{{ (root ~ route)|e('html') }}"/>
         <lastmod>{{ p.modified|date('Y-m-d') }}</lastmod>
         <changefreq>{{ p.home ? 'daily' : (top ? 'weekly' : 'monthly') }}</changefreq>
         <priority>{{ p.home ? '1.0' : (top ? '0.8' : '0.6') }}</priority>
     </url>
+{% endfor %}
 {% endif -%}
 {% endfor %}
 </urlset>

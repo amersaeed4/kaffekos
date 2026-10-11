@@ -6,6 +6,19 @@
     var $ = function (sel, root) { return (root || doc).querySelector(sel); };
     var $$ = function (sel, root) { return Array.prototype.slice.call((root || doc).querySelectorAll(sel)); };
 
+    /* texts for the visitor's language (printed into the page by the theme); English is the fallback */
+    var T = { time24: false, days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        openNow: 'Open now · until {time}', closedOpensToday: 'Closed now · opens today at {time}', closedOpensTomorrow: 'Closed now · opens tomorrow at {time}',
+        closedOpensDay: 'Closed now · opens {day} at {time}', closed: 'Closed', happeningNow: 'Happening now', menuOpen: 'Open menu', menuClose: 'Close menu',
+        addPick: 'Add {name} to my picks', removePick: 'Remove {name} from my picks', myPicks: 'My picks', allMenu: 'All', surprise: 'Surprise me',
+        noPicks: 'No picks yet. Tap the heart on any item to save it here.', noMatch: 'Nothing matches your search. Try another word.',
+        savePhoto: 'Save this photo', removePhoto: 'Remove from saved' };
+    try {
+        var i18nEl = doc.getElementById('kk-i18n');
+        if (i18nEl) { var loaded = JSON.parse(i18nEl.textContent) || {}; Object.keys(loaded).forEach(function (k) { if (loaded[k] !== '' && loaded[k] !== null) T[k] = loaded[k]; }); }
+    } catch (e) { /* keep the English defaults */ }
+    var fill = function (str, vars) { return String(str).replace(/\{(\w+)\}/g, function (m, k) { return vars[k] === undefined ? m : vars[k]; }); };
+
     /* ---------- header: solid after scrolling, mobile menu ---------- */
     var header = $('#site-header');
     var toggle = $('.nav-toggle');
@@ -19,7 +32,7 @@
         toggle.addEventListener('click', function () {
             var open = doc.body.classList.toggle('nav-open');
             toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+            toggle.setAttribute('aria-label', open ? T.menuClose : T.menuOpen);
         });
         $$('#main-nav a').forEach(function (a) {
             a.addEventListener('click', function () { doc.body.classList.remove('nav-open'); toggle.setAttribute('aria-expanded', 'false'); });
@@ -36,9 +49,11 @@
         var m = toMin(t);
         if (m === null) return '';
         var h = Math.floor(m / 60) % 24, mm = m % 60, ap = h >= 12 ? 'PM' : 'AM';
+        if (T.time24) return (h < 10 ? '0' : '') + h + ':' + (mm < 10 ? '0' : '') + mm;
         return ((h % 12) || 12) + ':' + (mm < 10 ? '0' : '') + mm + ' ' + ap;
     }
-    function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+    /* weekday name in the visitor's language (T.days starts on Monday, DAYS on Sunday) */
+    function dayName(key) { return T.days[(DAYS.indexOf(key) + 6) % 7] || key; }
 
     function lahoreNow() {
         try {
@@ -63,23 +78,23 @@
         // still open from yesterday's late session (e.g. closes 01:00)?
         if (yest && !yest.closed) {
             var yo = toMin(yest.open), yc = toMin(yest.close);
-            if (yo !== null && yc !== null && yc <= yo && now.min < yc) return { open: true, text: 'Open now · until ' + fmt(yest.close) };
+            if (yo !== null && yc !== null && yc <= yo && now.min < yc) return { open: true, text: fill(T.openNow, { time: fmt(yest.close) }) };
         }
         if (today && !today.closed) {
             var o = toMin(today.open), c = toMin(today.close);
             if (o !== null && c !== null) {
                 var overnight = c <= o;
-                if (now.min >= o && (overnight || now.min < c)) return { open: true, text: 'Open now · until ' + fmt(today.close) };
-                if (now.min < o) return { open: false, text: 'Closed now · opens today at ' + fmt(today.open) };
+                if (now.min >= o && (overnight || now.min < c)) return { open: true, text: fill(T.openNow, { time: fmt(today.close) }) };
+                if (now.min < o) return { open: false, text: fill(T.closedOpensToday, { time: fmt(today.open) }) };
             }
         }
         for (var i = 1; i <= 7; i++) {
             var nd = byDay[DAYS[(idx + i) % 7]];
             if (nd && !nd.closed && nd.open) {
-                return { open: false, text: 'Closed now · opens ' + (i === 1 ? 'tomorrow' : cap(DAYS[(idx + i) % 7])) + ' at ' + fmt(nd.open) };
+                return { open: false, text: i === 1 ? fill(T.closedOpensTomorrow, { time: fmt(nd.open) }) : fill(T.closedOpensDay, { day: dayName(DAYS[(idx + i) % 7]), time: fmt(nd.open) }) };
             }
         }
-        return { open: false, text: 'Closed' };
+        return { open: false, text: T.closed };
     }
 
     var hoursEl = $('#kk-hours');
@@ -110,7 +125,7 @@
             if (now >= evEnd) { evBanner.hidden = true; return; }
             if (now >= evStart && !evBanner.classList.contains('is-live')) {
                 evBanner.classList.add('is-live');
-                if (evLabel) evLabel.textContent = 'Happening now';
+                if (evLabel) evLabel.textContent = T.happeningNow;
             }
         };
         evTick();
@@ -192,7 +207,7 @@
                 allItems.push(it);
                 var btn = document.createElement('button');
                 btn.type = 'button'; btn.className = 'menu-fav'; btn.innerHTML = heart;
-                btn.setAttribute('aria-label', 'Add ' + it.querySelector('h3').textContent.trim() + ' to my picks');
+                btn.setAttribute('aria-label', fill(T.addPick, { name: it.querySelector('h3').textContent.trim() }));
                 var k = keyOf(it);
                 var paint = function () { var on = !!favs[k]; btn.classList.toggle('is-on', on); btn.setAttribute('aria-pressed', on); it.classList.toggle('is-fav', on); };
                 btn.addEventListener('click', function (e) {
@@ -213,15 +228,15 @@
         };
         var chips = [];
         if (groups.length > 1) {
-            var all = mk('', 'All', function () { state.group = ''; update(); });
+            var all = mk('', T.allMenu, function () { state.group = ''; update(); });
             all.dataset.group = ''; chips.push(all);
             groups.forEach(function (g) {
                 var c = mk('', g.getAttribute('data-group-label'), function () { state.group = g.getAttribute('data-group'); update(); });
                 c.dataset.group = g.getAttribute('data-group'); chips.push(c);
             });
         }
-        var favChip = mk('chip-fav', heart + ' <span>My picks</span> <b class="chip-count">0</b>', function () { state.favs = !state.favs; update(); });
-        mk('chip-surprise', '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg> Surprise me', function () {
+        var favChip = mk('chip-fav', heart + ' <span>' + T.myPicks + '</span> <b class="chip-count">0</b>', function () { state.favs = !state.favs; update(); });
+        mk('chip-surprise', '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg> ' + T.surprise, function () {
             var pool = allItems.filter(function (it) { return !it.hidden && !it.closest('[hidden]'); });
             if (!pool.length) return;
             var it = pool[Math.floor(Math.random() * pool.length)];
@@ -257,7 +272,7 @@
             favChip.querySelector('.chip-count').textContent = n;
             if (none) {
                 none.hidden = any || !filtering;
-                none.textContent = state.favs && !term ? 'No picks yet. Tap the heart on any item to save it here.' : 'Nothing matches your search. Try another word.';
+                none.textContent = state.favs && !term ? T.noPicks : T.noMatch;
             }
         };
         if (q) q.addEventListener('input', function () { state.term = q.value.trim(); update(); });
@@ -283,7 +298,7 @@
                 var on = saved.indexOf(c.getAttribute('data-id')) > -1, b = $('.gal-heart', c);
                 b.classList.toggle('is-saved', on);
                 b.setAttribute('aria-pressed', on ? 'true' : 'false');
-                b.setAttribute('aria-label', on ? 'Remove from saved' : 'Save this photo');
+                b.setAttribute('aria-label', on ? T.removePhoto : T.savePhoto);
             });
             savedEls.forEach(function (el) { el.textContent = saved.length; });
         };

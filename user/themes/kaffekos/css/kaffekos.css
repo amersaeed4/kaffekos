@@ -163,6 +163,13 @@ address { font-style: normal; }
 .main-nav ul a:hover::after, .main-nav ul a.active::after { transform: scaleX(1); }
 .nav-cta { padding: .65rem 1.3rem; }
 
+/* language switcher (EN | NO) */
+.lang-switch { display: inline-flex; align-items: center; padding: 3px; border: 1.5px solid currentColor; border-radius: 999px; line-height: 1; flex: none; }
+.lang-switch a { display: block; padding: .38rem .7rem; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-decoration: none; opacity: .8; transition: background .2s, color .2s, opacity .2s; }
+.lang-switch a:hover { opacity: 1; }
+.lang-switch a.is-active { background: var(--gold); color: var(--navy); opacity: 1; }
+.lang-switch a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
 .nav-toggle { display: none; width: 46px; height: 46px; border: 0; background: transparent; cursor: pointer; color: inherit; padding: 0; position: relative; }
 .nav-toggle span { position: absolute; left: 11px; right: 11px; height: 2px; background: currentColor; border-radius: 2px; transition: transform .25s, opacity .2s, top .25s; }
 .nav-toggle span:nth-child(1) { top: 15px; }
@@ -1467,6 +1474,14 @@ address { font-style: normal; }
     .photo-strip { grid-template-columns: repeat(3, 1fr); }
     .kos { background-attachment: scroll; }
 }
+@media (min-width: 881px) and (max-width: 1140px) {
+    .header-inner { gap: 1rem; }
+    .main-nav { gap: 1rem; }
+    .main-nav ul { gap: 1rem; }
+    .main-nav ul a { font-size: .9rem; }
+    .nav-cta { padding: .55rem 1rem; font-size: .9rem; }
+    .brand-tag { display: none; }
+}
 @media (max-width: 880px) {
     :root { --header-h: 72px; }
     .nav-toggle { display: block; }
@@ -1480,6 +1495,8 @@ address { font-style: normal; }
     .main-nav ul a { display: block; padding: 1rem 0; font-size: 1.15rem; border-bottom: 1px solid var(--line); }
     .main-nav ul a::after { display: none; }
     .nav-cta { margin-top: 1.4rem; }
+    .lang-switch { align-self: flex-start; margin-top: 1.2rem; border-color: var(--line); }
+    .lang-switch a { padding: .5rem 1rem; font-size: .9rem; }
     .nav-open .main-nav { transform: none; opacity: 1; visibility: visible; }
     .nav-open .site-header { background: var(--cream); color: var(--ink); }
     .split { grid-template-columns: 1fr; }
