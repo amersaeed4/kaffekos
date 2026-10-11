@@ -6,6 +6,7 @@
     upcoming: {label: 'KK.EVENTS.KIND_UPCOMING'|t, emoji: '🔥'},
     event:    {label: 'KK.EVENTS.KIND_EVENT'|t,    emoji: '🎉'},
     activity: {label: 'KK.EVENTS.KIND_ACTIVITY'|t, emoji: '🎲'},
+    music:    {label: 'KK.EVENTS.KIND_MUSIC'|t,    emoji: '🎵'},
     news:     {label: 'KK.EVENTS.KIND_NEWS'|t,     emoji: '📣'}
 } %}
 {% set ribbon = ('KK.EVENTS.RIBBON'|t)|split(',')|map(w => w|trim) %}
@@ -66,7 +67,7 @@
         <div class="ev-filters" role="toolbar" aria-label="{{ 'KK.EVENTS.FILTER'|t }}">
             <button type="button" class="ev-fchip is-on" data-ev-filter="all" style="--c: var(--ev-saffron)" aria-pressed="true">🌈 {{ 'KK.ALL'|t }}</button>
             {% for key, k in kinds %}{% if key in used %}
-                <button type="button" class="ev-fchip" data-ev-filter="{{ key }}" style="--c: var(--ev-{{ {upcoming: 'leaf', event: 'coral', activity: 'lagoon', news: 'plum'}[key] }})" aria-pressed="false">{{ k.emoji }} {{ k.label }}</button>
+                <button type="button" class="ev-fchip" data-ev-filter="{{ key }}" style="--c: var(--ev-{{ {upcoming: 'leaf', event: 'coral', activity: 'lagoon', music: 'saffron', news: 'plum'}[key] }})" aria-pressed="false">{{ k.emoji }} {{ k.label }}</button>
             {% endif %}{% endfor %}
         </div>
         {% endif %}

@@ -21,6 +21,7 @@ form:
                 upcoming: 'Upcoming event (removed automatically after its date)'
                 event: 'Event (stays on the page, e.g. photos after the event)'
                 activity: 'Activity'
+                music: 'Live music (a music night that already happened)'
                 news: 'News'
               help: 'Choose "Upcoming event" for an announcement or poster: it shows under "Coming up" on the Events page and the Home page and disappears by itself once the event day is over. Use "Event" for a write-up of something that already happened.'
             header.when:
