@@ -14,7 +14,6 @@
 {% block hero %}
 <section class="hero hero-fun"{% if hero_img %} style="--hero: url('{{ kk.imgurlfit(hero_img, 2400, 3200) }}'); --hero-y: {{ hero.focus ?: '40%' }}"{% endif %}>
     <div class="hero-shade"></div>
-    <div class="hm-hero-aurora" aria-hidden="true"><i></i><i></i></div>
     <span class="hm-chip hm-chip-1" aria-hidden="true"><b>Kaffe</b>{% if gloss %} coffee{% endif %}</span>
     <span class="hm-chip hm-chip-2" aria-hidden="true"><b>Kos</b>{% if gloss %} cosiness{% endif %}</span>
     <span class="hm-chip hm-chip-3" aria-hidden="true">{{ kk.flag_no() }}<b>Skål</b>{% if gloss %} cheers{% endif %}</span>
