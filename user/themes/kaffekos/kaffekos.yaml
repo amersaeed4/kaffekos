@@ -48,13 +48,13 @@ google:
   max_calls_per_day: 6
 
 hours:
-  - { day: Monday, open: '07:00', close: '23:00', closed: false }
-  - { day: Tuesday, open: '07:00', close: '23:00', closed: false }
-  - { day: Wednesday, open: '07:00', close: '23:00', closed: false }
-  - { day: Thursday, open: '07:00', close: '23:00', closed: false }
-  - { day: Friday, open: '07:00', close: '23:00', closed: false }
-  - { day: Saturday, open: '07:00', close: '23:00', closed: false }
-  - { day: Sunday, open: '07:00', close: '23:00', closed: false }
+  - { day: Monday, open: '07:00', close: '01:00', closed: false }
+  - { day: Tuesday, open: '07:00', close: '01:00', closed: false }
+  - { day: Wednesday, open: '07:00', close: '01:00', closed: false }
+  - { day: Thursday, open: '07:00', close: '01:00', closed: false }
+  - { day: Friday, open: '07:00', close: '01:00', closed: false }
+  - { day: Saturday, open: '07:00', close: '01:00', closed: false }
+  - { day: Sunday, open: '07:00', close: '01:00', closed: false }
 hours_note: ''
 hours_note_no: ''
 
