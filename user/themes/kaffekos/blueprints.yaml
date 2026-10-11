@@ -190,6 +190,12 @@ form:
               label: Map longitude
               default: '74.3024827'
 
+            business.directions_note:
+              type: textarea
+              rows: 2
+              label: How to find us (optional)
+              help: 'Landmarks and parking help people searching "cafe near me" and are shown with the address. Example: Opposite Grand Park, second floor, parking at the front.'
+
             business.price_range:
               type: text
               label: Price range (for Google)

@@ -34,6 +34,7 @@ class Kaffekos extends Theme
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_gallery_photos', [$this, 'galleryPhotos']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_google_rating', [$this, 'googleRating']));
         $twig->twig->addFunction(new \Twig\TwigFunction('kk_event_posts', [$this, 'eventPosts']));
+        $twig->twig->addFunction(new \Twig\TwigFunction('kk_is_expired', [self::class, 'isExpiredAnnouncement']));
     }
 
     /**

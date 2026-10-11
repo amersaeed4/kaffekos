@@ -12,6 +12,7 @@
                 <div>
                     <h3>{{ kk.icon('pin', 18) }} Address</h3>
                     <address>{{ biz.address|e('html')|nl2br }}</address>
+                    {% if biz.directions_note %}<p>{{ biz.directions_note|e('html')|nl2br }}</p>{% endif %}
                     <p class="visit-links">
                         {% if biz.phone %}<a href="tel:{{ biz.phone|replace({' ': ''}) }}">{{ biz.phone }}</a>{% endif %}
                         {% if biz.email %}<a href="mailto:{{ biz.email }}">{{ biz.email }}</a>{% endif %}

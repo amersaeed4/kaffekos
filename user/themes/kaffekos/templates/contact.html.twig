@@ -104,6 +104,7 @@
             <div class="ct-address">
                 <h2>{{ kk.icon('pin', 24) }} {{ c.info_title ?: 'Find us' }}</h2>
                 <p>{{ biz.address|e('html')|nl2br }}</p>
+                {% if biz.directions_note %}<p class="ct-note">{{ biz.directions_note|e('html')|nl2br }}</p>{% endif %}
                 {% if biz.maps_url %}<a class="btn btn-primary btn-block" href="{{ biz.maps_url }}" target="_blank" rel="noopener">Get directions {{ kk.icon('arrow', 18) }}</a>{% endif %}
             </div>
         </div>

@@ -27,3 +27,5 @@ Allow: /user/plugins/*.css$
 Allow: /user/plugins/*.css?
 Allow: /user/plugins/*.js$
 Allow: /user/plugins/*.js?
+
+Sitemap: https://kaffekos.pk/sitemap.xml

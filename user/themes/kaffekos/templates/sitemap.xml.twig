@@ -1,0 +1,19 @@
+{#- Sitemap for search engines, built from the live page tree. New pages appear here automatically.
+    Left out: unpublished, hidden-from-Google (SEO tab), error pages, finished announcements. -#}
+{%- set seen = [] -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% for p in page.evaluate({'@root.descendants': true}) if p.published and p.routable and p.template != 'error' and p.template != 'sitemap' and not p.header.seo.noindex and not (p.template == 'blog-item' and kk_is_expired(p)) %}
+{%- set loc = p.url(true, true) -%}
+{%- if loc not in seen -%}
+{%- set seen = seen|merge([loc]) -%}
+{%- set top = (p.route|trim('/')|split('/')|length) == 1 -%}
+    <url>
+        <loc>{{ loc|e('html') }}</loc>
+        <lastmod>{{ p.modified|date('Y-m-d') }}</lastmod>
+        <changefreq>{{ p.home ? 'daily' : (top ? 'weekly' : 'monthly') }}</changefreq>
+        <priority>{{ p.home ? '1.0' : (top ? '0.8' : '0.6') }}</priority>
+    </url>
+{% endif -%}
+{% endfor %}
+</urlset>

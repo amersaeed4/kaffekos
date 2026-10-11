@@ -8,12 +8,18 @@
 {% endfor %}
 {% set same = [] %}
 {% for k, v in social if v %}{% set same = same|merge([v]) %}{% endfor %}
+{% if biz.maps_url %}{% set same = same|merge([biz.maps_url]) %}{% endif %}
 {% set data = {
     '@context': 'https://schema.org',
     '@type': 'CafeOrCoffeeShop',
+    '@id': base_url_absolute ~ '/#cafe',
     'name': site.title,
     'url': base_url_absolute ~ '/',
+    'logo': url('theme://images/kk-logo.png', true),
     'image': url('theme://images/kk-logo.png', true),
+    'hasMap': biz.maps_url,
+    'currenciesAccepted': 'PKR',
+    'contactPoint': {'@type': 'ContactPoint', 'telephone': biz.phone, 'contactType': 'customer service', 'areaServed': 'PK', 'availableLanguage': ['English', 'Urdu']},
     'telephone': biz.phone,
     'email': biz.email,
     'priceRange': biz.price_range,
@@ -24,7 +30,7 @@
     'hasMenu': url('/menu', true),
     'areaServed': seo_site.area|default('Lahore'),
     'knowsAbout': ['Hausbrandt coffee', 'Italian espresso', 'Norwegian coffee culture', 'Matcha', 'Kanelbolle'],
-    'address': {'@type': 'PostalAddress', 'streetAddress': (biz.address|default('')|replace({"\n": ', '})), 'addressLocality': 'Lahore', 'addressCountry': 'PK'},
+    'address': {'@type': 'PostalAddress', 'streetAddress': (biz.address|default('')|replace({"\n": ', '})), 'addressLocality': 'Lahore', 'addressRegion': 'Punjab', 'addressCountry': 'PK'},
     'geo': {'@type': 'GeoCoordinates', 'latitude': biz.lat, 'longitude': biz.lng},
     'openingHoursSpecification': specs,
     'sameAs': same
