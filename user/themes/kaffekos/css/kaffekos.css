@@ -867,6 +867,8 @@ address { font-style: normal; }
     --navy: #4a2457; --navy-deep: #321840; --red: #e8553a; --gold: #f4b63f; --cream: #fff6e4; --sand: #f9e4b8; --ink: #2a1530;
     --muted: color-mix(in srgb, #2a1530 70%, #fff6e4); --line: color-mix(in srgb, #2a1530 16%, #fff6e4);
     --ev-coral: #e8553a; --ev-saffron: #f4b63f; --ev-lagoon: #1f9ab8; --ev-plum: #7b4a8c; --ev-leaf: #3fae6a; --ev-ink: #2a1530;
+    /* the photo viewer (shared with the Gallery page) takes the Events colours */
+    --g-pink: var(--ev-coral); --g-lime: var(--ev-saffron); --g-yellow: var(--ev-saffron); --g-ink: var(--ev-ink); --g-violet: var(--ev-plum); --g-sky: var(--ev-lagoon);
 }
 
 /* hero */
@@ -1017,6 +1019,9 @@ address { font-style: normal; }
 /* single post: extra photos */
 .ev-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem; margin: 1.6rem 0 .4rem; }
 .ev-gallery figure { margin: 0; }
+.ev-zoom, .ev-zoomable { cursor: zoom-in; }
+.ev-post-hero .ev-zoom { display: block; }
+.lightbox.is-single .lightbox-nav { display: none; }
 .ev-gallery a { display: block; border: 3px solid var(--ev-ink); border-radius: 14px; overflow: hidden; box-shadow: 5px 5px 0 var(--ev-ink); background: #1b1030; transition: transform .25s cubic-bezier(.3, 1.5, .5, 1); }
 .ev-gallery a:hover { transform: translate(-2px, -3px) rotate(-.8deg); }
 .ev-gallery img { width: 100%; height: auto; }

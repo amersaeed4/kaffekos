@@ -465,6 +465,45 @@
             }, { passive: true });
         }
     }
+    /* ---------- event post: every photo opens in a viewer with previous / next ---------- */
+    var evBox = $('#ev-lightbox');
+    if (evBox && typeof evBox.showModal === 'function') {
+        var evItems = $$('.ev-post-card .ev-zoom, .ev-post-card .prose img');
+        if (evItems.length) {
+            var evFig = $('figure', evBox), evImg = $('img', evBox), evTxt = $('.lightbox-text', evBox), evNum = $('.lightbox-count', evBox), evCur = 0;
+            var evSrc = function (el) { return el.tagName === 'A' ? el.getAttribute('href') : (el.currentSrc || el.src); };
+            var evCap = function (el) { return el.tagName === 'A' ? (el.getAttribute('data-caption') || '') : (el.getAttribute('alt') || ''); };
+            var evShow = function (i) {
+                evCur = (i + evItems.length) % evItems.length;
+                var el = evItems[evCur];
+                evImg.src = evSrc(el);
+                evImg.alt = evCap(el);
+                evTxt.textContent = evCap(el);
+                evNum.textContent = evItems.length > 1 ? (evCur + 1) + ' / ' + evItems.length : '';
+                evBox.classList.toggle('is-single', evItems.length < 2);
+                evFig.classList.remove('swap'); void evFig.offsetWidth; evFig.classList.add('swap');
+            };
+            evItems.forEach(function (el, i) {
+                if (el.tagName === 'IMG') { el.classList.add('ev-zoomable'); }
+                el.addEventListener('click', function (e) { e.preventDefault(); evShow(i); evBox.showModal(); });
+            });
+            $('.lightbox-close', evBox).addEventListener('click', function () { evBox.close(); });
+            $('.lightbox-prev', evBox).addEventListener('click', function () { evShow(evCur - 1); });
+            $('.lightbox-next', evBox).addEventListener('click', function () { evShow(evCur + 1); });
+            evBox.addEventListener('click', function (e) { if (e.target === evBox) evBox.close(); });
+            evBox.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowLeft') evShow(evCur - 1);
+                if (e.key === 'ArrowRight') evShow(evCur + 1);
+            });
+            var evTx = null;
+            evBox.addEventListener('touchstart', function (e) { evTx = e.changedTouches[0].clientX; }, { passive: true });
+            evBox.addEventListener('touchend', function (e) {
+                if (evTx === null) return;
+                var dx = e.changedTouches[0].clientX - evTx; evTx = null;
+                if (Math.abs(dx) > 50) evShow(evCur + (dx < 0 ? 1 : -1));
+            }, { passive: true });
+        }
+    }
     /* ---------- events: filter by type ---------- */
     var evGrid = $('[data-events]');
     if (evGrid) {

@@ -44,7 +44,7 @@
 <article class="ev-stage ev-post">
     <div class="wrap wrap-narrow">
         <div class="ev-post-card">
-            {% if cover %}<div class="ev-post-hero{{ header.cover_focus == 'full' ? ' is-poster' : '' }}"{% if header.cover_focus and focus[header.cover_focus] %} style="--focus: {{ focus[header.cover_focus] }}"{% endif %}>{{ kk.imgfit(cover, 1100, 1100, page.title) }}</div>{% endif %}
+            {% if cover %}<div class="ev-post-hero{{ header.cover_focus == 'full' ? ' is-poster' : '' }}"{% if header.cover_focus and focus[header.cover_focus] %} style="--focus: {{ focus[header.cover_focus] }}"{% endif %}><a class="ev-zoom" href="{{ cover.cropResize(1800, 1800).quality(84).url }}" data-caption="{{ page.title|e('html_attr') }}">{{ kk.imgfit(cover, 1100, 1100, page.title) }}</a></div>{% endif %}
             {% if header.when or header.where %}
                 <ul class="ev-meta ev-meta-lg">
                     {% if header.when %}<li>{{ kk.icon('clock', 20) }} {{ header.when }}</li>{% endif %}
@@ -57,7 +57,7 @@
                     {% for item in header.gallery %}{% if item.image and page.media[item.image] %}
                         {% set m = page.media[item.image] %}
                         <figure>
-                            <a href="{{ m.cropResize(1800, 1800).quality(84).url }}" target="_blank" rel="noopener">{{ kk.imgfit(m, 800, 1000, item.caption ?: page.title) }}</a>
+                            <a class="ev-zoom" href="{{ m.cropResize(1800, 1800).quality(84).url }}" data-caption="{{ (item.caption ?: '')|e('html_attr') }}">{{ kk.imgfit(m, 800, 1000, item.caption ?: page.title) }}</a>
                             {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
                         </figure>
                     {% endif %}{% endfor %}
@@ -67,4 +67,11 @@
         <p class="center"><a class="ev-btn ev-btn-alt" href="{{ page.parent.url }}">&larr; {{ 'KK.EVENTS.ALL'|t }}</a></p>
     </div>
 </article>
+
+<dialog class="lightbox" id="ev-lightbox" aria-label="{{ 'KK.GALLERY.VIEWER'|t }}">
+    <button class="lightbox-close" type="button" aria-label="{{ 'KK.GALLERY.CLOSE'|t }}">&times;</button>
+    <button class="lightbox-nav lightbox-prev" type="button" aria-label="{{ 'KK.GALLERY.PREV'|t }}">&#8249;</button>
+    <figure><img src="" alt=""><figcaption><span class="lightbox-text"></span><span class="lightbox-count"></span></figcaption></figure>
+    <button class="lightbox-nav lightbox-next" type="button" aria-label="{{ 'KK.GALLERY.NEXT'|t }}">&#8250;</button>
+</dialog>
 {% endblock %}
