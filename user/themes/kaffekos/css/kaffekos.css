@@ -1014,7 +1014,6 @@ address { font-style: normal; }
 .ev-card.is-poster .ev-cover { aspect-ratio: auto; background: #1b1030; }
 .ev-card.is-poster .ev-cover img { position: static; height: auto; object-fit: contain; }
 .ev-card.is-poster .ev-date { display: none; }
-.ev-card.is-poster .ev-soon { top: auto; bottom: 1rem; right: 1rem; }
 
 /* single post: extra photos */
 .ev-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem; margin: 1.6rem 0 .4rem; }
