@@ -1,14 +1,21 @@
 ---
 title: 'Saturday Night Hits Different: Live with Ali Kazmi'
 date: '2026-10-17 20:00'
-media_order: 'ali-kazmi-music-night.jpg'
+media_order: 'ali-kazmi-music-night.jpg, ali-kazmi-offer.jpg, ali-kazmi-location.jpg'
 cover: ali-kazmi-music-night.jpg
 cover_focus: full
 kind: upcoming
 when: 'Saturday 17 October, 8:00 PM onwards'
 event_start: '2026-10-17 20:00'
 where: 'Grand Park, Shouq Chowk, Johar Town, Lahore'
-summary: 'Live music, big Saturday energy and your favourite people. Ali Kazmi takes the stage at Kaffekos on 17 October, 8 PM onwards.'
+summary: 'Live music, big Saturday energy and your favourite people. Ali Kazmi takes the stage at Kaffekos on 17 October, 8 PM onwards, with 15% off drinks.'
+gallery:
+    -
+        image: ali-kazmi-offer.jpg
+        caption: '15% off drinks on Saturday 17 October.'
+    -
+        image: ali-kazmi-location.jpg
+        caption: 'Our location: Grand Park, Johar Town.'
 seo:
     title: 'Music Night with Ali Kazmi, Saturday 17 October | Kaffekos Lahore'
     description: 'Live music night with Ali Kazmi at Kaffekos, the Norwegian coffee shop in Johar Town, Lahore. Saturday 17 October, 8 PM onwards at Grand Park, Shouq Chowk.'
@@ -19,12 +26,13 @@ seo:
 
 Mark the date: **Saturday 17 October, 8 PM onwards.** Kaffekos is hosting a **Music Night with Ali Kazmi**, and you are invited.
 
-Live music, good lighting, good drinks and good company. Zero stress, maximum vibe.
+Live music, good lighting, good drinks and good company, plus **15% off drinks** on the night. Zero stress, maximum vibe.
 
 ### The vibe
 
 * 🎸 **Live music** with Ali Kazmi
 * ☕ **Your favourite drinks and bakes**, fresh from our kitchen
+* 🏷️ **15% off drinks** on the night
 * ✨ **The Kaffekos glow**, made for the camera roll
 * 🫶 **Your people**, all in one place
 
