@@ -184,6 +184,31 @@
         syncTopics();
     }
 
+    /* ---------- contact: map is tap-to-activate; copy address ---------- */
+    var mapFrame = $('[data-map-frame]');
+    if (mapFrame) {
+        var mapBtn = $('[data-map-activate]', mapFrame);
+        var setMap = function (on) { mapFrame.classList.toggle('is-active', on); };
+        mapFrame.classList.add('js-map');
+        if (mapBtn) {
+            mapBtn.hidden = false;
+            mapBtn.addEventListener('click', function () { setMap(true); });
+        }
+        mapFrame.addEventListener('mouseleave', function () { setMap(false); });
+        doc.addEventListener('touchstart', function (e) { if (!mapFrame.contains(e.target)) setMap(false); }, { passive: true });
+    }
+    var copyBtn = $('[data-copy]');
+    if (copyBtn && navigator.clipboard) {
+        copyBtn.hidden = false;
+        var copyLabel = copyBtn.textContent;
+        copyBtn.addEventListener('click', function () {
+            navigator.clipboard.writeText(copyBtn.getAttribute('data-copy')).then(function () {
+                copyBtn.textContent = copyBtn.getAttribute('data-copied');
+                setTimeout(function () { copyBtn.textContent = copyLabel; }, 2000);
+            });
+        });
+    }
+
     /* ---------- menu: highlight the category you are reading ---------- */
     var tabs = $$('.menu-tabs a');
     if (tabs.length && 'IntersectionObserver' in window) {

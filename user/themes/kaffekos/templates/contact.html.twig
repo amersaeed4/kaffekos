@@ -10,7 +10,13 @@
     <span class="ct-chip ct-chip-1" aria-hidden="true"><b>Hei!</b>{% if gloss %} hello{% endif %}</span>
     <span class="ct-chip ct-chip-2" aria-hidden="true"><b>Kaffe?</b>{% if gloss %} coffee?{% endif %}</span>
     <span class="ct-chip ct-chip-3" aria-hidden="true"><b>Takk</b>{% if gloss %} thanks{% endif %}</span>
-    <span class="ct-bean ct-bean-1" aria-hidden="true">{{ kk.icon('bean', 64) }}</span>
+    <div class="ct-badge" aria-hidden="true">
+        <svg class="ring" viewBox="0 0 120 120">
+            <defs><path id="ct-circ" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs>
+            <text><textPath href="#ct-circ" textLength="290" lengthAdjust="spacing">HEI · KAFFE · KOS · HEI · KAFFE · KOS · </textPath></text>
+        </svg>
+        {{ kk.icon('cup', 34) }}
+    </div>
     <span class="ct-bean ct-bean-2" aria-hidden="true">{{ kk.icon('cup', 56) }}</span>
     <div class="wrap">
         {% if header.banner.eyebrow %}<p class="eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
@@ -84,6 +90,7 @@
                 <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text></span></p>
             </div>
             <div class="card ct-hello">
+                <span class="ct-hello-star" aria-hidden="true">{{ kk.icon('star', 28) }}</span>
                 <h2>{{ kk.icon('heart', 26) }} {{ 'KK.CONTACT.SAY_HEJ'|t }}</h2>
                 <p>{{ 'KK.CONTACT.POP_IN'|t }}</p>
                 {% set links = {instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn', x: 'X'} %}
@@ -99,14 +106,37 @@
     </div>
 
     {% if (c.show_map is null or c.show_map) and biz.lat and biz.lng %}
+        {% set addr_lines = biz.address|split("\n")|map(l => l|trim)|filter(l => l) %}
+        {% set ticker = addr_lines|merge(['KK.CONTACT.SEE_YOU'|t, 'Kaffe', 'Kos']) %}
+        <div class="ct-ticker" aria-hidden="true">
+            <div class="ct-ticker-band">
+                <div class="ct-ticker-track">
+                    {% for g in 1..2 %}
+                        <div class="ct-ticker-group">
+                            {% for r in 1..2 %}{% for w in ticker %}<span>{{ w }}</span>{% endfor %}{% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
         <div class="wrap wrap-wide contact-map">
-            <iframe title="{{ 'KK.MAP_TITLE'|t }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                src="https://www.google.com/maps?q={{ biz.lat }},{{ biz.lng }}&amp;z=16&amp;output=embed"></iframe>
+            <div class="ct-map-frame" data-map-frame>
+                <iframe title="{{ 'KK.MAP_TITLE'|t }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                    src="https://www.google.com/maps?q={{ biz.lat }},{{ biz.lng }}&amp;z=16&amp;output=embed"></iframe>
+                <span class="ct-map-pulse" aria-hidden="true"><i></i><i></i></span>
+                <button type="button" class="ct-map-activate" data-map-activate hidden><span class="ct-map-hint">{{ kk.icon('pin', 18) }} {{ 'KK.CONTACT.MAP_HINT'|t }}</span></button>
+            </div>
             <div class="ct-address">
+                <span class="ct-address-tag">{{ 'KK.CONTACT.PIN_DROPPED'|t }}</span>
                 <h2>{{ kk.icon('pin', 24) }} {{ c.info_title ?: 'KK.FIND_US'|t }}</h2>
                 <p>{{ biz.address|e('html')|nl2br }}</p>
                 {% if biz.directions_note %}<p class="ct-note">{{ biz.directions_note|e('html')|nl2br }}</p>{% endif %}
-                {% if biz.maps_url %}<a class="btn btn-primary btn-block" href="{{ biz.maps_url }}" target="_blank" rel="noopener">{{ 'KK.GET_DIRECTIONS'|t }} {{ kk.icon('arrow', 18) }}</a>{% endif %}
+                <p class="open-badge open-badge-dark" data-open-status><span class="dot"></span><span data-open-text></span></p>
+                <div class="ct-address-actions">
+                    {% if biz.maps_url %}<a class="btn btn-primary" href="{{ biz.maps_url }}" target="_blank" rel="noopener">{{ 'KK.GET_DIRECTIONS'|t }} {{ kk.icon('arrow', 18) }}</a>{% endif %}
+                    <a class="btn btn-outline" href="{{ biz.ride_url ?: 'https://indrive.com/en-pk' }}" target="_blank" rel="noopener">{{ 'KK.CONTACT.RIDE'|t }}</a>
+                    <button type="button" class="btn btn-outline" data-copy="{{ addr_lines|join(', ')|e('html_attr') }}" data-copied="{{ 'KK.CONTACT.COPIED'|t|e('html_attr') }}" hidden>{{ 'KK.CONTACT.COPY'|t }}</button>
+                </div>
             </div>
         </div>
     {% endif %}

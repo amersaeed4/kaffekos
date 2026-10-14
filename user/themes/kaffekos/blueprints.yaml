@@ -196,6 +196,12 @@ form:
               label: How to find us (optional)
               help: 'Landmarks and parking help people searching "cafe near me" and are shown with the address. Example: Opposite Grand Park, second floor, parking at the front.'
 
+            business.ride_url:
+              type: text
+              label: Ride-hailing link (optional)
+              placeholder: 'https://indrive.com/en-pk'
+              help: 'Opened by the "Ride there" button on the Contact page. Leave empty to use the inDrive website.'
+
             business.price_range:
               type: text
               label: Price range (for Google)
