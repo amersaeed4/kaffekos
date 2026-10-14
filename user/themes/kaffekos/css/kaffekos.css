@@ -626,7 +626,7 @@ address { font-style: normal; }
 .page-gallery {
     --navy: #24104f; --navy-deep: #170a36; --red: #ff2e93; --gold: #ffd23f; --cream: #f6f0ff; --sand: #ebe0ff; --ink: #1a0b2e;
     --muted: color-mix(in srgb, #1a0b2e 70%, #f6f0ff); --line: color-mix(in srgb, #1a0b2e 16%, #f6f0ff);
-    --g-pink: #ff2e93; --g-lime: #b8ff3c; --g-orange: #ff8a1f; --g-sky: #2ec8ff; --g-violet: #7a3cff; --g-yellow: #ffd23f; --g-ink: #1a0b2e;
+    --g-pink: #ff2e93; --g-lime: #b8ff3c; --g-orange: #ff8a1f; --g-sky: #2ec8ff; --g-violet: #7a3cff; --g-yellow: #ffd23f; --g-mint: #3dffc0; --g-ink: #1a0b2e;
 }
 
 /* hero */
@@ -758,6 +758,12 @@ address { font-style: normal; }
     background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .78) 0 8px, rgba(255, 255, 255, .5) 8px 16px); border: 1px solid rgba(26, 11, 46, .18); box-shadow: 0 3px 6px -2px rgba(26, 11, 46, .35);
 }
 .gal-card:nth-child(even) .gal-tape { transform: rotate(5deg); width: 78px; margin-left: -39px; }
+.gal-new {
+    position: absolute; z-index: 4; left: -16px; top: -18px; width: 66px; height: 66px; display: grid; place-items: center; color: var(--g-ink); font-weight: 800; font-size: .8rem; letter-spacing: .08em;
+    background: var(--g-yellow); border: 3px solid var(--g-ink); border-radius: 50%; box-shadow: 3px 3px 0 var(--g-ink); transform: rotate(-14deg); animation: gal-newpulse 1.8s ease-in-out infinite;
+}
+.gal-new::before { content: ''; position: absolute; inset: -9px; z-index: -1; background: var(--g-pink); border: 3px solid var(--g-ink); clip-path: polygon(50% 0, 61% 16%, 79% 9%, 82% 28%, 100% 34%, 90% 50%, 100% 66%, 82% 72%, 79% 91%, 61% 84%, 50% 100%, 39% 84%, 21% 91%, 18% 72%, 0 66%, 10% 50%, 0 34%, 18% 28%, 21% 9%, 39% 16%); }
+@keyframes gal-newpulse { 50% { transform: rotate(-4deg) scale(1.14); } }
 .gal-frame { padding: .8rem .8rem .2rem; background: var(--c); border: 3px solid var(--g-ink); border-radius: 22px; box-shadow: 8px 8px 0 var(--g-ink); transition: box-shadow .28s; }
 .gal-card:hover .gal-frame { box-shadow: 12px 12px 0 var(--g-ink); }
 .gal-photo { position: relative; border: 3px solid var(--g-ink); border-radius: 14px; overflow: hidden; background: #fff; }
@@ -851,6 +857,7 @@ address { font-style: normal; }
     .gal-cap { padding: .6rem .15rem .75rem; gap: .35rem; }
     .gal-cap-text { font-size: .92rem; }
     .gal-tag { font-size: .62rem; padding: .15rem .5rem; }
+    .gal-new { width: 50px; height: 50px; left: -10px; top: -12px; font-size: .62rem; }
     .gal-tape { width: 64px; height: 20px; margin-left: -32px; top: -10px; }
     .lightbox-nav { top: auto; bottom: 1.2rem; transform: none; }
     .lightbox-nav:hover { transform: scale(1.12); }
