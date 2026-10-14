@@ -134,7 +134,6 @@
                 <p class="open-badge open-badge-dark" data-open-status><span class="dot"></span><span data-open-text></span></p>
                 <div class="ct-address-actions">
                     {% if biz.maps_url %}<a class="btn btn-primary" href="{{ biz.maps_url }}" target="_blank" rel="noopener">{{ 'KK.GET_DIRECTIONS'|t }} {{ kk.icon('arrow', 18) }}</a>{% endif %}
-                    <a class="btn btn-outline" href="{{ biz.ride_url ?: 'https://indrive.com/en-pk' }}" target="_blank" rel="noopener">{{ 'KK.CONTACT.RIDE'|t }}</a>
                     <button type="button" class="btn btn-outline" data-copy="{{ addr_lines|join(', ')|e('html_attr') }}" data-copied="{{ 'KK.CONTACT.COPIED'|t|e('html_attr') }}" hidden>{{ 'KK.CONTACT.COPY'|t }}</button>
                 </div>
             </div>

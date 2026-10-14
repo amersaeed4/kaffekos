@@ -140,7 +140,6 @@ en:
       MAP_HINT: "Tap to explore the map"
       SEE_YOU: "See you soon"
       PIN_DROPPED: "Pin dropped"
-      RIDE: "Ride there with inDrive"
       COPY: "Copy address"
       COPIED: "Copied!"
     MENU:
@@ -360,7 +359,6 @@ en:
       MAP_HINT: "Trykk for å utforske kartet"
       SEE_YOU: "Vi sees snart"
       PIN_DROPPED: "Pinnen er satt"
-      RIDE: "Ta inDrive dit"
       COPY: "Kopier adressen"
       COPIED: "Kopiert!"
     MENU:
