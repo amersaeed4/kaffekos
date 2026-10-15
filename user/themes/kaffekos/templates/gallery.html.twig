@@ -8,7 +8,8 @@
     sips:  {label: 'KK.GALLERY.CAT_SIPS'|t,  emoji: '🧋'},
     bites: {label: 'KK.GALLERY.CAT_BITES'|t, emoji: '🥐'},
     beans: {label: 'KK.GALLERY.CAT_BEANS'|t, emoji: '🫘'},
-    crew:  {label: 'KK.GALLERY.CAT_CREW'|t,  emoji: '🧑‍🍳'}
+    crew:  {label: 'KK.GALLERY.CAT_CREW'|t,  emoji: '🧑‍🍳'},
+    garden: {label: 'KK.GALLERY.CAT_GARDEN'|t, emoji: '🌿'}
 } %}
 {% set meta = {
     'cappuccino-and-cake.jpg':    {cat: 'sips',  cap: 'main character breakfast'},
@@ -33,7 +34,11 @@
     'kaffekos-storefront.jpg':    {cat: 'vibes', cap: 'the main character walk', new: true},
     'espresso-machine.jpg':       {cat: 'crew',  cap: 'meet the real MVP', new: true},
     'pastry-counter.jpg':         {cat: 'bites', cap: 'the sweet spot', new: true},
-    'barista-counter.jpg':        {cat: 'crew',  cap: 'ready when you are', new: true}
+    'barista-counter.jpg':        {cat: 'crew',  cap: 'ready when you are', new: true},
+    'garden-path.jpg':            {cat: 'garden', cap: 'brick road to happiness', new: true},
+    'garden-lawn.jpg':            {cat: 'garden', cap: 'touch grass, then touch coffee', new: true},
+    'garden-greens.jpg':          {cat: 'garden', cap: 'plant parent era', new: true},
+    'garden-view.jpg':            {cat: 'garden', cap: 'the backyard of your dreams', new: true}
 } %}
 {% set ribbon = ('KK.GALLERY.RIBBON'|t)|split(',')|map(w => w|trim) %}
 
@@ -60,14 +65,9 @@
 </section>
 
 <div class="gal-ribbons" aria-hidden="true">
-    <div class="gal-band gal-band-lime">
+    <div class="gal-band">
         <div class="gal-track">
             {% for i in 1..2 %}<div class="gal-group">{% for w in ribbon %}<span>{{ w }}</span>{% endfor %}</div>{% endfor %}
-        </div>
-    </div>
-    <div class="gal-band gal-band-pink">
-        <div class="gal-track gal-track-rev">
-            {% for i in 1..2 %}<div class="gal-group">{% for w in ribbon|reverse %}<span>{{ w }}</span>{% endfor %}</div>{% endfor %}
         </div>
     </div>
 </div>
@@ -92,7 +92,7 @@
             <div class="gal-chips">
                 <button type="button" class="gal-fchip is-on" data-filter="all" style="--c: var(--g-yellow)" aria-pressed="true">🌈 {{ 'KK.ALL'|t }}</button>
                 {% for key, c in cats %}
-                    <button type="button" class="gal-fchip" data-filter="{{ key }}" style="--c: var(--g-{{ {vibes: 'pink', sips: 'sky', bites: 'orange', beans: 'lime', crew: 'mint'}[key] }})" aria-pressed="false">{{ c.emoji }} {{ c.label }}</button>
+                    <button type="button" class="gal-fchip" data-filter="{{ key }}" style="--c: var(--g-{{ {vibes: 'pink', sips: 'sky', bites: 'orange', beans: 'lime', crew: 'mint', garden: 'coral'}[key] }})" aria-pressed="false">{{ c.emoji }} {{ c.label }}</button>
                 {% endfor %}
                 <button type="button" class="gal-fchip" data-filter="saved" style="--c: var(--g-violet)" aria-pressed="false">♥ {{ 'KK.GALLERY.SAVED'|t }} <span class="gal-saved-n" data-saved-count>0</span></button>
             </div>

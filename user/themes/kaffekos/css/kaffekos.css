@@ -724,7 +724,7 @@ address { font-style: normal; }
 .page-gallery {
     --navy: #24104f; --navy-deep: #170a36; --red: #ff2e93; --gold: #ffd23f; --cream: #f6f0ff; --sand: #ebe0ff; --ink: #1a0b2e;
     --muted: color-mix(in srgb, #1a0b2e 70%, #f6f0ff); --line: color-mix(in srgb, #1a0b2e 16%, #f6f0ff);
-    --g-pink: #ff2e93; --g-lime: #b8ff3c; --g-orange: #ff8a1f; --g-sky: #2ec8ff; --g-violet: #7a3cff; --g-yellow: #ffd23f; --g-mint: #3dffc0; --g-ink: #1a0b2e;
+    --g-pink: #ff2e93; --g-lime: #b8ff3c; --g-orange: #ff8a1f; --g-sky: #2ec8ff; --g-violet: #7a3cff; --g-yellow: #ffd23f; --g-mint: #3dffc0; --g-coral: #ff6b5b; --g-ink: #1a0b2e;
 }
 
 /* hero */
@@ -777,16 +777,19 @@ address { font-style: normal; }
 .gal-chip-3 { right: 12%; bottom: 25%; --r: -4deg; background: var(--g-lime); animation-delay: -3.5s; }
 @keyframes gal-chipbob { to { transform: translateY(-14px) rotate(calc(var(--r) + 5deg)); } }
 
-/* crossing marquee ribbons on the hero's bottom edge */
-.gal-ribbons { position: relative; z-index: 3; height: 8.6rem; margin-top: -6rem; overflow: hidden; pointer-events: none; }
-.gal-band { position: absolute; left: -4%; width: 108%; padding: .7rem 0; border-block: 3px solid var(--g-ink); overflow: hidden; box-shadow: 0 10px 0 -4px rgba(26, 11, 46, .25); }
-.gal-band-lime { top: 1.6rem; background: var(--g-lime); color: var(--g-ink); transform: rotate(-2.2deg); }
-.gal-band-pink { top: 3.4rem; background: var(--g-pink); color: #fff; transform: rotate(1.8deg); z-index: -1; }
-.gal-track { display: flex; width: max-content; animation: gal-marquee 34s linear infinite; }
-.gal-track-rev { animation-direction: reverse; animation-duration: 40s; }
-.gal-group { display: flex; flex: none; }
-.gal-group span { display: inline-flex; align-items: center; gap: 1.6rem; padding-right: 1.6rem; font-family: var(--font-head); font-size: clamp(1.15rem, 2.4vw, 1.7rem); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
-.gal-group span::after { content: '✦'; font-size: 1.1em; }
+/* film strip on the hero's bottom edge: dark negative, sprocket holes, numbered colour frames */
+.gal-ribbons { position: relative; z-index: 3; margin-top: -3.2rem; padding: 1rem 0; overflow: hidden; pointer-events: none; }
+.gal-band { position: relative; width: 104%; margin-left: -2%; padding: 1.55rem 0; overflow: hidden; background: var(--g-ink); transform: rotate(1.1deg); box-shadow: 0 16px 0 -6px rgba(26, 11, 46, .22); }
+.gal-band::before, .gal-band::after { content: ''; position: absolute; left: 0; right: 0; height: 9px; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .88) 0 13px, transparent 13px 28px); opacity: .9; }
+.gal-band::before { top: 7px; }
+.gal-band::after { bottom: 7px; }
+.gal-track { display: flex; width: max-content; animation: gal-marquee 40s linear infinite; }
+.gal-group { display: flex; flex: none; gap: .7rem; padding-right: .7rem; counter-reset: gal-frame; }
+.gal-group span { counter-increment: gal-frame; display: inline-flex; align-items: baseline; gap: .8rem; padding: .35rem 1.2rem; border-radius: 6px; background: var(--g-lime); color: var(--g-ink); font-family: var(--font-head); font-size: clamp(1.1rem, 2.3vw, 1.6rem); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.gal-group span::before { content: counter(gal-frame, decimal-leading-zero); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .5em; font-weight: 700; letter-spacing: .05em; opacity: .65; }
+.gal-group span:nth-child(4n+2) { background: var(--g-pink); color: #fff; }
+.gal-group span:nth-child(4n+3) { background: var(--g-sky); }
+.gal-group span:nth-child(4n) { background: var(--g-yellow); }
 @keyframes gal-marquee { to { transform: translateX(-50%); } }
 
 /* stage */
