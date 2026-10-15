@@ -5,6 +5,7 @@ media_order: 'ali-kazmi-music-night.jpg, ali-kazmi-offer.jpg, ali-kazmi-location
 cover: ali-kazmi-music-night.jpg
 cover_focus: full
 kind: upcoming
+event_style: music
 when: 'Saturday 17 October, 8:00 PM onwards'
 event_start: '2026-10-17 20:00'
 where: 'Grand Park, Shouq Chowk, Johar Town, Lahore'

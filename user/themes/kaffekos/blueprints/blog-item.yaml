@@ -24,6 +24,15 @@ form:
                 music: 'Live music (a music night that already happened)'
                 news: 'News'
               help: 'Choose "Upcoming event" for an announcement or poster: it shows under "Coming up" on the Events page and the Home page and disappears by itself once the event day is over. Use "Event" for a write-up of something that already happened.'
+            header.event_style:
+              type: select
+              label: Look of the Home page banner
+              default: ''
+              options:
+                '': 'Standard (gold)'
+                music: 'Live music (purple stage, equalizer, vinyl)'
+                awareness: 'Awareness / charity (pink ribbon)'
+              help: 'Only for "Upcoming event" posts: how the banner under the Home page buttons looks. Pick "Live music" for a music night. Set it in both the English and Norwegian version of the post.'
             header.when:
               type: text
               label: When (optional)

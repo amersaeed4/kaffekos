@@ -75,6 +75,15 @@ form:
                 0: 'No'
               validate:
                 type: bool
+            header.hero.awareness:
+              type: select
+              label: Pink October (Breast Cancer Awareness Month) message
+              default: auto
+              options:
+                auto: 'Automatic: only in October'
+                'on': 'Always show'
+                'off': 'Never show'
+              help: 'A pink-ribbon message at the top of the hero, with a pink ribbon on the chips and the ribbon band.'
             header.hero.show_partner:
               type: toggle
               label: Show "Brewed exclusively with Hausbrandt"
