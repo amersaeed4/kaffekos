@@ -3,14 +3,40 @@
 {% set social = theme_var('social') %}
 {% set hours = theme_var('hours') %}
 {% set tagline = kk_l('brand.tagline') %}
+{% set wordmark = theme_var('brand.wordmark') ?: site.title %}
+{% set ticker = ('KK.FOOTER.TICKER'|t)|split(',') %}
 <footer class="site-footer">
     <div class="pattern-band" aria-hidden="true"></div>
+
+    {% set ticker_icons = ['cup', 'bun', 'heart', 'bean', 'star', 'cake', 'leaf'] %}
+    <div class="ft-ticker" aria-hidden="true">
+        <div class="ft-ticker-track">
+            {% for n in 1..4 %}
+                {% for word in ticker %}<span class="ft-chip ft-chip-{{ loop.index0 % 3 }}">{{ kk.icon(ticker_icons[loop.index0 % 7], 18) }}{{ word|trim }}</span>{% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="wrap">
+        <section class="ft-cta">
+            <div class="ft-cta-text">
+                <h2>{{ 'KK.FOOTER.CTA_TITLE'|t }}<span aria-hidden="true">.</span></h2>
+                <p>{{ 'KK.FOOTER.CTA_SUB'|t }}</p>
+                <p class="open-badge open-badge-dark" data-open-status><span class="dot"></span><span data-open-text></span></p>
+            </div>
+            <div class="ft-cta-actions">
+                {% if biz.maps_url %}<a class="btn btn-primary btn-lg" href="{{ biz.maps_url }}" target="_blank" rel="noopener">{{ kk.icon('pin', 20) }} {{ 'KK.GET_DIRECTIONS'|t }}</a>{% endif %}
+                {% if biz.whatsapp %}<a class="btn btn-ghost btn-lg" href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener">{{ kk.icon('whatsapp', 20) }} {{ 'KK.VISIT.WHATSAPP'|t }}</a>{% endif %}
+            </div>
+        </section>
+    </div>
+
     <div class="wrap footer-grid">
         <div class="footer-brand">
             <a class="brand brand-light" href="{{ base_url == '' ? '/' : base_url }}">
                 <img src="{{ logo_url }}" alt="" width="52" height="52">
                 <span class="brand-text">
-                    <span class="brand-name">{{ theme_var('brand.wordmark') ?: site.title }}</span>
+                    <span class="brand-name">{{ wordmark }}</span>
                     {% if tagline %}<span class="brand-tag">{{ tagline }}</span>{% endif %}
                 </span>
             </a>
@@ -19,22 +45,22 @@
                 {% set social_names = {instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn', x: 'X'} %}
                 {% for key in ['instagram', 'facebook', 'tiktok', 'youtube', 'linkedin', 'x'] %}
                     {% if social[key] %}
-                        <li><a href="{{ social[key] }}" target="_blank" rel="noopener" aria-label="{{ social_names[key] }}">{{ kk.icon(key, 20) }}</a></li>
+                        <li><a class="soc-{{ key }}" href="{{ social[key] }}" target="_blank" rel="noopener" aria-label="{{ social_names[key] }}" data-tip="{{ social_names[key] }}">{{ kk.icon(key, 20) }}</a></li>
                     {% elseif key != 'x' %}
                         <li><span class="is-soon" title="{{ 'KK.SOON'|t(social_names[key]) }}" role="img" aria-label="{{ 'KK.SOON'|t(social_names[key]) }}">{{ kk.icon(key, 20) }}</span></li>
                     {% endif %}
                 {% endfor %}
                 {% if biz.whatsapp %}
-                    <li><a href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener" aria-label="WhatsApp">{{ kk.icon('whatsapp', 20) }}</a></li>
+                    <li><a class="soc-whatsapp" href="https://wa.me/{{ biz.whatsapp }}" target="_blank" rel="noopener" aria-label="WhatsApp" data-tip="WhatsApp">{{ kk.icon('whatsapp', 20) }}</a></li>
                 {% endif %}
             </ul>
         </div>
 
         <div>
             <h3 class="footer-title">{{ 'KK.FOOTER.EXPLORE'|t }}</h3>
-            <ul class="footer-links">
+            <ul class="footer-links footer-nav">
                 {% for p in pages.children.visible %}
-                    <li><a href="{{ p.url }}">{{ p.menu }}</a></li>
+                    <li><a href="{{ p.url }}"><span>{{ p.menu }}</span>{{ kk.icon('arrow', 16) }}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -44,9 +70,19 @@
             <address class="footer-address">
                 {{ biz.address|e('html')|nl2br }}
             </address>
-            <ul class="footer-links">
-                {% if biz.phone %}<li><a href="tel:{{ biz.phone|replace({' ': ''}) }}">{{ kk.icon('phone', 16) }} {{ biz.phone }}</a></li>{% endif %}
-                {% if biz.email %}<li><a href="mailto:{{ biz.email }}">{{ kk.icon('mail', 16) }} {{ biz.email }}</a></li>{% endif %}
+            <ul class="footer-links footer-contact">
+                {% if biz.phone %}
+                    <li>
+                        <a href="tel:{{ biz.phone|replace({' ': ''}) }}">{{ kk.icon('phone', 16) }} {{ biz.phone }}</a>
+                        <button type="button" class="ft-copy" data-copy="{{ biz.phone }}" aria-label="{{ 'KK.FOOTER.COPY'|t(biz.phone) }}" title="{{ 'KK.FOOTER.COPY'|t(biz.phone) }}">{{ kk.icon('copy', 15) }}</button>
+                    </li>
+                {% endif %}
+                {% if biz.email %}
+                    <li>
+                        <a href="mailto:{{ biz.email }}">{{ kk.icon('mail', 16) }} {{ biz.email }}</a>
+                        <button type="button" class="ft-copy" data-copy="{{ biz.email }}" aria-label="{{ 'KK.FOOTER.COPY'|t(biz.email) }}" title="{{ 'KK.FOOTER.COPY'|t(biz.email) }}">{{ kk.icon('copy', 15) }}</button>
+                    </li>
+                {% endif %}
                 {% if biz.maps_url %}<li><a href="{{ biz.maps_url }}" target="_blank" rel="noopener">{{ kk.icon('pin', 16) }} {{ 'KK.GET_DIRECTIONS'|t }}</a></li>{% endif %}
             </ul>
         </div>
@@ -56,10 +92,16 @@
             {% include 'partials/hours.html.twig' with {compact: true} %}
         </div>
     </div>
+
+    <div class="ft-wordmark" aria-hidden="true">
+        {% for ch in wordmark|upper|split('') %}<span>{{ ch }}</span>{% endfor %}
+    </div>
+
     <div class="footer-bottom">
         <div class="wrap">
             <span>&copy; {{ 'now'|date('Y') }} {{ kk_l('footer.copyright') }}</span>
-            {% if kk_l('footer.tagline') %}<span class="footer-kos">{{ kk_l('footer.tagline') }}</span>{% endif %}
+            <button type="button" class="ft-top" data-to-top>{{ kk.icon('arrow-up', 16) }} {{ 'KK.FOOTER.BACK_TO_TOP'|t }}</button>
+            {% if kk_l('footer.tagline') %}<span class="footer-kos">{{ kk_l('footer.tagline') }} <button type="button" class="ft-heart" data-heart aria-label="&#10084;">&#10084;</button></span>{% endif %}
         </div>
     </div>
 </footer>

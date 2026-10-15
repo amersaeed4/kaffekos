@@ -116,6 +116,59 @@
         }
     }
 
+    /* ---------- footer: reveal on scroll, copy buttons, back to top, heart burst ---------- */
+    (function () {
+        var grid = $('.footer-grid'), cta = $('.ft-cta');
+        if (grid && 'IntersectionObserver' in window) {
+            doc.documentElement.classList.add('js-ready');
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } });
+            }, { threshold: .15 });
+            io.observe(grid);
+            if (cta) io.observe(cta);
+        }
+        $$('.ft-copy').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var text = btn.getAttribute('data-copy') || '';
+                var done = function () {
+                    btn.setAttribute('data-msg', T.copied || 'Copied!');
+                    btn.classList.add('is-copied');
+                    setTimeout(function () { btn.classList.remove('is-copied'); }, 1600);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () {});
+                else {
+                    var ta = doc.createElement('textarea');
+                    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                    doc.body.appendChild(ta); ta.select();
+                    try { doc.execCommand('copy'); done(); } catch (e) { /* ignore */ }
+                    doc.body.removeChild(ta);
+                }
+            });
+        });
+        var top = $('[data-to-top]');
+        if (top) top.addEventListener('click', function () {
+            var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' });
+        });
+        var heart = $('[data-heart]');
+        if (heart) heart.addEventListener('click', function () {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            var r = heart.getBoundingClientRect(), bits = ['\u2615', '\u2764\uFE0F', '\u2728', '\uD83E\uDD50', '\uD83C\uDF6A'];
+            for (var i = 0; i < 14; i++) {
+                var el = doc.createElement('span');
+                el.className = 'ft-burst';
+                el.textContent = bits[i % bits.length];
+                el.style.left = (r.left + r.width / 2) + 'px';
+                el.style.top = (r.top + r.height / 2) + 'px';
+                el.style.setProperty('--dx', (Math.random() * 240 - 120) + 'px');
+                el.style.setProperty('--dy', (-60 - Math.random() * 160) + 'px');
+                el.style.setProperty('--rot', (Math.random() * 360 - 180) + 'deg');
+                doc.body.appendChild(el);
+                setTimeout((function (n) { return function () { n.remove(); }; })(el), 950);
+            }
+        });
+    })();
+
     /* ---------- home: event banner flips to "Happening now" / hides itself when over (no reload needed) ---------- */
     var evBanner = $('.hm-event[data-start]');
     if (evBanner) {

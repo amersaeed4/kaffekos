@@ -41,6 +41,12 @@ en:
       PAGE_AT: "%s at %s. "
     FOOTER:
       EXPLORE: "Explore"
+      TICKER: "Coffee,Comfort,Connection,Hygge,Warm bakes,Good vibes,Kos"
+      CTA_TITLE: "Come hang out"
+      CTA_SUB: "Grab a coffee, a warm bake and the cosiest corner in Lahore."
+      BACK_TO_TOP: "Back to top"
+      COPY: "Copy %s"
+      COPIED: "Copied!"
     VISIT:
       TITLE: "Visit us"
       ADDRESS: "Address"
@@ -260,6 +266,12 @@ en:
       PAGE_AT: "%s hos %s. "
     FOOTER:
       EXPLORE: "Utforsk"
+      TICKER: "Kaffe,Komfort,Samhold,Hygge,Varme bakverk,God stemning,Kos"
+      CTA_TITLE: "Kom innom"
+      CTA_SUB: "Ta en kaffe, et varmt bakverk og det koseligste hjørnet i Lahore."
+      BACK_TO_TOP: "Til toppen"
+      COPY: "Kopier %s"
+      COPIED: "Kopiert!"
     VISIT:
       TITLE: "Besøk oss"
       ADDRESS: "Adresse"
