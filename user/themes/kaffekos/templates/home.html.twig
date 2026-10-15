@@ -17,13 +17,9 @@
     <span class="hm-chip hm-chip-1" aria-hidden="true"><b>Kaffe</b>{% if gloss %} coffee{% endif %}</span>
     <span class="hm-chip hm-chip-2" aria-hidden="true"><b>Kos</b>{% if gloss %} cosiness{% endif %}</span>
     <span class="hm-chip hm-chip-3" aria-hidden="true">{{ kk.flag_no() }}<b>Skål</b>{% if gloss %} cheers{% endif %}</span>
-    {% if hero.awareness == 'on' or ((hero.awareness ?: 'auto') == 'auto' and ((('now'|date('U')) + 18000)|date('n')) == 10) %}<span class="hm-chip hm-chip-4" aria-hidden="true">{{ kk.ribbon(18) }}<b>{{ 'KK.HOME.PINK_CHIP'|t }}</b></span>{% endif %}
     <div class="wrap hero-content">
         {% set pink_mode = hero.awareness ?: 'auto' %}
         {% set pink = pink_mode == 'on' or (pink_mode == 'auto' and ((('now'|date('U')) + 18000)|date('n')) == 10) %}
-        {% if pink %}
-            <p class="hm-pink"><span class="hm-pink-icon">{{ kk.ribbon(20) }}</span><span class="hm-pink-text"><b>{{ 'KK.HOME.PINK_TITLE'|t }}</b> <span>{{ 'KK.HOME.PINK_TEXT'|t }}</span></span></p>
-        {% endif %}
         {% if hero.eyebrow %}<p class="eyebrow eyebrow-light hm-hero-eyebrow">{{ kk.flag_no() }}<span>{{ hero.eyebrow }}</span></p>{% endif %}
         {% set hw = (hero.title|default(page.title))|split(' ') %}
         <h1>{% if hw|length > 1 %}{{ hw|slice(0, -1)|join(' ') }} {% endif %}<em>{{ hw|last }}</em></h1>
@@ -46,6 +42,7 @@
                     <span class="hm-brew-arrow" aria-hidden="true">{{ kk.icon('arrow', 15) }}</span>
                 </a>
             {% endif %}
+            {% if pink %}<span class="hm-pink" title="{{ 'KK.HOME.PINK_TEXT'|t }}"><span class="hm-pink-icon">{{ kk.ribbon(15) }}</span>{{ 'KK.HOME.PINK_SHORT'|t }}</span>{% endif %}
         </div>
 
         {# Upcoming-event banner: shown while an event is still to come or on right now; links to the soonest one.
@@ -70,9 +67,7 @@
             {% set ev_style = ev.header.event_style in ['music', 'awareness'] ? ev.header.event_style : '' %}
             <a class="hm-event{{ ev_live ? ' is-live' : '' }}{{ ev_style ? ' hm-event--' ~ ev_style : '' }}" href="{{ ev_more ? ev_page.url : ev.url }}"{% if ev_start %} data-start="{{ ev_start }}" data-end="{{ ev_end }}"{% endif %}>
                 <span class="hm-event-tag"><span class="hm-event-dot" aria-hidden="true"></span><span data-ev-label>{{ ev_when }}</span></span>
-                {% if ev_style == 'music' %}<span class="hm-event-notes" aria-hidden="true"><i>♪</i><i>♫</i><i>♬</i></span>{% endif %}
                 <span class="hm-event-main">
-                    {% if ev_style == 'music' %}<span class="hm-event-kicker">{{ 'KK.EVENTS.KIND_MUSIC'|t }}</span>{% elseif ev_style == 'awareness' %}<span class="hm-event-kicker">{{ 'KK.HOME.PINK_CHIP'|t }}</span>{% endif %}
                     <strong>{{ ev.title }}</strong>
                     {% if ev.header.when %}<small>{{ ev.header.when }}{% if ev_more %} &middot; {{ ev_more_text }}{% endif %}</small>{% elseif ev_more %}<small>{{ ev_more_text }}</small>{% endif %}
                 </span>
