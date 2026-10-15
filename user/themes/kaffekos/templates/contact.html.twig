@@ -102,6 +102,35 @@
                     {% endfor %}
                 </ul>
             </div>
+            {% set g = kk_google_rating() %}
+            {% set review_url = kk_google_review_url() %}
+            {% if g or review_url %}
+                <div class="card ct-review">
+                    {% if g %}
+                        <a class="ct-review-rating" href="{{ biz.maps_url ?: '#' }}" target="_blank" rel="noopener" aria-label="{{ 'KK.HOME.GOOGLE_SEE'|t }}">
+                            <span class="ct-review-g">{{ kk.google_g(30) }}</span>
+                            <span class="ct-review-score">{{ g.rating|number_format(1) }}</span>
+                            <span class="ct-review-meta">
+                                <span class="ct-review-stars" style="--pct: {{ (g.rating / 5 * 100)|round }}%" role="img" aria-label="{{ 'KK.HOME.GOOGLE_STARS_ARIA'|t(g.rating|number_format(1)) }}">★★★★★</span>
+                                <span class="ct-review-count">{{ (g.count == 1 ? 'KK.HOME.GOOGLE_REVIEWS_ONE' : 'KK.HOME.GOOGLE_REVIEWS')|t(g.count) }}</span>
+                            </span>
+                            <span class="ct-review-see">{{ kk.icon('arrow', 22) }}</span>
+                        </a>
+                    {% endif %}
+                    {% if review_url %}
+                        {% do assets.addJs('theme://js/qrcode.js', {group: 'bottom', loading: 'defer'}) %}
+                        <div class="ct-review-ask">
+                            <div class="ct-qr" data-qr="{{ review_url }}" role="img" aria-label="{{ 'KK.HOME.REVIEW_ALT'|t }}"></div>
+                            <div class="ct-review-body">
+                                <h2>{{ 'KK.HOME.REVIEW_TITLE'|t }}</h2>
+                                <p class="ct-review-scan">{{ 'KK.HOME.REVIEW_SCAN'|t }}</p>
+                                <p class="ct-review-tap">{{ 'KK.HOME.REVIEW_TAP'|t }}</p>
+                                <a class="ct-review-btn" href="{{ review_url }}" target="_blank" rel="noopener"><span aria-hidden="true">★</span> {{ 'KK.HOME.REVIEW_BTN'|t }}</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
         </aside>
     </div>
 
