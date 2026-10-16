@@ -223,6 +223,7 @@ en:
         GARDEN_LAWN: "touch grass, then touch coffee"
         GARDEN_GREENS: "plant parent era"
         GARDEN_VIEW: "the backyard of your dreams"
+        GARDEN_NIGHT: "blue hour, big mood"
     JS:
       MENU_OPEN: "Open menu"
       MENU_CLOSE: "Close menu"
@@ -457,6 +458,7 @@ en:
         GARDEN_LAWN: "rør gress, så rør kaffe"
         GARDEN_GREENS: "plantemamma-æraen"
         GARDEN_VIEW: "drømmehagen din"
+        GARDEN_NIGHT: "blåtime, stor stemning"
     JS:
       MENU_OPEN: "Åpne meny"
       MENU_CLOSE: "Lukk meny"
