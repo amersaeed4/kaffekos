@@ -1564,19 +1564,50 @@ address { font-style: normal; }
 .hm-kos .kos-pron { display: inline-block; padding: .35rem 1rem; border-radius: 999px; background: rgba(255, 255, 255, .14); }
 @keyframes hm-wobble { 50% { transform: rotate(-2deg) scale(1.03); } }
 
-/* photo strip: tilted snapshots */
-.hm-strip { position: relative; overflow: hidden; background: var(--sand); }
-.hm-strip .section-head .eyebrow { background: #fff; }
-.hm-photos { gap: 1rem; padding: .6rem 0; }
-.hm-photos .photo { border: 4px solid #fff; border-radius: 16px; box-shadow: 0 18px 28px -18px rgba(15, 39, 71, .6); transform: rotate(var(--r, 0deg)); transition: transform .3s cubic-bezier(.3, 1.5, .5, 1), box-shadow .3s; }
-.hm-photos .photo:nth-child(6n+1) { --r: -2.5deg; }
-.hm-photos .photo:nth-child(6n+2) { --r: 2deg; margin-top: 1rem; }
-.hm-photos .photo:nth-child(6n+3) { --r: -1.5deg; }
-.hm-photos .photo:nth-child(6n+4) { --r: 2.5deg; margin-top: 1rem; }
-.hm-photos .photo:nth-child(6n+5) { --r: -2deg; }
-.hm-photos .photo:nth-child(6n+6) { --r: 1.5deg; margin-top: 1rem; }
-.hm-photos .photo:hover { transform: rotate(0deg) scale(1.07); z-index: 2; box-shadow: 0 26px 36px -18px rgba(15, 39, 71, .7); }
-.hm-photos .photo.reveal.is-visible { transition: transform .3s, box-shadow .3s, opacity .8s ease; }
+/* photo strip: gen-z photo dump (random photos, taped polaroids, stickers, shuffle) */
+.hm-strip { --g-ink: #1a0b2e; --g-pink: #ff2e93; --g-lime: #b8ff3c; --g-orange: #ff8a1f; --g-sky: #2ec8ff; --g-violet: #7a3cff; --g-yellow: #ffd23f;
+    position: relative; overflow: hidden; isolation: isolate; padding-bottom: clamp(3.5rem, 7vw, 5.5rem);
+    background-color: #f6f0ff; background-image: radial-gradient(color-mix(in srgb, var(--g-violet) 26%, transparent) 1.6px, transparent 1.8px); background-size: 28px 28px; }
+.hm-strip-blob { position: absolute; z-index: -1; border-radius: 50%; filter: blur(70px); opacity: .38; pointer-events: none; animation: mp-drift 14s ease-in-out infinite alternate; }
+.hm-strip-blob-1 { width: 460px; aspect-ratio: 1; left: -160px; top: 8%; background: var(--g-pink); }
+.hm-strip-blob-2 { width: 480px; aspect-ratio: 1; right: -180px; bottom: 6%; background: var(--g-sky); animation-delay: -6s; }
+.hm-strip .section-head .eyebrow { background: #fff; border: 2px solid var(--g-ink); color: var(--g-ink); box-shadow: 3px 3px 0 var(--g-ink); }
+.hm-strip .section-head h2 { color: var(--g-ink); }
+.hm-strip .section-head h2::after { display: none; }
+.hm-strip .section-head h2 mark { display: inline-block; padding: 0 .22em; margin-inline: .05em; color: #fff; background: var(--g-violet); border-radius: .14em; transform: rotate(-1.8deg); box-shadow: 5px 5px 0 var(--g-ink); }
+.hm-strip .section-head .lead { color: var(--g-ink); font-weight: 500; }
+.hm-strip-head { position: relative; }
+.hm-strip-sticker { position: absolute; right: 2%; top: -.4rem; padding: .4rem 1rem; border: 3px solid var(--g-ink); border-radius: 999px; background: var(--g-lime); color: var(--g-ink); font-weight: 800; font-size: .85rem; letter-spacing: .06em; box-shadow: 4px 4px 0 var(--g-ink); transform: rotate(7deg); animation: gal-wiggle 3.2s ease-in-out infinite; }
+
+.hm-photos { gap: 1.3rem; padding: 1rem .4rem .6rem; align-items: start; }
+.hm-polaroid { --c: var(--g-pink); --r: -2deg; position: relative; display: block; aspect-ratio: auto; overflow: visible; background: var(--c); padding: .55rem .55rem .2rem; border: 3px solid var(--g-ink); border-radius: 18px; box-shadow: 6px 6px 0 var(--g-ink); transform: rotate(var(--r)); transition: transform .28s cubic-bezier(.3, 1.5, .5, 1), box-shadow .28s; }
+.hm-polaroid:nth-child(6n+1) { --c: var(--g-pink); --r: -2.6deg; }
+.hm-polaroid:nth-child(6n+2) { --c: var(--g-lime); --r: 2deg; margin-top: 1.6rem; }
+.hm-polaroid:nth-child(6n+3) { --c: var(--g-orange); --r: -1.4deg; }
+.hm-polaroid:nth-child(6n+4) { --c: var(--g-sky); --r: 2.6deg; margin-top: 1.6rem; }
+.hm-polaroid:nth-child(6n+5) { --c: var(--g-violet); --r: -2.2deg; }
+.hm-polaroid:nth-child(6n+6) { --c: var(--g-yellow); --r: 1.6deg; margin-top: 1.6rem; }
+.hm-polaroid-img { display: block; border: 3px solid var(--g-ink); border-radius: 11px; overflow: hidden; background: #fff; line-height: 0; }
+.hm-polaroid-img img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; transition: transform .7s cubic-bezier(.2, .8, .2, 1), filter .4s; }
+.hm-polaroid:hover { --r: 0deg; transform: translateY(-8px) scale(1.06) rotate(0deg); box-shadow: 10px 12px 0 var(--g-ink); z-index: 3; }
+.hm-polaroid:hover .hm-polaroid-img img { transform: scale(1.1) rotate(.6deg); filter: saturate(1.25) contrast(1.04); }
+.hm-tape { position: absolute; z-index: 2; left: 50%; top: -13px; width: 70px; height: 24px; margin-left: -35px; transform: rotate(-4deg); background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .8) 0 7px, rgba(255, 255, 255, .5) 7px 14px); border: 1px solid rgba(26, 11, 46, .18); box-shadow: 0 3px 6px -2px rgba(26, 11, 46, .35); }
+.hm-polaroid:nth-child(even) .hm-tape { transform: rotate(5deg); width: 60px; margin-left: -30px; }
+.hm-polaroid-tag { display: inline-block; margin: .45rem 0 .35rem .2rem; padding: .18rem .65rem; border: 2px solid var(--g-ink); border-radius: 999px; background: #fff; color: var(--g-ink); font-size: .74rem; font-weight: 800; letter-spacing: .04em; white-space: nowrap; transition: transform .25s cubic-bezier(.3, 1.8, .5, 1); }
+.hm-polaroid:hover .hm-polaroid-tag { transform: rotate(-5deg) scale(1.12); }
+.hm-polaroid.reveal.is-visible { animation: gal-pop .75s cubic-bezier(.3, 1.5, .5, 1) backwards; animation-delay: calc(var(--i, 0) * 90ms); transition: transform .28s cubic-bezier(.3, 1.5, .5, 1), box-shadow .28s, opacity .8s ease; }
+.hm-polaroid.is-flip { transform: rotate(var(--r)) scale(.82) rotateY(70deg); opacity: .4; }
+.hm-polaroid.is-pop { animation: gal-pop2 .55s cubic-bezier(.3, 1.8, .5, 1); }
+
+.hm-strip-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem; margin-top: clamp(1.8rem, 4vw, 2.6rem); }
+.hm-shuffle, .hm-gal-btn { display: inline-flex; align-items: center; gap: .6rem; padding: .85rem 1.5rem; border: 3px solid var(--g-ink); border-radius: 999px; font: 800 1.02rem/1 var(--font-body); color: var(--g-ink); text-decoration: none; cursor: pointer; box-shadow: 5px 5px 0 var(--g-ink); transition: transform .18s cubic-bezier(.3, 1.6, .5, 1), box-shadow .18s, background .18s; }
+.hm-shuffle { background: var(--g-lime); }
+.hm-gal-btn { background: var(--g-pink); color: #fff; }
+.hm-shuffle:hover, .hm-gal-btn:hover { transform: translate(-2px, -4px) rotate(-2deg); box-shadow: 8px 9px 0 var(--g-ink); }
+.hm-shuffle:active, .hm-gal-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--g-ink); }
+.hm-shuffle.is-spin .hm-shuffle-ico { animation: hm-spin .6s ease; display: inline-block; }
+.hm-gal-btn svg { transition: transform .2s; }
+.hm-gal-btn:hover svg { transform: translateX(4px); }
 
 /* visit: warmer navy */
 .page-home .visit { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%); position: relative; overflow: hidden; }
@@ -2003,11 +2034,16 @@ address { font-style: normal; }
     .hm-cards { grid-template-columns: 1fr; }
     .hm-card:nth-child(even) { margin-top: 0; }
     .hm-welcome .frame { transform: none; }
-    .hm-photos .photo:nth-child(n) { margin-top: 0; }
+    .hm-polaroid:nth-child(n) { margin-top: 0; }
+    .hm-photos { gap: 1.1rem .9rem; }
+    .hm-polaroid { box-shadow: 4px 4px 0 var(--g-ink); border-radius: 14px; padding: .4rem .4rem .1rem; }
+    .hm-polaroid-tag { font-size: .66rem; padding: .12rem .5rem; }
+    .hm-strip-sticker { display: none; }
+    .hm-shuffle, .hm-gal-btn { flex: 1 1 100%; justify-content: center; }
     .page-home .visit-map { transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .hm-flag, .hero-fun::after, .hm-chip, .hm-ticker-track, .page-home .coffee::after, .page-home .coffee-halo, .page-home .coffee-products .product, .hm-kos .kos-word, .hm-kos .kos-inner::before, .hm-kos .kos-inner::after, .page-home .visit::before { animation: none; }
+    .hm-strip-blob, .hm-strip-sticker, .hm-flag, .hero-fun::after, .hm-chip, .hm-ticker-track, .page-home .coffee::after, .page-home .coffee-halo, .page-home .coffee-products .product, .hm-kos .kos-word, .hm-kos .kos-inner::before, .hm-kos .kos-inner::after, .page-home .visit::before { animation: none; }
 }
 
 /* ---- Home: "Coming up" showcase (fills itself from the Events page) ---- */

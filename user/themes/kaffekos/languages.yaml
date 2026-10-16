@@ -94,6 +94,9 @@ en:
       PINK_SHORT: "Breast Cancer Awareness Month"
       FULL_MENU: "See the full menu"
       VIEW_GALLERY: "View the gallery"
+      STRIP_SHUFFLE: "Shuffle"
+      STRIP_STICKER: "📸 photo dump"
+      STRIP_TAGS: "✨ vibes,☕ sip sip,💜 obsessed,🥐 yum,🌿 touch grass,🎶 mood,😍 so cute,🔥 fire"
       KIND_WORDS: "Kind words"
       STARS: "%d out of 5 stars"
     ABOUT:
@@ -329,6 +332,9 @@ en:
       PINK_SHORT: "Brystkreftmåneden"
       FULL_MENU: "Se hele menyen"
       VIEW_GALLERY: "Se galleriet"
+      STRIP_SHUFFLE: "Bland"
+      STRIP_STICKER: "📸 bildedump"
+      STRIP_TAGS: "✨ stemning,☕ slurp,💜 forelsket,🥐 nam,🌿 ta på gress,🎶 mood,😍 så søt,🔥 fyr"
       KIND_WORDS: "Pene ord"
       STARS: "%d av 5 stjerner"
     ABOUT:

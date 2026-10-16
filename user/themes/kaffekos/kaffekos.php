@@ -214,7 +214,7 @@ class Kaffekos extends Theme
      *
      * @return array<int, array{media: mixed, caption: string}>
      */
-    public function galleryPhotos($galleryPage, $limit = 0): array
+    public function galleryPhotos($galleryPage, $limit = 0, $random = false): array
     {
         $out = [];
         if (!$galleryPage) {
@@ -237,6 +237,9 @@ class Kaffekos extends Theme
                     $out[] = ['media' => $file, 'caption' => ''];
                 }
             }
+        }
+        if ($random) {
+            shuffle($out);
         }
         return $limit > 0 ? array_slice($out, 0, (int)$limit) : $out;
     }

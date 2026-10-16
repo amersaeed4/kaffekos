@@ -421,19 +421,41 @@
 {% set ps = header.photostrip ?? {} %}
 {% if ps.enabled is null or ps.enabled %}
     {% set gpage = page.find('/gallery') %}
-    {% set strip = kk_gallery_photos(gpage, ps.count ?: 6) %}
+    {% set shown = ps.count ?: 6 %}
+    {# a different random set from the gallery on every visit; a few extra ones wait for the Shuffle button #}
+    {% set strip_all = kk_gallery_photos(gpage, shown + 8, true) %}
+    {% set strip = strip_all|slice(0, shown) %}
+    {% set strip_pool = strip_all|slice(shown) %}
     {% if strip %}
+        {% set tags = ('KK.HOME.STRIP_TAGS'|t)|split(',') %}
+        {% set tag_start = random(0, tags|length - 1) %}
         <section class="section hm-strip">
+            <span class="hm-strip-blob hm-strip-blob-1" aria-hidden="true"></span>
+            <span class="hm-strip-blob hm-strip-blob-2" aria-hidden="true"></span>
             <div class="wrap">
-                {% include 'partials/section-head.html.twig' with {eyebrow: 'KK.NAV_GALLERY'|t, title: ps.title, subtitle: ps.subtitle} %}
+                {% set sw = (ps.title ?: '')|split(' ') %}
+                {% set sn = sw|length > 2 ? 2 : 1 %}
+                <div class="section-head hm-strip-head">
+                    <p class="eyebrow">{{ 'KK.NAV_GALLERY'|t }}</p>
+                    {% if ps.title %}<h2>{% if sw|length > sn %}{{ sw|slice(0, -sn)|join(' ') }} {% endif %}<mark>{{ sw|slice(-sn)|join(' ') }}</mark></h2>{% endif %}
+                    {% if ps.subtitle %}<p class="lead">{{ ps.subtitle }}</p>{% endif %}
+                    <span class="hm-strip-sticker" aria-hidden="true">{{ 'KK.HOME.STRIP_STICKER'|t }}</span>
+                </div>
             </div>
             <div class="wrap wrap-wide">
-                <div class="photo-strip hm-photos">
+                <div class="photo-strip hm-photos" data-shuffle-pool='{{ strip_pool|map(ph => kk.imgurl(ph.media, 560, 560))|json_encode|e('html_attr') }}'>
                     {% for ph in strip %}
-                        <a href="{{ gpage.url }}" class="photo">{{ kk.img(ph.media, 560, 560, ph.caption ?: site.title) }}</a>
+                        <a href="{{ gpage.url }}" class="photo hm-polaroid" style="--i: {{ loop.index0 }}">
+                            <span class="hm-tape" aria-hidden="true"></span>
+                            <span class="hm-polaroid-img">{{ kk.img(ph.media, 560, 560, ph.caption ?: site.title) }}</span>
+                            <span class="hm-polaroid-tag" aria-hidden="true">{{ tags[(tag_start + loop.index0 * 3) % tags|length]|trim }}</span>
+                        </a>
                     {% endfor %}
                 </div>
-                <p class="center"><a class="btn btn-primary btn-lg" href="{{ gpage.url }}">{{ 'KK.HOME.VIEW_GALLERY'|t }}</a></p>
+                <div class="hm-strip-actions">
+                    {% if strip_pool %}<button type="button" class="hm-shuffle" data-shuffle><span class="hm-shuffle-ico" aria-hidden="true">🔀</span> {{ 'KK.HOME.STRIP_SHUFFLE'|t }}</button>{% endif %}
+                    <a class="hm-gal-btn" href="{{ gpage.url }}">{{ 'KK.HOME.VIEW_GALLERY'|t }} {{ kk.icon('arrow', 20) }}</a>
+                </div>
                 {% set ig = theme_var('social.instagram') %}
                 {% if ig %}
                     {% do assets.addJs('theme://js/qrcode.js', {group: 'bottom', loading: 'defer'}) %}

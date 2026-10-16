@@ -198,6 +198,45 @@
         });
     }
 
+    /* ---------- Home photo strip: Shuffle swaps in other photos from the gallery ---------- */
+    var shuffleBtn = $('[data-shuffle]'), shuffleGrid = $('[data-shuffle-pool]');
+    if (shuffleBtn && shuffleGrid) {
+        var pool = [];
+        try { pool = JSON.parse(shuffleGrid.getAttribute('data-shuffle-pool')) || []; } catch (e) { pool = []; }
+        var cards = $$('.hm-polaroid', shuffleGrid);
+        var busy = false;
+        shuffleBtn.addEventListener('click', function () {
+            if (busy || !pool.length) return;
+            busy = true;
+            shuffleBtn.classList.add('is-spin');
+            setTimeout(function () { shuffleBtn.classList.remove('is-spin'); }, 600);
+            cards.forEach(function (card, i) {
+                var img = $('img', card);
+                var next = pool.shift();
+                if (!img || !next) return;
+                var old = img.currentSrc || img.src;
+                pool.push(old);
+                var loader = new Image();
+                loader.onload = function () {
+                    setTimeout(function () {
+                        card.classList.add('is-flip');
+                        setTimeout(function () {
+                            img.loading = 'eager';
+                            img.removeAttribute('srcset');
+                            img.src = next;
+                            card.style.setProperty('--r', (Math.random() * 6 - 3).toFixed(1) + 'deg');
+                            card.classList.remove('is-flip');
+                            card.classList.add('is-pop');
+                            setTimeout(function () { card.classList.remove('is-pop'); }, 600);
+                        }, 220);
+                    }, i * 70);
+                };
+                loader.src = next;
+            });
+            setTimeout(function () { busy = false; }, 900);
+        });
+    }
+
     /* ---------- reduced motion: also stop the SVG (SMIL) animations in the "kos" scene ---------- */
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         $$('.kos-scene svg').forEach(function (svg) { if (svg.pauseAnimations) svg.pauseAnimations(); });
