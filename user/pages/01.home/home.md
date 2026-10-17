@@ -11,6 +11,7 @@ hero:
     btn2_label: 'Find us'
     btn2_url: /contact
     show_open_badge: true
+    partner_logo: hausbrandt-logo.svg
 intro:
     enabled: true
     eyebrow: Velkommen

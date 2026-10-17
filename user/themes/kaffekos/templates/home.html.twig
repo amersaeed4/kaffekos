@@ -35,10 +35,10 @@
                 <p class="open-badge" data-open-status><span class="dot"></span><span data-open-text>{{ 'KK.HOME.HOURS_BELOW'|t }}</span></p>
             {% endif %}
             {% if show_partner %}
-                <a class="hm-brew" href="#coffee">
-                    <span class="hm-brew-cup" aria-hidden="true">{{ kk.icon('cup', 16) }}</span>
+                <a class="hm-brew{{ partner_logo ? ' has-logo' : '' }}" href="#coffee">
+                    {% if not partner_logo %}<span class="hm-brew-cup" aria-hidden="true">{{ kk.icon('cup', 16) }}</span>{% endif %}
                     <span class="hm-brew-label">{{ 'KK.HOME.BREWED_WITH'|t }}</span>
-                    {% if partner_logo %}<img class="hm-brew-logo" src="{{ partner_logo.url }}" alt="Hausbrandt" height="22">{% else %}<span class="hm-brew-mark">Hausbrandt</span>{% endif %}
+                    {% if partner_logo %}<img class="hm-brew-logo" src="{{ partner_logo.url }}" alt="Hausbrandt" height="30">{% else %}<span class="hm-brew-mark">Hausbrandt</span>{% endif %}
                     <span class="hm-brew-arrow" aria-hidden="true">{{ kk.icon('arrow', 15) }}</span>
                 </a>
             {% endif %}

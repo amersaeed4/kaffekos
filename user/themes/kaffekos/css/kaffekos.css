@@ -1952,13 +1952,16 @@ address { font-style: normal; }
 .hm-brew-cup { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #db030e; color: #fff; flex: none; }
 .hm-brew-label { opacity: .92; white-space: nowrap; }
 .hm-brew-mark { font-family: var(--font-head); font-weight: 800; font-size: 1.02rem; letter-spacing: .16em; text-transform: uppercase; color: #e6d6a2; }
-.hm-brew-logo { display: block; height: 22px; width: auto; }
+.hm-brew.has-logo { padding: .3rem .4rem .3rem 1rem; gap: .65rem; }
+.hm-brew-logo { display: block; box-sizing: content-box; height: 30px; width: auto; padding: 5px 12px; border-radius: 12px; background: #f2e6d8; box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .6); }
+.hm-brew.has-logo .hm-brew-arrow { margin-right: .5rem; }
 .hm-brew-arrow { display: grid; place-items: center; opacity: .8; transform: rotate(90deg); transition: transform .25s; }
 .hm-brew:hover .hm-brew-arrow { transform: rotate(90deg) translateX(4px); }
 @media (max-width: 600px) {
     .hm-brew { gap: .45rem; padding: .4rem .8rem .4rem .55rem; font-size: .8rem; }
     .hm-brew-cup { width: 22px; height: 22px; }
     .hm-brew-mark { font-size: .86rem; letter-spacing: .08em; }
+    .hm-brew-logo { height: 26px; padding: 4px 9px; }
 }
 
 /* ---- Hero: musical event banner (flag "Live music"), awareness banner, Pink October ---- */
