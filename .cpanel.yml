@@ -2,5 +2,10 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/hqpnorway/kaffekos.pk/
-    - /bin/rsync -av --exclude='/.git' --exclude='/.cpanel.yml' --exclude='/.gitignore' --exclude='/cache' --exclude='/logs' --exclude='/images' --exclude='/assets' --exclude='/backup' --exclude='/tmp' ./ $DEPLOYPATH
     - /bin/mkdir -p $DEPLOYPATH/cache $DEPLOYPATH/logs $DEPLOYPATH/images $DEPLOYPATH/assets $DEPLOYPATH/backup $DEPLOYPATH/tmp
+    # safety net: keep one copy of the live pages (and their photos) as they were before this deploy
+    - /bin/rm -rf $DEPLOYPATH/backup/pages-before-last-deploy && /bin/cp -a $DEPLOYPATH/user/pages $DEPLOYPATH/backup/pages-before-last-deploy || true
+    - /bin/rsync -av --exclude='/.git' --exclude='/.cpanel.yml' --exclude='/.gitignore' --exclude='/cache' --exclude='/logs' --exclude='/images' --exclude='/assets' --exclude='/backup' --exclude='/tmp' ./ $DEPLOYPATH
+    # photos/pages/theme files deleted in git are deleted on the server too (only these two folders; theme images/uploads are left alone)
+    - /bin/rsync -av --delete ./user/pages/ $DEPLOYPATH/user/pages/
+    - /bin/rsync -av --delete --exclude='/kaffekos/images' ./user/themes/ $DEPLOYPATH/user/themes/
