@@ -2,18 +2,52 @@
 {% block body_class %}page-menu{% endblock %}
 {% block hero %}
 <section class="menu-hero">
+    <div class="menu-stickers" aria-hidden="true">
+        <span class="menu-sticker" style="--x:4%;--y:18%;--r:-8deg;--d:0s;--t:5.2s">☕</span>
+        <span class="menu-sticker" style="--x:88%;--y:14%;--r:7deg;--d:.6s;--t:6s">🥪</span>
+        <span class="menu-sticker" style="--x:10%;--y:52%;--r:-5deg;--d:1.1s;--t:5.6s">🍪</span>
+        <span class="menu-sticker" style="--x:86%;--y:50%;--r:9deg;--d:.3s;--t:6.4s">🍩</span>
+        <span class="menu-sticker" style="--x:3%;--y:82%;--r:6deg;--d:1.6s;--t:5.8s">🧁</span>
+        <span class="menu-sticker" style="--x:92%;--y:84%;--r:-7deg;--d:.9s;--t:5.4s">🍔</span>
+        <span class="menu-sticker" style="--x:20%;--y:8%;--r:5deg;--d:2s;--t:6.2s">🥤</span>
+        <span class="menu-sticker" style="--x:76%;--y:7%;--r:-6deg;--d:1.3s;--t:5.9s">🍵</span>
+    </div>
     <div class="wrap">
         {% if header.banner.eyebrow %}<p class="eyebrow">{{ header.banner.eyebrow }}</p>{% endif %}
         <h1>{{ page.title }}</h1>
         {% if header.banner.subtitle %}<p class="lead">{{ header.banner.subtitle }}</p>{% endif %}
-        <label class="menu-search">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label class="menu-search" id="menu-search-box" data-hints="{{ 'KK.MENU.SEARCH_HINTS'|t }}" data-prefix="{{ 'KK.MENU.SEARCH_PREFIX'|t }}" data-found="{{ 'KK.MENU.FOUND'|t }}" data-none="{{ 'KK.MENU.FOUND_NONE'|t }}">
+            <span class="ms-ico" aria-hidden="true">🔍</span>
             <input type="search" id="menu-search" placeholder="{{ 'KK.MENU.SEARCH_PH'|t }}" autocomplete="off" aria-label="{{ 'KK.MENU.SEARCH'|t }}">
+            <span class="ms-count" id="menu-search-count" aria-live="polite" hidden></span>
+            <button type="button" class="ms-clear" id="menu-search-clear" aria-label="{{ 'KK.MENU.CLEAR'|t }}" hidden>✕</button>
         </label>
-        <div class="menu-controls" id="menu-controls" role="group" aria-label="{{ 'KK.MENU.FILTERS'|t }}"></div>
+        <div class="menu-controls" id="menu-controls">
+            <div class="mc-zone mc-cats" hidden>
+                <p class="mc-label">{{ 'KK.MENU.CRAVING'|t }}</p>
+                <div class="mc-row" id="menu-cats" role="group" aria-label="{{ 'KK.MENU.FILTERS'|t }}"></div>
+            </div>
+            <div class="mc-zone mc-tools">
+                <p class="mc-label">{{ 'KK.MENU.TOOLS'|t }}</p>
+                <div class="mc-row" id="menu-tools" data-picks-sub="{{ 'KK.MENU.PICKS_SUB'|t }}" data-surprise-sub="{{ 'KK.MENU.SURPRISE_SUB'|t }}"></div>
+            </div>
+        </div>
+        {% set pdf = page.media[header.menu_options.pdf ?: 'kaffekos-menu.pdf'] %}
+        {% if pdf %}
+            <a class="menu-dl" href="{{ pdf.url }}" download target="_blank" rel="noopener">
+                <span class="menu-dl-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 20h14"/></svg></span>
+                <span class="menu-dl-text"><strong>{{ 'KK.MENU.DOWNLOAD'|t }}</strong><small>{{ 'KK.MENU.DOWNLOAD_SUB'|t }}</small></span>
+            </a>
+        {% endif %}
     </div>
     <div class="pattern-band pattern-band-gold" aria-hidden="true"></div>
 </section>
+{% set pdf = page.media[header.menu_options.pdf ?: 'kaffekos-menu.pdf'] %}
+{% if pdf %}
+<a class="menu-dl-fab" id="menu-dl-fab" href="{{ pdf.url }}" download target="_blank" rel="noopener" aria-label="{{ 'KK.MENU.DOWNLOAD'|t }}">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 20h14"/></svg> <span>{{ 'KK.MENU.DOWNLOAD'|t }}</span>
+</a>
+{% endif %}
 {% endblock %}
 {% block content %}
 {% set cats = page.children.published %}
@@ -70,4 +104,10 @@
         </div>
     </div>
 </section>
+{% set pdf = page.media[header.menu_options.pdf ?: 'kaffekos-menu.pdf'] %}
+{% if pdf %}
+<a class="menu-dl-fab" id="menu-dl-fab" href="{{ pdf.url }}" download target="_blank" rel="noopener" aria-label="{{ 'KK.MENU.DOWNLOAD'|t }}">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 20h14"/></svg> <span>{{ 'KK.MENU.DOWNLOAD'|t }}</span>
+</a>
+{% endif %}
 {% endblock %}

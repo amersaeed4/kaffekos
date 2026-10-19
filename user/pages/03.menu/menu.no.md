@@ -1,5 +1,5 @@
 ---
-title: 'Vår meny'
+title: 'Kaffekos-meny'
 menu: Meny
 banner:
     eyebrow: 'Meny'
@@ -7,6 +7,7 @@ banner:
 menu_options:
     show_prices: false
     show_images: true
+    pdf: kaffekos-menu.pdf
     note: 'Si fra om eventuelle allergier når du bestiller.'
 seo:
     title: 'Meny | Kaffe, matcha, milkshaker og sandwicher | Kaffekos Lahore'

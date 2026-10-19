@@ -323,10 +323,17 @@
         $$('.menu-section').forEach(function (s) { spy.observe(s); });
     }
 
+    /* ---------- menu: floating download button appears once the hero is scrolled past ---------- */
+    var dlFab = $('#menu-dl-fab'), dlHero = $('.menu-dl');
+    if (dlFab) {
+        var showFab = function () { dlFab.classList.toggle('is-shown', window.scrollY > (dlHero ? dlHero.getBoundingClientRect().bottom + window.scrollY : 500)); };
+        window.addEventListener('scroll', showFab, { passive: true }); showFab();
+    }
+
     /* ---------- menu: section switch, live search, favourites, surprise ---------- */
     var menuBlocks = $$('[data-menu-block]');
     if (menuBlocks.length) {
-        var q = $('#menu-search'), none = $('#menu-empty'), ctl = $('#menu-controls');
+        var q = $('#menu-search'), none = $('#menu-empty'), catsEl = $('#menu-cats'), toolsEl = $('#menu-tools');
         var groups = $$('.menu-group'), tabsAll = $$('.menu-tabs a');
         var state = { term: '', group: '', favs: false };
         var FAV_KEY = 'kk-menu-favs', favs = {};
@@ -355,35 +362,49 @@
             });
         });
 
-        /* controls: section switch + my picks + surprise me */
-        var mk = function (cls, html, onclick) {
+        /* food-type chips (what to show) and tool cards (what to do) */
+        var emojiFor = function (label) {
+            var l = label.toLowerCase();
+            if (/drink|drikk|coffee|kaffe/.test(l)) return '☕';
+            if (/sandwich|burger/.test(l)) return '🥪';
+            if (/bak|dessert|sweet|cake|søt/.test(l)) return '🍪';
+            return '🍽️';
+        };
+        var mk = function (target, cls, html, onclick) {
             var b = document.createElement('button');
-            b.type = 'button'; b.className = 'menu-chip ' + cls; b.innerHTML = html; b.addEventListener('click', onclick);
-            ctl.appendChild(b); return b;
+            b.type = 'button'; b.className = cls; b.innerHTML = html; b.addEventListener('click', onclick);
+            target.appendChild(b); return b;
         };
         var chips = [];
         if (groups.length > 1) {
-            var all = mk('', T.allMenu, function () { state.group = ''; update(); });
+            catsEl.parentNode.hidden = false;
+            var chipHtml = function (emoji, label) { return '<span class="mc-emoji" aria-hidden="true">' + emoji + '</span><span>' + label + '</span>'; };
+            var all = mk(catsEl, 'menu-chip', chipHtml('✨', T.allMenu), function () { state.group = ''; update(); });
             all.dataset.group = ''; chips.push(all);
             groups.forEach(function (g) {
-                var c = mk('', g.getAttribute('data-group-label'), function () { state.group = g.getAttribute('data-group'); update(); });
+                var label = g.getAttribute('data-group-label');
+                var c = mk(catsEl, 'menu-chip', chipHtml(emojiFor(label), label), function () { state.group = g.getAttribute('data-group'); update(); });
                 c.dataset.group = g.getAttribute('data-group'); chips.push(c);
             });
         }
-        var favChip = mk('chip-fav', heart + ' <span>' + T.myPicks + '</span> <b class="chip-count">0</b>', function () { state.favs = !state.favs; update(); });
-        mk('chip-surprise', '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg> ' + T.surprise, function () {
+        var toolHtml = function (icon, title, sub, extra) { return '<span class="tool-ico" aria-hidden="true">' + icon + '</span><span class="tool-txt"><strong>' + title + '</strong><small>' + sub + '</small></span>' + (extra || ''); };
+        var favChip = mk(toolsEl, 'menu-tool chip-fav', toolHtml(heart, T.myPicks, toolsEl.getAttribute('data-picks-sub'), '<b class="chip-count">0</b>'), function () { state.favs = !state.favs; update(); });
+        var diceBtn = mk(toolsEl, 'menu-tool chip-surprise', toolHtml('🎲', T.surprise, toolsEl.getAttribute('data-surprise-sub')), function () {
+            diceBtn.classList.remove('is-rolling'); void diceBtn.offsetWidth; diceBtn.classList.add('is-rolling');
             var pool = allItems.filter(function (it) { return !it.hidden && !it.closest('[hidden]'); });
             if (!pool.length) return;
             var it = pool[Math.floor(Math.random() * pool.length)];
             $$('.is-picked').forEach(function (x) { x.classList.remove('is-picked'); });
-            it.scrollIntoView({ block: 'center', behavior: 'smooth' });
-            void it.offsetWidth; it.classList.add('is-picked');
-            setTimeout(function () { it.classList.remove('is-picked'); }, 3200);
+            setTimeout(function () {
+                it.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                void it.offsetWidth; it.classList.add('is-picked');
+                setTimeout(function () { it.classList.remove('is-picked'); }, 3200);
+            }, 450);
         });
 
         /* apply the search, section and favourites filters together */
         var update = function () {
-            var term = state.term.toLowerCase(), any = false, filtering = !!(term || state.group || state.favs);
+            var total = 0, term = state.term.toLowerCase(), any = false, filtering = !!(term || state.group || state.favs);
             groups.forEach(function (g) {
                 var gHidden = !!state.group && g.getAttribute('data-group') !== state.group, gAny = false;
                 $$('[data-menu-block]', g).forEach(function (b) {
@@ -393,7 +414,7 @@
                         it.hidden = !hit; if (hit) shown++;
                     });
                     b.hidden = gHidden || !shown;
-                    if (!b.hidden) { gAny = true; b.classList.add('is-visible'); }
+                    if (!b.hidden) { gAny = true; total += shown; b.classList.add('is-visible'); }
                 });
                 $$('.menu-filler', g).forEach(function (f) { f.hidden = filtering; });
                 g.hidden = gHidden || !gAny;
@@ -405,11 +426,43 @@
             favChip.classList.toggle('is-active', state.favs); favChip.setAttribute('aria-pressed', state.favs);
             favChip.classList.toggle('has-favs', n > 0);
             favChip.querySelector('.chip-count').textContent = n;
+            searchFeedback(term, total);
             if (none) {
                 none.hidden = any || !filtering;
                 none.textContent = state.favs && !term ? T.noPicks : T.noMatch;
             }
         };
+        /* funky search: typing placeholder, result bubble, clear button */
+        var sBox = $('#menu-search-box'), sCount = $('#menu-search-count'), sClear = $('#menu-search-clear');
+        var searchFeedback = function (term, total) {
+            if (!sBox) return;
+            sClear.hidden = !q.value;
+            if (!term) { sCount.hidden = true; return; }
+            sCount.textContent = total ? sBox.getAttribute('data-found').replace('{n}', total) : sBox.getAttribute('data-none');
+            sCount.classList.toggle('is-none', !total);
+            sCount.hidden = false; sCount.classList.remove('is-pop'); void sCount.offsetWidth; sCount.classList.add('is-pop');
+        };
+        if (sBox && q) {
+            sClear.addEventListener('click', function () { q.value = ''; q.dispatchEvent(new Event('input')); q.focus(); });
+            var hints = (sBox.getAttribute('data-hints') || '').split('|').filter(Boolean), base = q.getAttribute('placeholder'), pre = sBox.getAttribute('data-prefix') || '';
+            if (hints.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                var hi = 0, ci = 0, typing = true, timer;
+                var tick = function () {
+                    if (document.activeElement === q || q.value) { q.setAttribute('placeholder', base); timer = setTimeout(tick, 1200); ci = 0; typing = true; return; }
+                    var h = hints[hi];
+                    if (typing) {
+                        ci++; q.setAttribute('placeholder', pre + h.slice(0, ci) + '|'.slice(0, ci % 2));
+                        if (ci >= h.length) { typing = false; timer = setTimeout(tick, 1500); return; }
+                        timer = setTimeout(tick, 70);
+                    } else {
+                        ci--; q.setAttribute('placeholder', pre + h.slice(0, Math.max(ci, 0)));
+                        if (ci <= 0) { typing = true; hi = (hi + 1) % hints.length; timer = setTimeout(tick, 300); return; }
+                        timer = setTimeout(tick, 35);
+                    }
+                };
+                timer = setTimeout(tick, 1800);
+            }
+        }
         if (q) q.addEventListener('input', function () { state.term = q.value.trim(); update(); });
         update();
     }

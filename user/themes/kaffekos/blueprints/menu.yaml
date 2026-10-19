@@ -56,6 +56,13 @@ form:
                 0: 'No'
               validate:
                 type: bool
+            header.menu_options.pdf:
+              type: filepicker
+              label: Menu PDF (download button)
+              help: 'The PDF people can download from the Menu page. Upload a new PDF on the first tab (Page Media), save, then pick it here. If empty, kaffekos-menu.pdf is used.'
+              accept:
+                - .pdf
+              preview_images: false
             header.menu_options.note:
               type: textarea
               rows: 3

@@ -1,5 +1,5 @@
 ---
-title: 'Our Menu'
+title: 'Kaffekos Menu'
 menu: Menu
 banner:
     eyebrow: 'Meny'
@@ -7,6 +7,7 @@ banner:
 menu_options:
     show_prices: false
     show_images: true
+    pdf: kaffekos-menu.pdf
     note: 'Please tell us about any allergies when you order.'
 seo:
     title: 'Menu | Coffee, Matcha, Shakes & Sandwiches | Kaffekos Lahore'
