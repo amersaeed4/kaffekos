@@ -48,6 +48,7 @@ form:
                 norway: 'Norway stamp'
                 sandwich-boy: 'Boy on a sandwich'
                 sandwich-duo: 'Chef and walking sandwich'
+                bakery-mix: 'Burger, donut, cookie and brownie'
         items:
           type: tab
           title: Menu Items
