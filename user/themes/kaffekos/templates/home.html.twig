@@ -25,8 +25,8 @@
         <h1>{% if hw|length > 1 %}{{ hw|slice(0, -1)|join(' ') }} {% endif %}<em>{{ hw|last }}</em></h1>
         {% if hero.subtitle %}<p class="lead">{{ hero.subtitle }}</p>{% endif %}
         <div class="hero-actions">
-            {% if hero.btn1_label %}<a class="btn btn-primary btn-lg" href="{{ kk.href(hero.btn1_url ?: '/menu') }}">{{ hero.btn1_label }}</a>{% endif %}
-            {% if hero.btn2_label %}<a class="btn btn-ghost btn-lg" href="{{ kk.href(hero.btn2_url ?: '/contact') }}">{{ hero.btn2_label }}</a>{% endif %}
+            {% if hero.btn1_label %}<a class="btn btn-primary btn-lg hm-btn-stuck" href="{{ kk.href(hero.btn1_url ?: '/menu') }}">{{ hero.btn1_label }}{{ kk.sticker('coffee') }}{{ kk.sticker('croissant') }}</a>{% endif %}
+            {% if hero.btn2_label %}<a class="btn btn-ghost btn-lg hm-btn-stuck" href="{{ kk.href(hero.btn2_url ?: '/contact') }}">{{ hero.btn2_label }}{{ kk.sticker('pin') }}</a>{% endif %}
         </div>
         {% set show_partner = hero.show_partner is null or hero.show_partner %}
         {% set partner_logo = hero.partner_logo ? page.media[hero.partner_logo] : null %}

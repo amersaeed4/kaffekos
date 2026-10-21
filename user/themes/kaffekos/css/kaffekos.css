@@ -2102,6 +2102,22 @@ address { font-style: normal; }
     .hm-eq i { transform: scaleY(.6); }
 }
 
+/* ---- Hero buttons: stickers peeking out of the edges ---- */
+.hm-btn-stuck { position: relative; overflow: visible; }
+.hm-stick { --r: 0deg; position: absolute; z-index: 2; width: 40px; height: 40px; pointer-events: none; transform: rotate(var(--r)); filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .4)); animation: hm-stick-bob 3.6s ease-in-out infinite alternate; transition: scale .35s cubic-bezier(.3, 1.8, .5, 1); }
+.hm-stick svg { display: block; width: 100%; height: 100%; }
+.hm-stick-coffee { --r: 12deg; top: -22px; right: 22px; }
+.hm-stick-croissant { --r: -14deg; top: -20px; left: 12px; width: 38px; height: 38px; animation-delay: -1.2s; }
+.hm-stick-pin { --r: -12deg; top: -22px; right: 14px; animation-delay: -.8s; }
+@keyframes hm-stick-bob { to { transform: translateY(-5px) rotate(calc(var(--r) + 7deg)); } }
+.hm-btn-stuck:hover .hm-stick { scale: 1.22; animation-duration: 1.2s; }
+@media (max-width: 600px) {
+    .hm-stick { width: 34px; height: 34px; }
+    .hm-stick-croissant { width: 32px; height: 32px; }
+    .hm-stick-pin { right: auto; left: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .hm-stick { animation: none; } }
+
 @media (max-width: 1100px) {
     .hm-chip { display: none; }
     .hm-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
