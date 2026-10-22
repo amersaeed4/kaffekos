@@ -1248,6 +1248,16 @@ address { font-style: normal; }
 .ev-post-card .prose p:has(> img) { margin: 1.8rem 0 .6rem; }
 .ev-post-card .prose p:has(> img) + p > em:only-child { color: var(--muted); font-size: .92rem; }
 .ev-post-card .prose a { color: var(--ev-coral); font-weight: 700; }
+.ev-post-card .prose a.ev-btn { color: #fff; font-weight: 800; margin: .4rem 0 .6rem; }
+.ev-post-card .prose a.ev-btn.ev-btn-alt { color: var(--ev-ink); }
+/* ticket partner button: white logo on a dark pill */
+.ev-post-card .prose a:has(> img.ev-tw-logo) {
+    display: inline-flex; align-items: center; gap: 1rem; margin: .4rem 0 .6rem; padding: .85rem 1.5rem; border: 3px solid var(--ev-ink); border-radius: 999px;
+    background: var(--ev-ink); color: #fff; text-decoration: none; box-shadow: 5px 5px 0 var(--ev-coral); transition: transform .18s cubic-bezier(.3, 1.6, .5, 1), box-shadow .18s;
+}
+.ev-post-card .prose a:has(> img.ev-tw-logo)::after { content: "\2192"; font-size: 1.5rem; font-weight: 800; color: var(--ev-saffron); }
+.ev-post-card .prose a:has(> img.ev-tw-logo):hover { transform: translate(-2px, -4px) rotate(-2deg); box-shadow: 8px 9px 0 var(--ev-coral); }
+.ev-post-card .prose img.ev-tw-logo { display: block; height: 2.6rem; width: auto; margin: 0; border: 0; box-shadow: none; border-radius: 0; background: none; }
 
 @media (max-width: 760px) {
     .ev-chip { display: none; }

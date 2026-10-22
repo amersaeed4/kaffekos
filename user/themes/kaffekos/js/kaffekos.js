@@ -638,7 +638,7 @@
     /* ---------- event post: every photo opens in a viewer with previous / next ---------- */
     var evBox = $('#ev-lightbox');
     if (evBox && typeof evBox.showModal === 'function') {
-        var evItems = $$('.ev-post-card .ev-zoom, .ev-post-card .prose img');
+        var evItems = $$('.ev-post-card .ev-zoom, .ev-post-card .prose img:not(.ev-tw-logo)');
         if (evItems.length) {
             var evFig = $('figure', evBox), evImg = $('img', evBox), evTxt = $('.lightbox-text', evBox), evNum = $('.lightbox-count', evBox), evCur = 0;
             var evSrc = function (el) { return el.tagName === 'A' ? el.getAttribute('href') : (el.currentSrc || el.src); };
