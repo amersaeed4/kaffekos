@@ -231,6 +231,17 @@ form:
                 max: 168
               help: 'How often the site asks Google for fresh numbers. 6 = 4 times a day.'
 
+            google.max_calls_per_month:
+              type: number
+              label: Maximum calls to Google per month
+              default: 150
+              size: x-small
+              validate:
+                type: int
+                min: 1
+                max: 900
+              help: 'Hard safety limit for the whole month (Lahore time). Google charges after about 1,000 calls a month for this data, so keep it well below that. At the default refresh of 6 hours the site needs about 125 calls a month.'
+
             google.max_calls_per_day:
               type: number
               label: Maximum calls to Google per day

@@ -16,3 +16,6 @@ Thumbs.db
 
 # Secrets (API keys)
 /user/config/google-places.yaml
+
+# Runtime state of the Google rating limiter (must stay on each server, never overwritten by a deploy)
+/user/data/kaffekos/

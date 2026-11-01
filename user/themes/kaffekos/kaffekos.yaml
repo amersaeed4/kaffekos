@@ -46,6 +46,7 @@ business:
 google:
   refresh_hours: 6
   max_calls_per_day: 6
+  max_calls_per_month: 150
   review_url: ''
 
 hours:

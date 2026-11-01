@@ -244,16 +244,29 @@ class Kaffekos extends Theme
         return $limit > 0 ? array_slice($out, 0, (int)$limit) : $out;
     }
 
+    private bool $ratingDone = false;
+    private ?array $ratingResult = null;
+
     /**
      * Live Google rating + review count for the café (Places API "Place Details").
      * Needs user/config/google-places.yaml (git-ignored): api_key + place_id. Without it, or if Google can't be reached,
      * returns the last good value, or null so templates fall back to the text typed in the admin.
-     * Refresh interval and the daily call limit are theme settings (defaults: every 6 hours, max 6 calls a day); a failed call is retried after 15 minutes. That keeps it far inside Google's free quota.
+     *
+     * Google bills this API, so the number of calls is limited hard, in this order:
+     *  - the numbers are refreshed at most every N hours (theme setting, default 6),
+     *  - at most N calls per day and N per month (theme settings), failed calls included,
+     *  - only ONE visitor at a time may call Google (file lock), everybody else gets the stored numbers.
+     * The state lives in user/data/kaffekos/ (NOT in Grav's cache, which is wiped on every deploy, settings save and update).
      *
      * @return array{rating: float, count: int}|null
      */
     public function googleRating(): ?array
     {
+        if ($this->ratingDone) {
+            return $this->ratingResult;
+        }
+        $this->ratingDone = true;
+
         $cfg   = $this->grav['config'];
         $key   = trim((string)$cfg->get('google-places.api_key'));
         $place = trim((string)$cfg->get('google-places.place_id'));
@@ -261,36 +274,83 @@ class Kaffekos extends Theme
             return null;
         }
 
-        // Both limits come from Admin -> Themes -> Kaffekos -> Google Rating
+        // Limits come from Admin -> Themes -> Kaffekos -> Google Rating
         $refreshHours = max(1, min(168, (int)$cfg->get('themes.kaffekos.google.refresh_hours', 6)));
-        $maxCalls     = max(1, min(100, (int)$cfg->get('themes.kaffekos.google.max_calls_per_day', 6)));
+        $maxDay       = max(1, min(100, (int)$cfg->get('themes.kaffekos.google.max_calls_per_day', 6)));
+        $maxMonth     = max(1, min(900, (int)$cfg->get('themes.kaffekos.google.max_calls_per_month', 150)));
 
-        $cache = $this->grav['cache'];
-        $id    = 'kk-google-rating-' . md5($place . $key);
-        $data  = $cache->fetch($id);
-        $data  = is_array($data) ? $data : [];
+        $dir = rtrim((string)$this->grav['locator']->findResource('user://data', true, true), '/') . '/kaffekos';
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            return null;
+        }
+        $base  = $dir . '/google-rating-' . substr(md5($place), 0, 10);
+        $state = $this->readRatingState($base . '.json');
 
-        if (empty($data['next']) || $data['next'] <= time()) {
-            // Hard self-imposed limit: never more than $maxCalls calls to Google per Lahore day
-            // (set in the theme settings), whatever else happens.
-            $today = gmdate('Y-m-d', time() + 5 * 3600);
-            if (($data['day'] ?? '') !== $today) {
-                $data['day']   = $today;
-                $data['calls'] = 0;
-            }
-            if ($data['calls'] < $maxCalls) {
-                $data['calls']++;
-                $fresh = $this->fetchGooglePlace($key, $place, (string)$cfg->get('google-places.endpoint'));
-                if ($fresh) {
-                    $data = $fresh + ['next' => time() + $refreshHours * 3600, 'day' => $data['day'], 'calls' => $data['calls']];
-                } else {
-                    $data['next'] = time() + 15 * 60;
+        $now = time();
+        if (empty($state['next']) || $state['next'] <= $now) {
+            $lock = @fopen($base . '.lock', 'c');
+            if ($lock && flock($lock, LOCK_EX | LOCK_NB)) {
+                // somebody may have refreshed while we were waiting: look again under the lock
+                $state = $this->readRatingState($base . '.json');
+                if (empty($state['next']) || $state['next'] <= $now) {
+                    $lahore = $now + 5 * 3600;
+                    $day    = gmdate('Y-m-d', $lahore);
+                    $month  = gmdate('Y-m', $lahore);
+                    if (($state['day'] ?? '') !== $day) {
+                        $state['day']       = $day;
+                        $state['calls_day'] = 0;
+                    }
+                    if (($state['month'] ?? '') !== $month) {
+                        $state['month']       = $month;
+                        $state['calls_month'] = 0;
+                    }
+                    if (($state['calls_day'] ?? 0) < $maxDay && ($state['calls_month'] ?? 0) < $maxMonth) {
+                        $state['calls_day']++;
+                        $state['calls_month']++;
+                        // count the call and hold the next one back BEFORE asking Google, so a crash or timeout can't cause a retry storm
+                        $state['next'] = $now + 15 * 60;
+                        $this->writeRatingState($base . '.json', $state);
+
+                        $fresh = $this->fetchGooglePlace($key, $place, (string)$cfg->get('google-places.endpoint'));
+                        if ($fresh) {
+                            $state = $fresh + ['next' => $now + $refreshHours * 3600] + $state;
+                            $state['rating'] = $fresh['rating'];
+                            $state['count']  = $fresh['count'];
+                            $state['next']   = $now + $refreshHours * 3600;
+                        }
+                        $this->grav['log']->info('Kaffekos Google rating: called Google (' . ($fresh ? 'ok' : 'failed') . '), today ' . $state['calls_day'] . '/' . $maxDay . ', month ' . $state['calls_month'] . '/' . $maxMonth);
+                    } else {
+                        $state['next'] = $now + 15 * 60; // limit reached: look again later, no call
+                    }
+                    $this->writeRatingState($base . '.json', $state);
                 }
-                $cache->save($id, $data, 30 * 86400);
+                flock($lock, LOCK_UN);
+            }
+            if ($lock) {
+                fclose($lock);
             }
         }
 
-        return isset($data['rating'], $data['count']) ? ['rating' => (float)$data['rating'], 'count' => (int)$data['count']] : null;
+        if (isset($state['rating'], $state['count'])) {
+            $this->ratingResult = ['rating' => (float)$state['rating'], 'count' => (int)$state['count']];
+        }
+        return $this->ratingResult;
+    }
+
+    private function readRatingState(string $file): array
+    {
+        $json = is_file($file) ? @file_get_contents($file) : false;
+        $data = is_string($json) ? json_decode($json, true) : null;
+        return is_array($data) ? $data : [];
+    }
+
+    /** Write to a temporary file and rename it, so a reader never sees a half-written file. */
+    private function writeRatingState(string $file, array $state): void
+    {
+        $tmp = $file . '.' . getmypid() . '.tmp';
+        if (@file_put_contents($tmp, json_encode($state)) !== false) {
+            @rename($tmp, $file);
+        }
     }
 
     /**
