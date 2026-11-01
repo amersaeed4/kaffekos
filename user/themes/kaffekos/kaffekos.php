@@ -337,6 +337,87 @@ class Kaffekos extends Theme
         return $this->ratingResult;
     }
 
+    /**
+     * Facts about the Google limiter for the admin (Home dashboard widget and the Google Rating tab).
+     *
+     * @return array<string, mixed>  level = ok | warn | limit | off
+     */
+    public static function googleStatusData(): array
+    {
+        $out = ['level' => 'off', 'setup' => false, 'rating' => null, 'count' => null, 'calls_day' => 0, 'max_day' => 6,
+            'calls_month' => 0, 'max_month' => 150, 'next_in' => null, 'refresh_hours' => 6, 'message' => ''];
+        try {
+            $grav  = \Grav\Common\Grav::instance();
+            $cfg   = $grav['config'];
+            $place = trim((string)$cfg->get('google-places.place_id'));
+            $out['max_day']       = max(1, min(100, (int)$cfg->get('themes.kaffekos.google.max_calls_per_day', 6)));
+            $out['max_month']     = max(1, min(900, (int)$cfg->get('themes.kaffekos.google.max_calls_per_month', 150)));
+            $out['refresh_hours'] = max(1, min(168, (int)$cfg->get('themes.kaffekos.google.refresh_hours', 6)));
+            if (trim((string)$cfg->get('google-places.api_key')) === '' || $place === '') {
+                $out['message'] = 'NOT SET UP: the file user/config/google-places.yaml with the API key and Place ID is missing on this server. The Home page shows the typed numbers.';
+                return $out;
+            }
+            $out['setup'] = true;
+            $file = rtrim((string)$grav['locator']->findResource('user://data', true, true), '/') . '/kaffekos/google-rating-' . substr(md5($place), 0, 10) . '.json';
+            $json = is_file($file) ? @file_get_contents($file) : false;
+            $st   = is_string($json) ? json_decode($json, true) : null;
+            if (!is_array($st)) {
+                $out['level']   = 'ok';
+                $out['message'] = 'No call to Google yet. The first visitor of the Home page triggers it.';
+                return $out;
+            }
+
+            $now    = time();
+            $lahore = $now + 5 * 3600;
+            $out['calls_day']   = (($st['day'] ?? '') === gmdate('Y-m-d', $lahore)) ? (int)($st['calls_day'] ?? 0) : 0;
+            $out['calls_month'] = (($st['month'] ?? '') === gmdate('Y-m', $lahore)) ? (int)($st['calls_month'] ?? 0) : 0;
+            if (isset($st['rating'], $st['count'])) {
+                $out['rating'] = (float)$st['rating'];
+                $out['count']  = (int)$st['count'];
+            }
+            if (!empty($st['next'])) {
+                $out['next_in'] = (int)$st['next'] - $now;
+            }
+
+            $out['level'] = 'ok';
+            if ($out['calls_month'] >= $out['max_month']) {
+                $out['level']   = 'limit';
+                $out['message'] = 'MONTHLY LIMIT REACHED: no more calls to Google until next month.';
+            } elseif ($out['calls_day'] >= $out['max_day']) {
+                $out['level']   = 'limit';
+                $out['message'] = 'DAILY LIMIT REACHED: no more calls to Google until tomorrow.';
+            } elseif ($out['calls_month'] >= $out['max_month'] * 0.8) {
+                $out['level']   = 'warn';
+                $out['message'] = 'Almost at the monthly limit.';
+            } elseif ($out['rating'] === null) {
+                $out['level']   = 'warn';
+                $out['message'] = 'No successful answer from Google yet. The Home page shows the typed numbers.';
+            }
+        } catch (\Throwable $e) {
+            $out['message'] = 'Status not available.';
+        }
+        return $out;
+    }
+
+    /** The same facts as one plain-text line (Admin -> Themes -> Kaffekos -> Google Rating, via data-text@ in the blueprint). */
+    public static function googleStatusText(): string
+    {
+        $d = self::googleStatusData();
+        if (!$d['setup'] || $d['calls_day'] + $d['calls_month'] === 0 && $d['rating'] === null) {
+            return $d['message'] . (!$d['setup'] ? '' : ' Limits: ' . $d['max_day'] . ' a day, ' . $d['max_month'] . ' a month.');
+        }
+        $parts = [];
+        $parts[] = $d['rating'] !== null ? 'Google says ' . number_format($d['rating'], 1) . ' stars from ' . $d['count'] . ' reviews' : 'No successful answer from Google yet (the Home page shows the typed numbers)';
+        $parts[] = 'calls today: ' . $d['calls_day'] . ' of ' . $d['max_day'];
+        $parts[] = 'this month: ' . $d['calls_month'] . ' of ' . $d['max_month'];
+        if ($d['next_in'] !== null) {
+            $in = $d['next_in'];
+            $parts[] = $in > 0 ? 'next refresh in about ' . ($in >= 3600 ? round($in / 3600, 1) . ' hours' : max(1, (int)ceil($in / 60)) . ' minutes') : 'next refresh at the next visit';
+        }
+        $text = implode(' · ', $parts) . '.';
+        return in_array($d['level'], ['limit', 'warn'], true) && $d['message'] !== '' && $d['rating'] !== null ? $d['message'] . ' ' . $text : $text;
+    }
+
     private function readRatingState(string $file): array
     {
         $json = is_file($file) ? @file_get_contents($file) : false;

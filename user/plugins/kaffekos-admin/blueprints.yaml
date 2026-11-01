@@ -1,0 +1,23 @@
+name: Kaffekos Admin
+slug: kaffekos-admin
+type: plugin
+version: 1.0.0
+description: 'Adds a "Google rating" status widget to the Admin 2 dashboard (calls used today and this month, current rating). Reads its numbers from the Kaffekos theme.'
+icon: star
+author:
+  name: Kaffekos
+license: MIT
+
+form:
+  validation: loose
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin status
+      highlight: 1
+      default: 1
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
