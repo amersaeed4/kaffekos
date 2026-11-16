@@ -266,7 +266,7 @@ form:
             hours_intro:
               type: spacer
               title: Opening hours
-              text: 'Use 24-hour times like 08:00 and 23:00. A time after midnight (for example 01:00) is fine. The site shows "Open now / Closed" automatically in Lahore time.'
+              text: 'Use 24-hour times like 08:00 and 23:00. A time after midnight (for example 03:00) is fine. The site shows "Open now / Closed" automatically in Lahore time.'
 
             hours:
               type: list

@@ -75,7 +75,7 @@
         var today = byDay[now.day];
         var yest = byDay[DAYS[(idx + 6) % 7]];
 
-        // still open from yesterday's late session (e.g. closes 01:00)?
+        // still open from yesterday's late session (e.g. closes 03:00)?
         if (yest && !yest.closed) {
             var yo = toMin(yest.open), yc = toMin(yest.close);
             if (yo !== null && yc !== null && yc <= yo && now.min < yc) return { open: true, text: fill(T.openNow, { time: fmt(yest.close) }) };
