@@ -10,11 +10,11 @@ when: 'Lørdag 28. november, fra kl. 20.00'
 event_start: '2026-11-28 20:00'
 event_end: '2026-11-29 01:00'
 where: 'Grand Park, Shouq Chowk, Johar Town, Lahore'
-summary: 'DJ Ahsan tar over DJ-settet på Kaffekos lørdag 28. november, fra kl. 20. Røde lys, store beats og hele gjengen din.'
+summary: 'DJ Ahsan tar over DJ-settet på Kaffekos lørdag 28. november, fra kl. 20. Røde lys, store beats og hele gjengen din. Kjøp billettene på nett.'
 seo:
     title: 'DJ Ahsan Night, 28. november | Kaffekos Lahore'
-    description: 'DJ Ahsan Night på Kaffekos, den norske kaffebaren i Johar Town, Lahore. Lørdag 28. november 2026 fra kl. 20 i Grand Park, Shouq Chowk. Billetter via TicketWala.'
-    keywords: 'DJ Ahsan, DJ Ahsan Night, DJ-kveld Lahore, DJ-kveld Johar Town, lørdagskveld Lahore, ting å gjøre i Lahore, fest Lahore november 2026, Kaffekos arrangementer, norsk kaffebar Lahore'
+    description: 'DJ Ahsan Night på Kaffekos, den norske kaffebaren i Johar Town, Lahore. Lørdag 28. november 2026 fra kl. 20 i Grand Park, Shouq Chowk. Kjøp billetter på nett via TicketWala.'
+    keywords: 'DJ Ahsan, DJ Ahsan Night, DJ-kveld Lahore, DJ-kveld Johar Town, lørdagskveld Lahore, ting å gjøre i Lahore, fest Lahore november 2026, DJ Ahsan billetter, TicketWala, Kaffekos arrangementer, norsk kaffebar Lahore'
 ---
 
 ## Lørdagskvelden ble akkurat litt høyere.
@@ -32,7 +32,9 @@ Tenk røde lys, tunge beats og et publikum som kom for å danse. God kaffe og go
 
 ### Billetter
 
-Billettene er tilgjengelige via **TicketWala**. Følg oss på Instagram [@kaffekospakistan](https://www.instagram.com/kaffekospakistan/) for siste nytt om billetter og inngang.
+**Kjøp billettene dine på nett** via **TicketWala**. Ikke vent til siste liten.
+
+[![TicketWala: Kjøp billetter på TicketWala](ticketwala-logo.webp?classes=ev-tw-logo)](https://ticketwala.pk/event/kaffekos-dj-night-8568?target=_blank "Kjøp billetter på TicketWala")
 
 ### Ta med gruppechatten
 
